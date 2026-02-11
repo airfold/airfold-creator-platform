@@ -1,0 +1,205 @@
+import { motion } from 'framer-motion';
+import Badge from '../../../components/Badge';
+import ProgressBar from '../../../components/ProgressBar';
+import { getCurrentCreator } from '../../../data/creators';
+
+export default function HealthScore() {
+  const creator = getCurrentCreator();
+  const score = creator.healthScore;
+
+  const scoreColor = score >= 80 ? '#10b981' : score >= 50 ? '#f59e0b' : '#ef4444';
+  const status = score >= 80 ? 'Eligible' : score >= 50 ? 'At Risk' : 'Under Review';
+  const statusColor = score >= 80 ? 'green' : score >= 50 ? 'amber' : 'red';
+
+  // Mock health metrics
+  const metrics = {
+    sameIPPercent: creator.flags.includes('same_ip_cluster') ? 42 : 3,
+    bounceRate: creator.flags.includes('high_bounce_rate') ? 68 : 22,
+    avgSessionTime: creator.flags.includes('low_session_time') ? '0:18' : '4:32',
+    rating: creator.rating,
+    ratingCount: creator.ratingCount,
+  };
+
+  const ratingMeetsMinimum = metrics.rating >= 3.0 && metrics.ratingCount >= 15;
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-bold mb-1">Health Score</h1>
+        <p className="text-white/40">Traffic quality and eligibility status</p>
+      </div>
+
+      {/* Score hero */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="glass-card p-8 flex flex-col items-center"
+      >
+        <div className="relative w-40 h-40 mb-6">
+          <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="8" />
+            <motion.circle
+              cx="60" cy="60" r="52"
+              fill="none"
+              stroke={scoreColor}
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeDasharray={`${2 * Math.PI * 52}`}
+              initial={{ strokeDashoffset: 2 * Math.PI * 52 }}
+              animate={{ strokeDashoffset: 2 * Math.PI * 52 * (1 - score / 100) }}
+              transition={{ duration: 1.5, ease: 'easeOut' }}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-4xl font-black" style={{ color: scoreColor }}>{score}</span>
+            <span className="text-xs text-white/40">/ 100</span>
+          </div>
+        </div>
+
+        <Badge label={status} color={statusColor as 'green' | 'amber' | 'red'} />
+        <p className="text-sm text-white/40 mt-2">
+          {score >= 80
+            ? "Your traffic looks healthy. You're eligible for full payouts."
+            : score >= 50
+              ? 'Some metrics need attention. Your account may be reviewed.'
+              : 'Your account is under review due to suspicious patterns.'}
+        </p>
+      </motion.div>
+
+      {/* Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="glass-card p-6"
+        >
+          <h3 className="text-lg font-semibold mb-4">Traffic Quality Flags</h3>
+          <div className="space-y-5">
+            <div>
+              <div className="flex justify-between mb-2">
+                <span className="text-sm text-white/50">Same IP Cluster</span>
+                <span className={`text-sm font-semibold ${metrics.sameIPPercent > 20 ? 'text-danger' : 'text-success'}`}>
+                  {metrics.sameIPPercent}%
+                </span>
+              </div>
+              <ProgressBar
+                value={metrics.sameIPPercent}
+                max={100}
+                showValue={false}
+                color={metrics.sameIPPercent > 20 ? 'linear-gradient(90deg, #ef4444, #ef4444)' : undefined}
+              />
+              <p className="text-xs text-white/30 mt-1">
+                {metrics.sameIPPercent > 20 ? 'High same-IP traffic detected' : 'Normal distribution'}
+              </p>
+            </div>
+
+            <div>
+              <div className="flex justify-between mb-2">
+                <span className="text-sm text-white/50">Bounce Rate</span>
+                <span className={`text-sm font-semibold ${metrics.bounceRate > 50 ? 'text-danger' : 'text-success'}`}>
+                  {metrics.bounceRate}%
+                </span>
+              </div>
+              <ProgressBar
+                value={metrics.bounceRate}
+                max={100}
+                showValue={false}
+                color={metrics.bounceRate > 50 ? 'linear-gradient(90deg, #ef4444, #ef4444)' : undefined}
+              />
+              <p className="text-xs text-white/30 mt-1">
+                {metrics.bounceRate > 50 ? 'Users leaving quickly' : 'Good engagement'}
+              </p>
+            </div>
+
+            <div>
+              <div className="flex justify-between mb-2">
+                <span className="text-sm text-white/50">Avg Session Time</span>
+                <span className={`text-sm font-semibold ${metrics.avgSessionTime < '1:00' ? 'text-danger' : 'text-success'}`}>
+                  {metrics.avgSessionTime}
+                </span>
+              </div>
+              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${Math.min(parseFloat(metrics.avgSessionTime.replace(':', '.')) / 10 * 100, 100)}%`,
+                    background: metrics.avgSessionTime < '1:00'
+                      ? 'linear-gradient(90deg, #ef4444, #ef4444)'
+                      : 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+                  }}
+                />
+              </div>
+              <p className="text-xs text-white/30 mt-1">
+                {metrics.avgSessionTime < '1:00' ? 'Very short sessions' : 'Healthy session lengths'}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="glass-card p-6"
+        >
+          <h3 className="text-lg font-semibold mb-4">App Rating Status</h3>
+
+          <div className="flex items-center gap-4 mb-6">
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black ${
+              ratingMeetsMinimum ? 'bg-success/10 text-success' : 'bg-danger/10 text-danger'
+            }`}>
+              {metrics.rating > 0 ? metrics.rating.toFixed(1) : 'N/A'}
+            </div>
+            <div>
+              <p className="font-medium">
+                {metrics.ratingCount > 0
+                  ? `${metrics.ratingCount} ratings`
+                  : 'No ratings yet'}
+              </p>
+              <p className="text-sm text-white/40">
+                Minimum: 3.0 from 15+ ratings
+              </p>
+            </div>
+          </div>
+
+          {ratingMeetsMinimum ? (
+            <div className="bg-success/10 border border-success/20 rounded-xl p-4 text-sm text-success">
+              Your rating meets the minimum requirement.
+            </div>
+          ) : (
+            <div className="bg-warning/10 border border-warning/20 rounded-xl p-4 text-sm text-warning">
+              {metrics.ratingCount < 15
+                ? `Need ${15 - metrics.ratingCount} more ratings to qualify.`
+                : 'Rating is below the 3.0 minimum.'}
+            </div>
+          )}
+
+          <div className="mt-6 pt-4 border-t border-white/5">
+            <h4 className="text-sm font-medium text-white/50 mb-3">Active Flags</h4>
+            {creator.flags.length === 0 ? (
+              <p className="text-sm text-success">No flags — you're in good standing.</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {creator.flags.map(flag => (
+                  <Badge
+                    key={flag}
+                    label={flag.replace(/_/g, ' ')}
+                    color="red"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6 pt-4 border-t border-white/5">
+            <h4 className="text-sm font-medium text-white/50 mb-2">Eligibility</h4>
+            <div className={`text-lg font-bold ${score >= 80 ? 'text-success' : score >= 50 ? 'text-warning' : 'text-danger'}`}>
+              {status}
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}

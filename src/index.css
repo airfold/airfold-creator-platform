@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-950: #0a0a0f;
+  --color-navy-900: #111827;
+  --color-navy-800: #1a1f36;
+  --color-navy-700: #242b45;
+  --color-navy-600: #2e3654;
+  --color-accent-blue: #3b82f6;
+  --color-accent-purple: #8b5cf6;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-navy-950 text-white font-sans antialiased m-0;
+  }
+}
+
+@utility glass-card {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
+}
+
+@utility glass-card-hover {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  transition: all 0.3s;
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+@utility gradient-text {
+  @apply bg-gradient-to-r from-accent-blue to-accent-purple bg-clip-text text-transparent;
+}
+
+@utility btn-primary {
+  @apply bg-gradient-to-r from-accent-blue to-accent-purple px-6 py-3 rounded-xl font-semibold text-white transition-all duration-200 cursor-pointer border-none;
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.25);
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+@utility btn-secondary {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-6 py-3 font-semibold text-white transition-all duration-200 cursor-pointer;
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
