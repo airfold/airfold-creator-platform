@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import {
-  LineChart, Line, AreaChart, Area, PieChart, Pie, Cell,
+  LineChart, Line, AreaChart, Area,
   BarChart, Bar,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
 } from 'recharts';
@@ -43,21 +43,6 @@ export default function Analytics() {
     { range: '5-10m', count: 190 },
     { range: '10m+', count: 70 },
   ];
-
-  const sourceData = [
-    { name: 'Airfold Platform', value: creator.platformPercent, color: '#BD295A' },
-    { name: 'External Links', value: 100 - creator.platformPercent, color: '#E8739F' },
-  ];
-
-  const platformVsExternal = creator.weeklyQAU.map((qau, i) => {
-    const platformQAU = Math.round(qau * creator.platformPercent / 100);
-    const externalQAU = qau - platformQAU;
-    return {
-      week: `W${i + 1}`,
-      platform: Math.round(platformQAU * 1.5),
-      external: externalQAU,
-    };
-  });
 
   return (
     <div className="space-y-8">
@@ -117,9 +102,9 @@ export default function Analytics() {
           </ResponsiveContainer>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-6">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-6 lg:col-span-2">
           <h3 className="text-lg font-semibold text-af-deep-charcoal mb-1">Session Duration</h3>
-          <p className="text-sm text-af-medium-gray mb-4">Distribution of user session lengths</p>
+          <p className="text-sm text-af-medium-gray mb-4">Distribution of user session lengths (sessions under 1 min do not count toward QAU)</p>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={sessionData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
@@ -130,39 +115,7 @@ export default function Analytics() {
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
-
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-af-deep-charcoal mb-1">Traffic Source</h3>
-          <p className="text-sm text-af-medium-gray mb-4">Airfold platform vs external links</p>
-          <ResponsiveContainer width="100%" height={240}>
-            <PieChart>
-              <Pie data={sourceData} cx="50%" cy="50%" innerRadius={70} outerRadius={100} dataKey="value" stroke="none">
-                {sourceData.map((entry, index) => (
-                  <Cell key={index} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip contentStyle={tooltipStyle} />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </motion.div>
       </div>
-
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-af-deep-charcoal mb-1">Platform QAU vs External QAU (Effective Value)</h3>
-        <p className="text-sm text-af-medium-gray mb-4">Platform users count as 1.5x value</p>
-        <ResponsiveContainer width="100%" height={280}>
-          <BarChart data={platformVsExternal}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
-            <XAxis dataKey="week" stroke="#8E8E93" fontSize={11} />
-            <YAxis stroke="#8E8E93" fontSize={11} />
-            <Tooltip contentStyle={tooltipStyle} />
-            <Legend />
-            <Bar dataKey="platform" name="Platform (1.5x)" stackId="a" fill="#BD295A" />
-            <Bar dataKey="external" name="External (1.0x)" stackId="a" fill="#E8739F" radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </motion.div>
     </div>
   );
 }

@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import Badge from '../../../components/Badge';
 import { creators, currentCreatorId } from '../../../data/creators';
-import { formatNumber, getStreakMultiplier, getStreakTierLabel } from '../../../utils/earnings';
+import { formatNumber, formatCurrency } from '../../../utils/earnings';
 
 type Period = 'week' | 'month' | 'all';
 
@@ -55,15 +54,13 @@ export default function Leaderboard() {
                 <th className="text-left px-6 py-4 text-af-medium-gray font-medium">Creator</th>
                 <th className="text-left px-6 py-4 text-af-medium-gray font-medium">App</th>
                 <th className="text-right px-6 py-4 text-af-medium-gray font-medium">QAU</th>
-                <th className="text-right px-6 py-4 text-af-medium-gray font-medium">Streak</th>
-                <th className="text-right px-6 py-4 text-af-medium-gray font-medium">Multiplier</th>
+                <th className="text-right px-6 py-4 text-af-medium-gray font-medium">Earnings</th>
               </tr>
             </thead>
             <tbody>
               {sorted.map((c, i) => {
                 const isCurrentUser = c.id === currentCreatorId;
-                const multiplier = getStreakMultiplier(c.streakWeek);
-                const tierLabel = getStreakTierLabel(c.streakWeek);
+                const weekEarnings = Math.min(c.qau * 2, period === 'week' ? 2000 : period === 'month' ? 5000 : Infinity);
 
                 return (
                   <motion.tr
@@ -98,15 +95,7 @@ export default function Leaderboard() {
                     </td>
                     <td className="px-6 py-4 text-af-medium-gray">{c.appName}</td>
                     <td className="text-right px-6 py-4 font-semibold text-af-deep-charcoal">{formatNumber(c.qau)}</td>
-                    <td className="text-right px-6 py-4 text-af-charcoal">
-                      {c.streakWeek > 0 ? `Week ${c.streakWeek}` : '-'}
-                    </td>
-                    <td className="text-right px-6 py-4">
-                      <Badge
-                        label={`${multiplier}x ${tierLabel}`}
-                        color={multiplier >= 2 ? 'amber' : multiplier >= 1.3 ? 'tint' : 'gray'}
-                      />
-                    </td>
+                    <td className="text-right px-6 py-4 font-bold text-af-tint">{formatCurrency(weekEarnings)}</td>
                   </motion.tr>
                 );
               })}

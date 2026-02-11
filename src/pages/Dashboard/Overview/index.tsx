@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import StatCard from '../../../components/StatCard';
 import SparklineChart from '../../../components/SparklineChart';
-import Badge from '../../../components/Badge';
 import ProgressBar from '../../../components/ProgressBar';
 import { getCurrentCreator } from '../../../data/creators';
 import {
@@ -9,9 +8,6 @@ import {
   formatCurrency,
   formatNumber,
   percentChange,
-  getStreakMultiplier,
-  getStreakTierLabel,
-  getStreakTierColor,
   WEEKLY_CAP,
 } from '../../../utils/earnings';
 
@@ -20,19 +16,7 @@ export default function Overview() {
   const currentQAU = creator.weeklyQAU[7];
   const lastWeekQAU = creator.weeklyQAU[6];
   const qauChange = percentChange(currentQAU, lastWeekQAU);
-
-  const earnings = calculateWeeklyEarnings(currentQAU, creator.streakWeek, creator.platformPercent);
-  const multiplier = getStreakMultiplier(creator.streakWeek);
-  const tierLabel = getStreakTierLabel(creator.streakWeek);
-  const tierColor = getStreakTierColor(creator.streakWeek);
-
-  const nextMultiplier = creator.streakWeek <= 2 ? 1.3 : creator.streakWeek <= 4 ? 1.6 : creator.streakWeek <= 8 ? 2.0 : 2.0;
-  const nextTierWeek = creator.streakWeek <= 2 ? 3 : creator.streakWeek <= 4 ? 5 : creator.streakWeek <= 8 ? 9 : 0;
-  const progressToNext = nextTierWeek > 0
-    ? ((creator.streakWeek - (nextTierWeek <= 3 ? 0 : nextTierWeek <= 5 ? 2 : 4)) /
-       (nextTierWeek - (nextTierWeek <= 3 ? 0 : nextTierWeek <= 5 ? 2 : 4) - 0)) * 100
-    : 100;
-
+  const earnings = calculateWeeklyEarnings(currentQAU);
   const monthlyProjection = earnings.capped * 4.3;
 
   return (
@@ -45,7 +29,7 @@ export default function Overview() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Earnings This Week" value={earnings.capped} prefix="$" icon={<span className="text-2xl">💰</span>} />
         <StatCard label="QAU This Week" value={currentQAU} change={qauChange} icon={<span className="text-2xl">👥</span>} />
-        <StatCard label="Streak Week" value={creator.streakWeek} icon={<span className="text-2xl">🔥</span>} />
+        <StatCard label="QAU Last Week" value={lastWeekQAU} icon={<span className="text-2xl">📊</span>} />
         <StatCard label="Monthly Projection" value={Math.round(monthlyProjection)} prefix="$" icon={<span className="text-2xl">📈</span>} />
       </div>
 
@@ -61,52 +45,34 @@ export default function Overview() {
           </div>
         </motion.div>
 
-        {/* Multiplier status */}
+        {/* Earnings breakdown */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-af-deep-charcoal mb-4">Multiplier Status</h3>
+          <h3 className="text-lg font-semibold text-af-deep-charcoal mb-4">Earnings Breakdown</h3>
 
-          <div className="flex items-center gap-4 mb-6">
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black"
-              style={{ backgroundColor: tierColor + '15', color: tierColor }}
-            >
-              {multiplier}x
-            </div>
-            <div>
-              <Badge label={tierLabel} color={multiplier >= 2 ? 'amber' : multiplier >= 1.3 ? 'tint' : 'gray'} />
-              <p className="text-sm text-af-medium-gray mt-1">Week {creator.streakWeek} streak</p>
-            </div>
-          </div>
-
-          {nextTierWeek > 0 ? (
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-af-medium-gray">Progress to {nextMultiplier}x</span>
-                <span className="text-af-charcoal">{nextTierWeek - creator.streakWeek} weeks to go</span>
+          <div className="space-y-4">
+            <div className="bg-af-surface rounded-xl p-4">
+              <div className="text-sm text-af-medium-gray mb-1">This Week</div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold text-af-tint">{formatCurrency(earnings.capped)}</span>
+                {earnings.capApplied && <span className="text-xs text-warning font-medium">CAP APPLIED</span>}
               </div>
-              <ProgressBar value={Math.max(progressToNext, 10)} max={100} showValue={false} />
             </div>
-          ) : (
-            <p className="text-sm text-success">Max multiplier reached!</p>
-          )}
 
-          <div className="mt-6 pt-4 border-t border-af-light-gray">
-            <h4 className="text-sm font-medium text-af-medium-gray mb-3">Earnings Breakdown</h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-af-medium-gray">Base ({formatNumber(currentQAU)} QAU x $2)</span>
-                <span className="text-af-deep-charcoal">{formatCurrency(earnings.baseEarnings)}</span>
+                <span className="text-af-medium-gray">QAU count</span>
+                <span className="text-af-deep-charcoal font-medium">{formatNumber(currentQAU)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-af-medium-gray">Platform bonus ({creator.platformPercent}%)</span>
-                <span className="text-success">+{formatCurrency(earnings.platformBonus)}</span>
+                <span className="text-af-medium-gray">Rate per QAU</span>
+                <span className="text-af-deep-charcoal font-medium">$2</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-af-medium-gray">Streak multiplier ({multiplier}x)</span>
-                <span className="text-af-tint">applied</span>
+                <span className="text-af-medium-gray">Gross earnings</span>
+                <span className="text-af-deep-charcoal font-medium">{formatCurrency(earnings.earnings)}</span>
               </div>
               <div className="flex justify-between pt-2 border-t border-af-light-gray font-semibold">
-                <span className="text-af-deep-charcoal">Total this week</span>
+                <span className="text-af-deep-charcoal">Payout</span>
                 <span className="text-af-tint">{formatCurrency(earnings.capped)}</span>
               </div>
             </div>

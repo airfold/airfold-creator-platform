@@ -5,8 +5,6 @@ export interface Creator {
   appName: string;
   category: string;
   avatar: string | null;
-  streakWeek: number;
-  platformPercent: number;
   rating: number;
   ratingCount: number;
   /** QAU values for last 8 weeks, oldest first */
@@ -14,13 +12,4 @@ export interface Creator {
   healthScore: number;
   flags: string[];
   joinedWeeksAgo: number;
-}
-
-export interface WeeklyEarningsData {
-  week: number;
-  weekLabel: string;
-  qau: number;
-  baseEarnings: number;
-  multiplier: number;
-  totalPayout: number;
 }
