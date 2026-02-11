@@ -12,8 +12,8 @@ const sizes = {
 export default function Logo({ size = 'md', className = '' }: LogoProps) {
   return (
     <span className={`font-black tracking-tight ${sizes[size]} ${className}`}>
-      <span className="bg-gradient-to-r from-accent-blue to-accent-purple bg-clip-text text-transparent">a</span>
-      <span className="text-white">irfold</span>
+      <span className="text-af-tint">a</span>
+      <span className="text-af-deep-charcoal">irfold</span>
     </span>
   );
 }

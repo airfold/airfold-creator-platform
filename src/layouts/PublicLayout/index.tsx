@@ -6,8 +6,8 @@ export default function PublicLayout() {
   const isLanding = location.pathname === '/';
 
   return (
-    <div className="min-h-screen bg-navy-950">
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-navy-950/80 backdrop-blur-xl border-b border-white/5">
+    <div className="min-h-screen bg-white">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-af-light-gray">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link to="/">
             <Logo size="md" />

@@ -28,9 +28,6 @@ export const WEEKLY_CAP = 2000;
 /** Monthly earnings cap */
 export const MONTHLY_CAP = 5000;
 
-/** Minimum QAU retention percentage to maintain streak */
-const STREAK_THRESHOLD = 0.7;
-
 /**
  * Streak multiplier tiers based on consecutive qualifying weeks
  *
@@ -61,10 +58,10 @@ export function getStreakTierLabel(streakWeek: number): string {
  * Returns the color associated with the current streak tier
  */
 export function getStreakTierColor(streakWeek: number): string {
-  if (streakWeek <= 2) return '#94a3b8';
-  if (streakWeek <= 4) return '#3b82f6';
-  if (streakWeek <= 8) return '#8b5cf6';
-  return '#f59e0b';
+  if (streakWeek <= 2) return '#8E8E93';
+  if (streakWeek <= 4) return '#E8739F';
+  if (streakWeek <= 8) return '#BD295A';
+  return '#f97316';
 }
 
 /**
@@ -151,7 +148,7 @@ export function calculateMonthlyEarnings(weeklyEarnings: number[]): {
  */
 export function isStreakMaintained(currentQAU: number, peakQAU: number): boolean {
   if (peakQAU === 0) return currentQAU > 0;
-  return currentQAU >= peakQAU * STREAK_THRESHOLD;
+  return currentQAU >= peakQAU * 0.7;
 }
 
 /**

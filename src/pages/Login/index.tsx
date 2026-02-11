@@ -30,40 +30,38 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 -mt-16">
-      <div className="absolute inset-0 bg-gradient-to-b from-accent-blue/5 via-transparent to-transparent" />
-
+    <div className="min-h-screen flex items-center justify-center px-6 -mt-16 bg-af-surface">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass-card p-10 w-full max-w-md relative"
+        className="glass-card p-10 w-full max-w-md"
       >
         <div className="text-center mb-8">
           <Logo size="lg" className="mb-4 inline-block" />
-          <h1 className="text-2xl font-bold mt-4">Creator Dashboard</h1>
-          <p className="text-white/40 text-sm mt-2">Sign in with your .edu email</p>
+          <h1 className="text-2xl font-bold text-af-deep-charcoal mt-4">Creator Dashboard</h1>
+          <p className="text-af-medium-gray text-sm mt-2">Sign in with your .edu email</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-white/50 mb-2">Email</label>
+            <label className="block text-sm font-medium text-af-charcoal mb-2">Email</label>
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="you@university.edu"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-accent-blue/50 focus:ring-1 focus:ring-accent-blue/50 transition-all"
+              className="w-full bg-white border border-af-light-gray rounded-xl px-4 py-3 text-af-deep-charcoal placeholder:text-af-medium-gray/50 focus:outline-none focus:border-af-tint focus:ring-1 focus:ring-af-tint transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/50 mb-2">Password</label>
+            <label className="block text-sm font-medium text-af-charcoal mb-2">Password</label>
             <input
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-accent-blue/50 focus:ring-1 focus:ring-accent-blue/50 transition-all"
+              className="w-full bg-white border border-af-light-gray rounded-xl px-4 py-3 text-af-deep-charcoal placeholder:text-af-medium-gray/50 focus:outline-none focus:border-af-tint focus:ring-1 focus:ring-af-tint transition-all"
             />
           </div>
 
@@ -82,7 +80,7 @@ export default function Login() {
           </button>
         </form>
 
-        <p className="text-center text-xs text-white/20 mt-8">
+        <p className="text-center text-xs text-af-medium-gray mt-8">
           Demo: any .edu email + any password works
         </p>
       </motion.div>

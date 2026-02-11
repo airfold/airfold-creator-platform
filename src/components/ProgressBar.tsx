@@ -16,24 +16,22 @@ export default function ProgressBar({ value, max, label, showValue = true, color
     <div>
       {(label || showValue) && (
         <div className="flex justify-between items-center mb-1.5">
-          {label && <span className="text-sm text-white/50">{label}</span>}
+          {label && <span className="text-sm text-af-medium-gray">{label}</span>}
           {showValue && (
-            <span className={`text-sm font-semibold ${isNearMax ? 'text-warning' : 'text-white/70'}`}>
+            <span className={`text-sm font-semibold ${isNearMax ? 'text-warning' : 'text-af-charcoal'}`}>
               {Math.round(percent)}%
             </span>
           )}
         </div>
       )}
-      <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+      <div className="h-2 bg-af-surface rounded-full overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${percent}%` }}
           transition={{ duration: 1, ease: 'easeOut' }}
           className="h-full rounded-full"
           style={{
-            background: color || (isNearMax
-              ? 'linear-gradient(90deg, #f59e0b, #ef4444)'
-              : 'linear-gradient(90deg, #3b82f6, #8b5cf6)'),
+            background: color || (isNearMax ? '#f97316' : '#BD295A'),
           }}
         />
       </div>

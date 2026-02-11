@@ -1,56 +1,62 @@
 @import "tailwindcss";
 
 @theme {
-  --color-navy-950: #0a0a0f;
-  --color-navy-900: #111827;
-  --color-navy-800: #1a1f36;
-  --color-navy-700: #242b45;
-  --color-navy-600: #2e3654;
-  --color-accent-blue: #3b82f6;
-  --color-accent-purple: #8b5cf6;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
+  --color-af-tint: #BD295A;
+  --color-af-tint-light: #E8739F;
+  --color-af-tint-soft: #FFF0F6;
+  --color-af-deep-charcoal: #1A1A1A;
+  --color-af-charcoal: #2C2C2E;
+  --color-af-medium-gray: #8E8E93;
+  --color-af-light-gray: #E5E5EA;
+  --color-af-surface: #F5F5F7;
+  --color-af-card: #FFFFFF;
+  --color-af-outline: rgba(0, 0, 0, 0.06);
+  --color-success: #22c55e;
   --color-danger: #ef4444;
+  --color-warning: #f97316;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 @layer base {
   body {
-    @apply bg-navy-950 text-white font-sans antialiased m-0;
+    @apply bg-af-surface text-af-deep-charcoal font-sans antialiased m-0;
   }
 }
 
 @utility glass-card {
-  @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 }
 
 @utility glass-card-hover {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
   transition: all 0.3s;
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.1);
   }
 }
 
 @utility gradient-text {
-  @apply bg-gradient-to-r from-accent-blue to-accent-purple bg-clip-text text-transparent;
+  color: #BD295A;
 }
 
 @utility btn-primary {
-  @apply bg-gradient-to-r from-accent-blue to-accent-purple px-6 py-3 rounded-xl font-semibold text-white transition-all duration-200 cursor-pointer border-none;
-  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.25);
+  @apply bg-af-tint px-6 py-3 rounded-xl font-semibold text-white transition-all duration-200 cursor-pointer border-none;
   &:hover {
-    opacity: 0.9;
+    background: #E8739F;
   }
 }
 
 @utility btn-secondary {
-  @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl px-6 py-3 font-semibold text-white transition-all duration-200 cursor-pointer;
+  @apply bg-white px-6 py-3 rounded-xl font-semibold text-af-deep-charcoal transition-all duration-200 cursor-pointer;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   &:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: #F5F5F7;
   }
 }

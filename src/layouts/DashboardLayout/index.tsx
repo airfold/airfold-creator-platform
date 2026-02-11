@@ -21,10 +21,10 @@ export default function DashboardLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-navy-950 flex">
+    <div className="min-h-screen bg-af-surface flex">
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-navy-900/50 border-r border-white/5 flex flex-col z-40">
-        <div className="p-6 border-b border-white/5">
+      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-af-light-gray flex flex-col z-40">
+        <div className="p-6 border-b border-af-light-gray">
           <Logo size="md" />
         </div>
         <nav className="flex-1 p-4 space-y-1">
@@ -36,8 +36,8 @@ export default function DashboardLayout() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? 'bg-accent-blue/10 text-accent-blue border border-accent-blue/20'
-                    : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
+                    ? 'bg-af-tint-soft text-af-tint'
+                    : 'text-af-medium-gray hover:text-af-deep-charcoal hover:bg-af-surface'
                 }`
               }
             >
@@ -46,11 +46,11 @@ export default function DashboardLayout() {
             </NavLink>
           ))}
         </nav>
-        <div className="p-4 border-t border-white/5">
-          <div className="glass-card p-3">
-            <p className="text-xs text-white/40 mb-1">Logged in as</p>
-            <p className="text-sm font-semibold text-white truncate">{user?.name}</p>
-            <p className="text-xs text-white/40 truncate">{user?.email}</p>
+        <div className="p-4 border-t border-af-light-gray">
+          <div className="bg-af-surface rounded-xl p-3">
+            <p className="text-xs text-af-medium-gray mb-1">Logged in as</p>
+            <p className="text-sm font-semibold text-af-deep-charcoal truncate">{user?.name}</p>
+            <p className="text-xs text-af-medium-gray truncate">{user?.email}</p>
           </div>
         </div>
       </aside>
@@ -58,14 +58,14 @@ export default function DashboardLayout() {
       {/* Main content */}
       <div className="flex-1 ml-64">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 bg-navy-950/80 backdrop-blur-xl border-b border-white/5">
+        <header className="sticky top-0 z-30 bg-af-surface/80 backdrop-blur-xl border-b border-af-light-gray">
           <div className="h-16 px-8 flex items-center justify-between">
             <div />
             <div className="flex items-center gap-4">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-accent-blue to-accent-purple flex items-center justify-center text-sm font-bold">
+              <div className="w-8 h-8 rounded-full bg-af-tint flex items-center justify-center text-sm font-bold text-white">
                 {user?.name?.charAt(0) || 'U'}
               </div>
-              <button onClick={handleLogout} className="text-sm text-white/50 hover:text-white transition-colors cursor-pointer bg-transparent border-none">
+              <button onClick={handleLogout} className="text-sm text-af-medium-gray hover:text-af-deep-charcoal transition-colors cursor-pointer bg-transparent border-none">
                 Logout
               </button>
             </div>

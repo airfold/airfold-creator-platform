@@ -6,7 +6,7 @@ interface SparklineChartProps {
   height?: number;
 }
 
-export default function SparklineChart({ data, color = '#3b82f6', height = 60 }: SparklineChartProps) {
+export default function SparklineChart({ data, color = '#BD295A', height = 60 }: SparklineChartProps) {
   const chartData = data.map((value, index) => ({ value, index }));
 
   return (
@@ -14,7 +14,7 @@ export default function SparklineChart({ data, color = '#3b82f6', height = 60 }:
       <AreaChart data={chartData}>
         <defs>
           <linearGradient id={`spark-${color}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity={0.3} />
+            <stop offset="0%" stopColor={color} stopOpacity={0.15} />
             <stop offset="100%" stopColor={color} stopOpacity={0} />
           </linearGradient>
         </defs>
