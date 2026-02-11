@@ -2,7 +2,13 @@
 
 University platform where creators build mini-apps and earn based on real user engagement. Serving 34K+ students across campus.
 
-![Banner](public/banner.png)
+<p align="center">
+  <img src="public/icon.png" alt="Airfold" width="80" />
+</p>
+
+<p align="center">
+  <img src="public/banner.png" alt="The new era of social apps" width="100%" />
+</p>
 
 ## What is Airfold?
 

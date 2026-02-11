@@ -117,6 +117,11 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Banner */}
+      <section className="max-w-7xl mx-auto px-6 py-12">
+        <img src="/banner.png" alt="The new era of social apps" className="w-full rounded-2xl" />
+      </section>
+
       {/* CTA */}
       <section className="max-w-7xl mx-auto px-6 py-24">
         <div className="bg-af-tint-soft rounded-2xl p-16 text-center border border-af-tint/10">
