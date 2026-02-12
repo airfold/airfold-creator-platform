@@ -8,7 +8,7 @@ export default function DesktopBlocker() {
 
         <div className="text-6xl mb-6">📱</div>
         <h1 className="text-3xl font-bold text-af-deep-charcoal mb-3">
-          Designed for Mobile
+          Mobile Access Only
         </h1>
         <p className="text-af-medium-gray leading-relaxed text-lg mb-10 max-w-sm mx-auto">
           The Airfold Creator Dashboard is built for on-the-go creators. Open this page on your phone to get started.
