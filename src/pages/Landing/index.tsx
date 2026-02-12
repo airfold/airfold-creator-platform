@@ -21,7 +21,7 @@ const stats = [
 const steps = [
   { num: '01', title: 'Create an app', desc: 'Describe your idea and Airfold AI builds it for you. No coding required.' },
   { num: '02', title: 'Grow your users', desc: 'Promote your app on campus. Every qualified active user counts toward your earnings.' },
-  { num: '03', title: 'Get paid', desc: 'Earn $2 per qualified active user, every week. Weekly payouts, no cap games.' },
+  { num: '03', title: 'Get paid', desc: 'Real money, every week. The more users you keep engaged, the more you earn.' },
 ];
 
 export default function Landing() {
