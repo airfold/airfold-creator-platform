@@ -76,28 +76,24 @@ export default function Landing() {
           <h2 className="text-2xl font-bold text-af-deep-charcoal mb-2">Featured Creator Apps</h2>
           <p className="text-af-medium-gray text-sm">Top performing apps built by student creators</p>
         </motion.div>
-        <div className="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
+        <div className="space-y-2 md:grid md:grid-cols-2 md:gap-3 md:space-y-0">
           {featuredCreators.map((creator, i) => (
-            <motion.div key={creator.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="glass-card-hover p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="font-bold text-base text-af-deep-charcoal">{creator.appName}</h3>
-                  <p className="text-xs text-af-medium-gray">by {creator.name}</p>
-                </div>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-af-tint-soft text-af-tint border border-af-tint/10">
-                  {formatNumber(creator.weeklyQAU[7])} QAU
-                </span>
+            <motion.div key={creator.id} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="glass-card-hover p-3 flex items-center gap-3">
+              <div className="w-16 shrink-0">
+                <SparklineChart data={creator.weeklyQAU} height={32} />
               </div>
-              <div className="mb-3"><SparklineChart data={creator.weeklyQAU} height={50} /></div>
-              <div className="flex items-center justify-between text-xs">
-                <div>
-                  <span className="text-af-medium-gray">Earning: </span>
-                  <span className="font-semibold text-af-deep-charcoal">{formatCurrency(creator.weeklyQAU[7] * 2)}/wk</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <h3 className="font-bold text-sm text-af-deep-charcoal truncate">{creator.appName}</h3>
+                  <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-af-tint-soft text-af-tint border border-af-tint/10 shrink-0">
+                    {formatNumber(creator.weeklyQAU[7])} QAU
+                  </span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-warning">{'★'.repeat(Math.round(creator.rating))}</span>
-                  <span className="text-af-medium-gray">{creator.rating}</span>
-                </div>
+                <p className="text-[11px] text-af-medium-gray">by {creator.name}</p>
+              </div>
+              <div className="text-right shrink-0">
+                <div className="text-sm font-bold text-af-tint">{formatCurrency(creator.weeklyQAU[7] * 2)}</div>
+                <div className="text-[10px] text-af-medium-gray">/week</div>
               </div>
             </motion.div>
           ))}

@@ -1,7 +1,6 @@
 import { SignIn, SignedIn } from '@clerk/clerk-react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import Logo from '../../components/Logo';
 import { enableDevMode, isDevMode } from '../../context/AuthContext';
 
 export default function Login() {
@@ -28,8 +27,7 @@ export default function Login() {
           className="w-full max-w-md"
         >
           <div className="text-center mb-8">
-            <Logo size="lg" className="mb-4 inline-block" />
-            <h1 className="text-2xl font-bold text-af-deep-charcoal mt-4">Creator Dashboard</h1>
+            <h1 className="text-2xl font-bold text-af-deep-charcoal">Creator Dashboard</h1>
             <p className="text-af-medium-gray text-sm mt-2">Sign in with your Airfold account</p>
           </div>
           <SignIn
