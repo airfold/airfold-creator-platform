@@ -50,7 +50,7 @@ export default function DashboardLayout() {
               </div>
               {isDevMode() ? (
                 <button
-                  onClick={() => { clearDevMode(); window.location.href = '/'; }}
+                  onClick={() => { clearDevMode(); window.location.reload(); }}
                   className="text-[9px] font-mono font-bold text-af-tint border border-af-tint/30 rounded px-1.5 py-0.5 active:opacity-70"
                 >
                   DEV

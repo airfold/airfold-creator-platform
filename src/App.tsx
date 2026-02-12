@@ -20,7 +20,7 @@ import { AppProvider } from './context/AppContext';
 initNativeToken();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  if (isDevMode() || isNativeMode()) {
+  if (import.meta.env.DEV || isDevMode() || isNativeMode()) {
     return <>{children}</>;
   }
   // Not authenticated — redirect to landing (no standalone login)

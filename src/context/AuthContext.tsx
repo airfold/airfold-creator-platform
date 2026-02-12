@@ -75,6 +75,22 @@ export function useAuth() {
     };
   }
 
+  // Local dev server (npm run dev) — allow access without auth for API testing
+  if (import.meta.env.DEV) {
+    return {
+      user: {
+        id: 'local_dev',
+        email: 'dev@airfold.co',
+        name: 'Local Dev',
+        avatar: undefined,
+      },
+      isAuthenticated: true,
+      isLoaded: true,
+      logout: () => {},
+      getToken: () => Promise.resolve('local-dev-token'),
+    };
+  }
+
   return {
     user: null,
     isAuthenticated: false,
