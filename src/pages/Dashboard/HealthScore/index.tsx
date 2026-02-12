@@ -68,21 +68,6 @@ export default function HealthScore() {
   const { data: healthData, isLoading } = useCreatorHealth(selectedAppId);
   const [showRules, setShowRules] = useState(false);
 
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <h1 className="text-2xl font-bold text-af-deep-charcoal">Health</h1>
-        <div className="h-10 rounded-xl animate-pulse bg-af-surface" />
-        <div className="h-40 rounded-2xl animate-pulse bg-af-surface" />
-        <div className="grid grid-cols-3 gap-3">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-20 rounded-2xl animate-pulse bg-af-surface" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   const score = healthData?.score ?? 80;
   const flags = healthData?.flags ?? [];
   const metrics = healthData?.metrics;
@@ -111,6 +96,26 @@ export default function HealthScore() {
 
       <AppSelector />
 
+      {isLoading ? (
+        <div className="space-y-4">
+          <div className="h-40 rounded-2xl animate-pulse bg-af-surface" />
+          <div className="space-y-2.5">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="glass-card p-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl animate-pulse bg-af-surface" />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-3.5 w-24 rounded animate-pulse bg-af-surface" />
+                  <div className="h-3 w-36 rounded animate-pulse bg-af-surface" />
+                </div>
+                <div className="space-y-1.5 text-right">
+                  <div className="h-5 w-12 rounded animate-pulse bg-af-surface ml-auto" />
+                  <div className="h-3 w-14 rounded animate-pulse bg-af-surface ml-auto" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
       <div className="space-y-4">
         {/* Score card */}
         <div className={`${scoreBg} rounded-2xl p-6 text-center`}>
@@ -194,6 +199,7 @@ export default function HealthScore() {
           </div>
         )}
       </div>
+      )}
 
       {showRules && <QAURulesSheet onClose={() => setShowRules(false)} />}
     </div>

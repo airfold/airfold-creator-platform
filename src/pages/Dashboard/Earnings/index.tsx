@@ -44,28 +44,6 @@ export default function Earnings() {
     ? (earningsData?.weekly?.[0]?.app_name ?? 'App')
     : 'All Apps';
 
-  if (isLoading) {
-    return (
-      <div className="space-y-5">
-        <div>
-          <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Earnings</h1>
-          <p className="text-sm text-af-medium-gray">All Apps</p>
-        </div>
-        <div className="h-10 rounded-xl animate-pulse bg-af-surface" />
-        <div className="glass-card p-4">
-          <div className="h-4 w-16 rounded animate-pulse bg-af-surface mb-3" />
-          <div className="h-[240px] rounded-xl animate-pulse bg-af-surface" />
-        </div>
-        <div className="glass-card p-4">
-          <div className="h-4 w-24 rounded animate-pulse bg-af-surface mb-3" />
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-8 rounded animate-pulse bg-af-surface mb-2" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-5">
       <div>
@@ -75,6 +53,20 @@ export default function Earnings() {
 
       <AppSelector />
 
+      {isLoading ? (
+        <div className="space-y-5">
+          <div className="glass-card p-4">
+            <div className="h-4 w-16 rounded animate-pulse bg-af-surface mb-3" />
+            <div className="h-[240px] rounded-xl animate-pulse bg-af-surface" />
+          </div>
+          <div className="glass-card p-4">
+            <div className="h-4 w-24 rounded animate-pulse bg-af-surface mb-3" />
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-8 rounded animate-pulse bg-af-surface mb-2" />
+            ))}
+          </div>
+        </div>
+      ) : (
       <div className="space-y-5">
       <div className="glass-card p-4">
         <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Weekly</h3>
@@ -123,6 +115,7 @@ export default function Earnings() {
         </div>
       )}
       </div>
+      )}
     </div>
   );
 }
