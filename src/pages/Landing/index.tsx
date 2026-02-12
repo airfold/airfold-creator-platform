@@ -21,7 +21,7 @@ const stats = [
 const steps = [
   { num: '01', title: 'Build an app', desc: 'Create a mini-app for your campus community using our tools and templates.' },
   { num: '02', title: 'Grow your users', desc: 'Promote your app on campus. Every qualified active user counts toward your earnings.' },
-  { num: '03', title: 'Get paid', desc: 'Earn $2 per QAU every week. Grow your user base and cash out weekly.' },
+  { num: '03', title: 'Get paid', desc: '100 active users = $200/week. 500 users = $1,000/week. Cash out every week.' },
 ];
 
 export default function Landing() {

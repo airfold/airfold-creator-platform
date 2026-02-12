@@ -39,7 +39,7 @@ export default function Calculator() {
           <div className="space-y-1.5 text-xs">
             <div className="flex justify-between">
               <span className="text-af-medium-gray">Rate</span>
-              <span className="text-af-deep-charcoal font-medium">$2 / QAU / week</span>
+              <span className="text-af-deep-charcoal font-medium">$2 per active user / week</span>
             </div>
             <div className="flex justify-between">
               <span className="text-af-medium-gray">Weekly cap</span>
@@ -57,7 +57,7 @@ export default function Calculator() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-4">
           <h3 className="text-xs text-af-medium-gray mb-1">Weekly Payout</h3>
           <span className="text-2xl font-bold text-af-tint">{formatCurrency(earnings.capped)}</span>
-          <div className="text-[10px] text-af-medium-gray mt-1">{qau.toLocaleString()} x $2</div>
+          <div className="text-[10px] text-af-medium-gray mt-1">{qau.toLocaleString()} users x $2</div>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="glass-card p-4">
