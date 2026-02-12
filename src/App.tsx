@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ClerkProvider, SignedIn, SignedOut } from '@clerk/clerk-react';
+import { ClerkProvider } from '@clerk/clerk-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import PublicLayout from './layouts/PublicLayout';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -8,7 +8,6 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
 });
 import Landing from './pages/Landing';
-import Login from './pages/Login';
 import Overview from './pages/Dashboard/Overview';
 import Earnings from './pages/Dashboard/Earnings';
 import Analytics from './pages/Dashboard/Analytics';
@@ -18,7 +17,7 @@ import HealthScore from './pages/Dashboard/HealthScore';
 import { isDevMode, isNativeMode, initNativeToken } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 
-// Pick up ?__clerk_token= from iOS app before React renders
+// Pick up native token from iOS WKWebView sessionStorage injection
 initNativeToken();
 
 const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -27,12 +26,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (isDevMode() || isNativeMode()) {
     return <>{children}</>;
   }
-  return (
-    <>
-      <SignedIn>{children}</SignedIn>
-      <SignedOut><Navigate to="/login" replace /></SignedOut>
-    </>
-  );
+  // Not authenticated — redirect to landing (no standalone login)
+  return <Navigate to="/" replace />;
 }
 
 function AppRoutes() {
@@ -40,7 +35,6 @@ function AppRoutes() {
     <Routes>
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
       </Route>
       <Route
         path="/dashboard"
@@ -59,6 +53,8 @@ function AppRoutes() {
         <Route path="calculator" element={<Calculator />} />
         <Route path="health" element={<HealthScore />} />
       </Route>
+      {/* Catch old /login route */}
+      <Route path="/login" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

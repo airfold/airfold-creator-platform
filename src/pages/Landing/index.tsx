@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '../../components/Logo';
 import SparklineChart from '../../components/SparklineChart';
@@ -51,9 +50,10 @@ export default function Landing() {
               Create apps for your campus, grow real users, and earn based on engagement.
             </p>
             <div className="flex flex-col md:flex-row md:justify-center items-center gap-3">
-              <Link to="/login" className="btn-primary text-base px-8 py-3.5 w-full max-w-xs">Start Creating</Link>
+              <a href="https://apps.apple.com/app/airfold" className="btn-primary text-base px-8 py-3.5 w-full max-w-xs text-center">Open in airfold App</a>
               <a href="#how-it-works" className="btn-secondary text-base px-8 py-3.5 w-full max-w-xs text-center">Learn More</a>
             </div>
+            <p className="text-xs text-af-medium-gray mt-3">Creator Dashboard is accessible from the airfold iOS app.</p>
           </motion.div>
         </div>
       </section>

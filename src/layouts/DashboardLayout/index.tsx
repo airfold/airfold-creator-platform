@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { UserButton } from '@clerk/clerk-react';
-import { useAuth, isDevMode, isNativeMode, enableDevMode, clearDevMode } from '../../context/AuthContext';
+import { useAuth, isDevMode, enableDevMode, clearDevMode } from '../../context/AuthContext';
 import { setTokenGetter } from '../../services/api';
 import Logo from '../../components/Logo';
 import { haptic } from '../../utils/haptic';
@@ -60,21 +59,13 @@ export default function DashboardLayout() {
                 <p className="text-xs font-semibold text-af-deep-charcoal leading-tight truncate max-w-[120px]">{user?.name}</p>
                 {selectedApp && <p className="text-[10px] text-af-medium-gray leading-tight truncate max-w-[120px]">{selectedApp.appName}</p>}
               </div>
-              {isDevMode() ? (
+              {isDevMode() && (
                 <button
                   onClick={() => { clearDevMode(); window.location.href = '/'; }}
                   className="w-8 h-8 rounded-full bg-af-tint text-white text-xs font-bold flex items-center justify-center"
                 >
                   DC
                 </button>
-              ) : (
-                <UserButton
-                  afterSignOutUrl="/"
-                  appearance={{
-                    variables: { colorPrimary: '#BD295A' },
-                    elements: { avatarBox: 'w-8 h-8' },
-                  }}
-                />
               )}
             </div>
           </div>
