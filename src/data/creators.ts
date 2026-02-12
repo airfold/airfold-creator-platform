@@ -388,10 +388,10 @@ export function getCreatorAvgHealthScore(creator: Creator): number {
   );
 }
 
-/** Platform-wide stats — early stage, just launched */
+/** Platform-wide stats */
 export const platformStats = {
-  totalCreators: 9,
-  totalAppsLive: 10,
-  totalQAUThisWeek: 490,
-  totalPaidOut: 2000,
+  totalCreators: 124,
+  totalAppsLive: 310,
+  totalQAUThisWeek: 3100,
+  totalPaidOut: 50000,
 };
