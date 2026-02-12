@@ -20,8 +20,8 @@ Creator dashboard for the airfold mini-app platform. Accessible exclusively from
            │                                        │
            │  GET /v1/creator/*  (earnings, health) │ Neon PostgreSQL
            │  GET /v1/leaderboard (rankings)        │   ↕
-           │  GET /v1/app/*/health (per-app)        │ ClickHouse Cloud
-           │  GET /v1/analytics/* (usage stats)     │   ↕
+           │  GET /v1/analytics/* (usage stats)     │ ClickHouse Cloud
+           │                                        │   ↕
            │                                        │ app_events table
            └────────────────────────────────────────┘
                                                       ↑
@@ -35,44 +35,56 @@ Creator dashboard for the airfold mini-app platform. Accessible exclusively from
 The creator dashboard has **no standalone web sign-in**. It is opened from within the airfold iOS app:
 
 1. **Native JWT injection** — the iOS app opens the dashboard in a WKWebView and injects the Clerk JWT into `sessionStorage` before page load via `WKUserScript`.
-2. **No web login flow** — visiting `creators.airfold.co` directly shows a landing page with an "Open in airfold App" link. There is no sign-in button on the web.
+2. **No web login flow** — visiting `creators.airfold.co` directly shows a landing page with featured creators and an App Store link. There is no sign-in button on the web.
 3. **Token-based auth** — the React app reads the JWT from `sessionStorage('native_token')` and sends it as `Authorization: Bearer <jwt>` to the API.
 
 ### Dev Mode
 
-A small "DEV" button next to the logo in the dashboard header enables dev mode, which bypasses auth and uses mock data for all API calls. This lets you run the dashboard without a backend or the iOS app.
+A small "DEV" toggle next to the logo in the dashboard header enables dev mode, which bypasses auth and uses mock data for all API calls. This lets you run the dashboard without a backend or the iOS app. Toggling dev mode reloads the page.
 
 ---
 
 ## Dashboard Tabs
 
 ### Overview
-Hero earnings card showing the big number (this month's total), a progress bar toward the $5,000 monthly cap, and inline stats (this week's earnings, QAU count, health score). Below that, a tappable 8-week QAU sparkline linking to the Earnings tab, and a list of all your apps with per-app earnings and growth percentage. "Show all" toggle if you have more than 4 apps.
+Hero earnings card showing this month's total, a progress bar toward the $5,000 monthly cap, and inline stats (this week's earnings, QAU count, health score). Below that, a tappable 8-week QAU sparkline linking to the Earnings tab, and a list of all apps sorted by QAU with per-app earnings. "Show all" toggle if you have more than 4 apps.
 
-**API**: `GET /v1/creator/earnings`
+**API**: `GET /v1/creator/earnings`, `GET /v1/creator/health`
 
 ### Earnings
-Detailed earnings view with a bar chart showing weekly QAU and earnings over the last 8 weeks, plus a weekly breakdown table. Shows cap progress — when the monthly $5,000 cap is hit, it tells the creator the excess rolls over to the next month's payout cycle. Supports per-app filtering via the app selector.
+Bar chart showing weekly payouts over the last 8 weeks (aggregated by week when viewing all apps), plus a breakdown table with QAU, gross, and capped payout per week. Shows cap progress — when the monthly $5,000 cap is hit, a notice explains the excess rolls over. Supports per-app filtering via the app selector.
 
 **API**: `GET /v1/creator/earnings` (all apps) or `GET /v1/creator/earnings/app/{appId}` (single app)
 
 ### Analytics
-Usage analytics: DAU sparkline, retention rate, average session duration, and total sessions. Displays weekly trends in a line chart. Per-app filtering supported.
+Usage analytics: DAU area chart (30 days), summary stats (views + unique users), QAU vs unique users bar chart, and retention curve. Per-app filtering supported via the app selector.
 
-**API**: `GET /v1/analytics/creator` — aggregates from ClickHouse `app_events`
+**API**: `GET /v1/analytics/creator`, `GET /v1/analytics/app/{appId}`
+
+### Health
+Traffic quality dashboard with plain-language metrics instead of raw numbers. Shows an overall health score (0–100) with color-coded status (green/orange/red), and three metric cards:
+
+- **Avg time in app** — session duration with "Users are sticking around" / "Users leave too quickly"
+- **One-time visitors** — bounce rate framed as retention
+- **User authenticity** — shows organic traffic percentage (inverted from same-IP %)
+
+Flags section uses friendly explanations (e.g., "Sessions are under 1 minute — add more content to keep users in"). An **(i)** info button opens a bottom sheet explaining QAU qualification rules. Per-app filtering supported.
+
+**API**: `GET /v1/creator/health` (aggregated) or `GET /v1/creator/health/app/{appId}` (single app)
 
 ### Leaderboard
-Ranked list of top creators by QAU. Supports weekly/monthly/all-time period switching. Shows the current creator's rank highlighted. Top 3 get colored rank badges.
+Ranked list of top creators by QAU. Supports weekly/monthly/all-time period switching. Current creator's row is highlighted with `(You)` tag and tinted background. Shows QAU count, earnings, and app count per entry.
 
 **API**: `GET /v1/leaderboard?period={week|month|all}&limit=20`
 
-### Calculator
-Interactive earnings estimator. Drag a slider to set projected QAU, see estimated weekly and monthly earnings. When the cap is reached, a rollover notice explains that excess earnings carry over to the next month's payout cycle. Pure client-side — no API calls.
+---
 
-### Health Score
-Traffic quality dashboard. Shows an overall health score (0-100), eligibility status, and individual metrics: same-IP percentage, bounce rate, average session duration, app rating, and any flags. Per-app filtering supported.
+## UX Patterns
 
-**API**: `GET /v1/creator/health` (aggregated) or `GET /v1/app/{appId}/health` (single app)
+- **Skeleton loading** — all pages show animated pulse placeholders on initial load (hero card, charts, metric cards, leaderboard rows)
+- **Smooth app switching** — `keepPreviousData` (React Query) keeps old data visible during refetch; content dims to 50% opacity during transition instead of flashing a skeleton
+- **Haptic feedback** — `navigator.vibrate()` on taps for mobile (nav items, buttons, app cards)
+- **Bottom sheet** — QAU rules info sheet slides up from bottom with backdrop blur, dismissible by tap-outside or "Got it" button
 
 ---
 
@@ -93,8 +105,8 @@ If a user opens your app twice on Monday and once on Tuesday, that's only 2 days
 
 - **$2 per QAU per week** — flat rate, no tiers
 - QAU counts are calculated every Monday for the previous week
-- **Weekly cap**: $2,000 (= 1,000 QAU max per week)
-- **Monthly cap**: $5,000
+- **Weekly cap**: $2,000 per app (= 1,000 QAU max per app per week)
+- **Monthly cap**: $5,000 per creator
 - **Payouts are monthly** — weekly earnings accumulate, paid out once at the end of the month
 - If you hit the monthly cap, the excess rolls over to the next month's payout cycle
 - Earnings are per-creator (summed across all your apps), not per-app
@@ -103,9 +115,10 @@ If a user opens your app twice on Monday and once on Tuesday, that's only 2 days
 
 - **React 18** + **Vite** + **TypeScript**
 - **Tailwind CSS v4** — airfold light theme with custom `@theme` variables
+- **TanStack React Query** — data fetching with `keepPreviousData` for smooth transitions
 - **Recharts** — charts (bar, line, area, sparklines)
 - **React Router v6** — client-side routing
-- **Framer Motion** — page animations and transitions
+- **Framer Motion** — landing page animations
 - **Croogla 4F** — custom brand font for "airfold" text
 - **Haptic feedback** — `navigator.vibrate()` on main CTAs for mobile
 - **Cloudflare Pages** — auto-deploys from `main` branch
@@ -126,19 +139,19 @@ npm install
 ### Environment
 ```bash
 cp .env.example .env
-# Edit .env if needed (defaults point to production)
+# Edit .env if needed (defaults point to production API)
 ```
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VITE_API_URL` | `https://airfold-api-...run.app` | Production API |
+| `VITE_API_URL` (dev) | `http://localhost:8000` | Local API (`.env.development`) |
 
 ### Development
 ```bash
 npm run dev
 ```
 Open [http://localhost:5173](http://localhost:5173)
-
-### Network Access (LAN)
-```bash
-npx vite --host 0.0.0.0
-```
 
 ### Build
 ```bash
@@ -149,55 +162,61 @@ npm run build
 
 ```
 src/
-  components/          # Shared UI (Logo, SparklineChart, AppSelector, Badge, ProgressBar)
-  context/             # Auth hooks (native JWT + dev mode), AppContext
-  data/                # Mock data (creators, platform stats)
-  hooks/               # Custom hooks (useCreatorData)
-  services/            # API client (sends JWT to backend)
+  components/          # Shared UI (Logo, SparklineChart, AppSelector)
+  context/             # AuthContext (native JWT + dev mode), AppContext (selected app)
+  data/                # Mock data (creators, platform stats — used in dev mode + landing)
+  hooks/               # useCreatorData (all dashboard data hooks with dev/prod switching)
+  services/            # API client (JWT-authenticated fetch calls)
   layouts/
-    PublicLayout/      # Landing page (no login)
-    DashboardLayout/   # Bottom nav with haptic feedback (authenticated)
+    PublicLayout/      # Landing page wrapper (no auth)
+    DashboardLayout/   # Bottom nav + dev mode toggle (authenticated)
   pages/
     Landing/           # Marketing page with featured creators + App Store link
     Dashboard/
-      Overview/        # Hero earnings card, app list, QAU sparkline
-      Earnings/        # Weekly charts, breakdown table, cap rollover
-      Analytics/       # DAU, retention, sessions
-      Leaderboard/     # Top creators ranking with period filter
-      Calculator/      # Interactive earnings estimator with rollover notice
-      HealthScore/     # Traffic quality, flags, eligibility
-  types/               # TypeScript interfaces
+      Overview/        # Hero earnings card, QAU sparkline, app list
+      Earnings/        # Weekly bar chart, breakdown table, cap rollover
+      Analytics/       # DAU, QAU vs unique, retention
+      HealthScore/     # Plain-language metrics, flags, QAU rules info sheet
+      Leaderboard/     # Creator ranking with period filter
   utils/
     earnings.ts        # Earnings calculations and formatting
     haptic.ts          # Haptic feedback utility
-  App.tsx              # Router setup (no ClerkProvider — auth via native JWT)
+  App.tsx              # Router setup + React Query client
   main.tsx             # Entry point
-  index.css            # Tailwind config + brand font + custom utilities
+  index.css            # Tailwind config, brand font, custom utilities, animations
 public/
   fonts/
-    croogla_4f-regular.otf  # Brand font for "airfold" text
+    croogla_4f-regular.otf  # Brand font
 ```
 
-## API Endpoints Summary
+## API Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/v1/creator/earnings` | GET | Weekly earnings for all creator's apps |
+| `/v1/creator/earnings` | GET | Weekly earnings across all creator's apps (last 8 weeks) |
 | `/v1/creator/earnings/app/{appId}` | GET | Weekly earnings for a single app |
 | `/v1/creator/health` | GET | Aggregated health score across all apps |
-| `/v1/app/{appId}/health` | GET | Health metrics for a single app |
-| `/v1/leaderboard` | GET | Top creators ranked by QAU |
-| `/v1/analytics/creator` | GET | Usage analytics (DAU, retention, sessions) |
-| `/v1/app` | GET | List of creator's apps |
+| `/v1/creator/health/app/{appId}` | GET | Health metrics for a single app |
+| `/v1/leaderboard` | GET | Creator leaderboard ranked by QAU (`?period=week\|month\|all`) |
+| `/v1/analytics/creator` | GET | Creator analytics (DAU, views, geo, devices) |
+| `/v1/analytics/app/{appId}` | GET | Per-app analytics |
+| `/v1/app` | GET | List of creator's published apps |
+
+## Deployment
+
+Pushes to `main` auto-deploy to **Cloudflare Pages** at `creators.airfold.co`.
 
 ## Roadmap
 
 - [x] Native JWT auth (iOS app WKWebView injection)
 - [x] API service layer (JWT-authenticated calls to backend)
 - [x] Analytics endpoints (ClickHouse queries via API)
-- [x] Creator earnings endpoints (backend)
-- [x] Health score endpoints (backend)
-- [x] Leaderboard endpoint (backend)
+- [x] Creator earnings endpoints
+- [x] Health score endpoints with plain-language UI
+- [x] Leaderboard endpoint
+- [x] QAU rules info sheet
+- [x] Skeleton loading states on all pages
+- [x] Smooth app switching (keepPreviousData + opacity transitions)
 - [x] Wire dashboard pages to real API (with dev mode fallback to mocks)
 - [x] Brand font (Croogla 4F) for airfold text
 - [x] Haptic feedback on mobile CTAs
