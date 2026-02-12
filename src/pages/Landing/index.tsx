@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '../../components/Logo';
 import SparklineChart from '../../components/SparklineChart';
 import { creators, platformStats, getCreatorTotalQAU, getCreatorAvgHealthScore } from '../../data/creators';
 import { formatNumber, formatCurrency } from '../../utils/earnings';
+import { enableDevMode } from '../../context/AuthContext';
 
 const featuredCreators = creators
   .filter(c => getCreatorAvgHealthScore(c) > 80 && getCreatorTotalQAU(c)[7] > 20)
@@ -24,6 +26,7 @@ const steps = [
 ];
 
 export default function Landing() {
+  const navigate = useNavigate();
   const [showTop, setShowTop] = useState(false);
 
   useEffect(() => {
@@ -54,6 +57,12 @@ export default function Landing() {
               <a href="#how-it-works" className="btn-secondary text-base px-8 py-3.5 w-full max-w-xs text-center">Learn More</a>
             </div>
             <p className="text-xs text-af-medium-gray mt-3">Creator Dashboard is accessible from the airfold iOS app.</p>
+            <button
+              onClick={() => { enableDevMode(); navigate('/dashboard'); }}
+              className="mt-4 text-[10px] font-mono text-af-medium-gray/40 border border-dashed border-af-light-gray/50 rounded px-2 py-1 active:text-af-tint active:border-af-tint transition-colors"
+            >
+              DEV MODE
+            </button>
           </motion.div>
         </div>
       </section>
