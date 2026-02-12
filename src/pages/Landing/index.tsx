@@ -1,14 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '../../components/Logo';
-import SparklineChart from '../../components/SparklineChart';
-import { creators, platformStats, getCreatorTotalQAU, getCreatorAvgHealthScore } from '../../data/creators';
+import { platformStats } from '../../data/creators';
 import { formatNumber, formatCurrency } from '../../utils/earnings';
-
-const featuredCreators = creators
-  .filter(c => getCreatorAvgHealthScore(c) > 80 && getCreatorTotalQAU(c)[7] > 20)
-  .sort((a, b) => getCreatorTotalQAU(b)[7] - getCreatorTotalQAU(a)[7])
-  .slice(0, 4);
 
 const stats = [
   { label: 'Creators', value: formatNumber(platformStats.totalCreators) },
@@ -57,35 +51,6 @@ export default function Landing() {
               <div className="text-[10px] text-af-medium-gray">{s.label}</div>
             </motion.div>
           ))}
-        </div>
-      </section>
-
-      {/* FOMO — Creators earning right now */}
-      <section className="max-w-7xl mx-auto px-5 py-10">
-        <motion.h2 initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-xl font-black text-af-deep-charcoal text-center mb-5">
-          Creators earning <span className="text-af-tint">right now</span>
-        </motion.h2>
-        <div className="space-y-2 md:grid md:grid-cols-2 md:gap-3 md:space-y-0">
-          {featuredCreators.map((creator, i) => {
-            const totalQAU = getCreatorTotalQAU(creator);
-            const weeklyEarnings = totalQAU[7] * 2;
-            const primaryApp = creator.apps[0];
-            return (
-              <motion.div key={creator.id} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="glass-card-hover p-3 flex items-center gap-3">
-                <div className="w-14 shrink-0">
-                  <SparklineChart data={totalQAU} height={28} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-sm text-af-deep-charcoal truncate">{primaryApp?.appName ?? creator.name}</h3>
-                  <p className="text-[11px] text-af-medium-gray">{creator.name}</p>
-                </div>
-                <div className="text-right shrink-0">
-                  <div className="text-base font-black text-af-tint">{formatCurrency(weeklyEarnings)}</div>
-                  <div className="text-[10px] text-success font-semibold">/week</div>
-                </div>
-              </motion.div>
-            );
-          })}
         </div>
       </section>
 
