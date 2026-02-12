@@ -58,9 +58,13 @@ export default function Calculator() {
       </div>
 
       {(earnings.capApplied || monthlyProjection.capApplied) && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-xs text-af-medium-gray text-center">
-          {earnings.capApplied && <p>Weekly earnings limit reached at this QAU level.</p>}
-          {monthlyProjection.capApplied && <p>Monthly earnings limit would be reached at this rate.</p>}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-3 flex items-start gap-2.5">
+          <span className="text-base mt-0.5">💡</span>
+          <div className="text-xs text-af-charcoal leading-relaxed">
+            {earnings.capApplied && <p className="font-medium">Weekly cap reached at this QAU level.</p>}
+            {monthlyProjection.capApplied && <p className="font-medium">Monthly cap reached at this rate.</p>}
+            <p className="text-af-medium-gray mt-1">Any excess automatically rolls over to your next month's payout cycle — nothing is lost.</p>
+          </div>
         </motion.div>
       )}
     </div>

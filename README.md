@@ -1,6 +1,6 @@
 # airfold Creator Platform
 
-Creator dashboard for the airfold mini-app platform. Creators sign in with the same account they use in the airfold iOS app and see real analytics, earnings, and health scores for their published apps.
+Creator dashboard for the airfold mini-app platform. Accessible exclusively from the airfold iOS app — no standalone web sign-in. Creators see real analytics, earnings, and health scores for their published apps.
 
 <p align="center">
   <img src="public/icon.png" alt="airfold" width="80" />
@@ -30,17 +30,17 @@ Creator dashboard for the airfold mini-app platform. Creators sign in with the s
                                               every mini-app request
 ```
 
-### Authentication (Clerk SSO)
+### Authentication (iOS app only)
 
-The creator platform uses **the same Clerk instance** (`clerk.airfold.co`) as the main airfold iOS app:
+The creator dashboard has **no standalone web sign-in**. It is opened from within the airfold iOS app:
 
-1. **Single identity** — a creator who signs up in the iOS app already has an account.
-2. **JWT flow** — Clerk issues a JWT on sign-in. The React app sends it as `Authorization: Bearer <jwt>` to the API.
-3. **No separate registration** — if you have an airfold account, you can access the creator dashboard.
+1. **Native JWT injection** — the iOS app opens the dashboard in a WKWebView and injects the Clerk JWT into `sessionStorage` before page load via `WKUserScript`.
+2. **No web login flow** — visiting `creators.airfold.co` directly shows a landing page with an "Open in airfold App" link. There is no sign-in button on the web.
+3. **Token-based auth** — the React app reads the JWT from `sessionStorage('native_token')` and sends it as `Authorization: Bearer <jwt>` to the API.
 
 ### Dev Mode
 
-A "DEV SKIP" button on the login page enables dev mode, which bypasses Clerk auth and uses mock data for all API calls. This lets you run the dashboard without a backend.
+A small "DEV" button next to the logo in the dashboard header enables dev mode, which bypasses auth and uses mock data for all API calls. This lets you run the dashboard without a backend or the iOS app.
 
 ---
 
@@ -67,7 +67,7 @@ Ranked list of top creators by QAU. Supports weekly/monthly/all-time period swit
 **API**: `GET /v1/leaderboard?period={week|month|all}&limit=20`
 
 ### Calculator
-Interactive earnings estimator. Drag a slider to set projected QAU, see estimated weekly and monthly earnings with cap visualization. Pure client-side — no API calls.
+Interactive earnings estimator. Drag a slider to set projected QAU, see estimated weekly and monthly earnings. When the cap is reached, a rollover notice explains that excess earnings carry over to the next month's payout cycle. Pure client-side — no API calls.
 
 ### Health Score
 Traffic quality dashboard. Shows an overall health score (0-100), eligibility status, and individual metrics: same-IP percentage, bounce rate, average session duration, app rating, and any flags. Per-app filtering supported.
@@ -102,13 +102,13 @@ If a user opens your app twice on Monday and once on Tuesday, that's only 2 days
 ## Tech Stack
 
 - **React 18** + **Vite** + **TypeScript**
-- **@clerk/clerk-react** — authentication (same Clerk instance as iOS app)
 - **Tailwind CSS v4** — airfold light theme with custom `@theme` variables
 - **Recharts** — charts (bar, line, area, sparklines)
 - **React Router v6** — client-side routing
 - **Framer Motion** — page animations and transitions
 - **Croogla 4F** — custom brand font for "airfold" text
 - **Haptic feedback** — `navigator.vibrate()` on main CTAs for mobile
+- **Cloudflare Pages** — auto-deploys from `main` branch
 
 ## Getting Started
 
@@ -149,29 +149,28 @@ npm run build
 
 ```
 src/
-  components/          # Shared UI (Logo, StatCard, SparklineChart, AppSelector)
-  context/             # Auth hooks (wraps Clerk, dev mode toggle)
-  data/                # Mock data (9 creators, early-stage platform)
-  hooks/               # Custom hooks (useAnimatedNumber, useCreatorData)
-  services/            # API client (sends Clerk JWT to backend)
+  components/          # Shared UI (Logo, SparklineChart, AppSelector, Badge, ProgressBar)
+  context/             # Auth hooks (native JWT + dev mode), AppContext
+  data/                # Mock data (creators, platform stats)
+  hooks/               # Custom hooks (useCreatorData)
+  services/            # API client (sends JWT to backend)
   layouts/
-    PublicLayout/      # Landing + Login
-    DashboardLayout/   # Bottom nav with haptic feedback (post-login)
+    PublicLayout/      # Landing page (no login)
+    DashboardLayout/   # Bottom nav with haptic feedback (authenticated)
   pages/
-    Landing/           # Platform home with featured creators
-    Login/             # Clerk SignIn + dev skip
+    Landing/           # Marketing page with featured creators + App Store link
     Dashboard/
       Overview/        # Hero earnings card, app list, QAU sparkline
       Earnings/        # Weekly charts, breakdown table, cap rollover
       Analytics/       # DAU, retention, sessions
       Leaderboard/     # Top creators ranking with period filter
-      Calculator/      # Interactive earnings estimator
+      Calculator/      # Interactive earnings estimator with rollover notice
       HealthScore/     # Traffic quality, flags, eligibility
   types/               # TypeScript interfaces
   utils/
     earnings.ts        # Earnings calculations and formatting
     haptic.ts          # Haptic feedback utility
-  App.tsx              # ClerkProvider + Router setup
+  App.tsx              # Router setup (no ClerkProvider — auth via native JWT)
   main.tsx             # Entry point
   index.css            # Tailwind config + brand font + custom utilities
 public/
@@ -193,7 +192,7 @@ public/
 
 ## Roadmap
 
-- [x] Clerk authentication (same SSO as iOS app)
+- [x] Native JWT auth (iOS app WKWebView injection)
 - [x] API service layer (JWT-authenticated calls to backend)
 - [x] Analytics endpoints (ClickHouse queries via API)
 - [x] Creator earnings endpoints (backend)
@@ -203,6 +202,9 @@ public/
 - [x] Brand font (Croogla 4F) for airfold text
 - [x] Haptic feedback on mobile CTAs
 - [x] Monthly payout messaging with cap rollover
+- [x] Remove standalone web login (app-only access)
+- [x] Cloudflare Pages deployment
+- [ ] Health score computation pipeline (scheduled job)
 - [ ] Stripe payout integration
 - [ ] Admin panel for reviewing flagged creators
 - [ ] Real-time QAU tracking
