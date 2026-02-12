@@ -9,7 +9,7 @@ import { formatNumber, formatCurrency } from '../../utils/earnings';
 const featuredCreators = creators
   .filter(c => c.healthScore > 80 && c.weeklyQAU[7] > 20)
   .sort((a, b) => b.weeklyQAU[7] - a.weeklyQAU[7])
-  .slice(0, 6);
+  .slice(0, 4);
 
 const stats = [
   { label: 'Active Creators', value: formatNumber(platformStats.totalCreators) },
@@ -123,11 +123,6 @@ export default function Landing() {
             ))}
           </div>
         </div>
-      </section>
-
-      {/* Banner */}
-      <section className="px-5 py-8">
-        <img src="/banner.png" alt="The new era of social apps" className="w-full rounded-xl" />
       </section>
 
       {/* Footer */}
