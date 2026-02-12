@@ -76,16 +76,28 @@ Traffic quality dashboard. Shows an overall health score (0-100), eligibility st
 
 ---
 
-## QAU Definition
-
-**QAU** = **Qualified Active User** — a user who opens a creator's app on **3+ different days** in a week, with each session **at least 1 minute** long. Must be authenticated with a verified .edu email and not flagged as bot/fake traffic.
-
 ## Payment Structure
 
-- **$2 per QAU per week** — flat rate
-- Weekly cap: **$2,000** | Monthly cap: **$5,000**
-- **Payouts are monthly** — earnings accumulate weekly, paid out once per month
-- If the monthly cap is hit, the excess amount rolls over to the next month's payout cycle
+### What is a QAU?
+
+**QAU** = **Qualified Active User**. Not every user counts — they have to meet all of these conditions:
+
+1. **3+ different days** in a single week (Mon–Sun) — opening the app once doesn't count
+2. **Minimum 1 minute per session** — quick bounces are filtered out
+3. **Verified .edu email** — must be authenticated with a real student account
+4. **Not flagged** — no bot traffic, no fake accounts, no same-IP farming
+
+If a user opens your app twice on Monday and once on Tuesday, that's only 2 days — not a QAU. They need to come back on a third day, spending at least 1 minute each time.
+
+### How earnings are calculated
+
+- **$2 per QAU per week** — flat rate, no tiers
+- QAU counts are calculated every Monday for the previous week
+- **Weekly cap**: $2,000 (= 1,000 QAU max per week)
+- **Monthly cap**: $5,000
+- **Payouts are monthly** — weekly earnings accumulate, paid out once at the end of the month
+- If you hit the monthly cap, the excess rolls over to the next month's payout cycle
+- Earnings are per-creator (summed across all your apps), not per-app
 
 ## Tech Stack
 
