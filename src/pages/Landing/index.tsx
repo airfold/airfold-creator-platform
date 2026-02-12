@@ -131,10 +131,10 @@ export default function Landing() {
           <div className="flex flex-col items-center gap-4 text-center">
             <Logo size="sm" />
             <div className="flex items-center gap-6 text-xs text-af-medium-gray">
-              <span className="active:text-af-deep-charcoal cursor-pointer">About</span>
-              <span className="active:text-af-deep-charcoal cursor-pointer">Terms</span>
-              <span className="active:text-af-deep-charcoal cursor-pointer">Privacy</span>
-              <span className="active:text-af-deep-charcoal cursor-pointer">Support</span>
+              <a href="https://airfold.co" target="_blank" rel="noopener noreferrer" className="active:text-af-deep-charcoal">About</a>
+              <a href="https://airfold.co/terms" target="_blank" rel="noopener noreferrer" className="active:text-af-deep-charcoal">Terms</a>
+              <a href="https://airfold.co/privacy" target="_blank" rel="noopener noreferrer" className="active:text-af-deep-charcoal">Privacy</a>
+              <a href="https://airfold.co/support" target="_blank" rel="noopener noreferrer" className="active:text-af-deep-charcoal">Support</a>
             </div>
             <p className="text-xs text-af-medium-gray">&copy; 2026 <span className="font-brand">airfold</span>. All rights reserved.</p>
           </div>
