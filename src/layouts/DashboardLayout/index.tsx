@@ -39,7 +39,7 @@ export default function DashboardLayout() {
       <DesktopBlocker />
       <div className="min-h-screen bg-af-surface lg:hidden">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-af-light-gray safe-top">
+        <header className="sticky top-0 z-30 bg-white border-b border-af-light-gray safe-top">
           <div className="h-14 px-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="cursor-pointer" onClick={() => navigate('/dashboard')}>
@@ -77,7 +77,7 @@ export default function DashboardLayout() {
         </main>
 
         {/* Bottom navigation */}
-        <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-af-light-gray safe-bottom">
+        <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-af-light-gray safe-bottom">
           <div className="flex items-center justify-around h-16 px-1">
             {navItems.map(item => (
               <NavLink

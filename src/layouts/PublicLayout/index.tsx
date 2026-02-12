@@ -7,7 +7,7 @@ export default function PublicLayout() {
     <>
       <DesktopBlocker />
       <div className="min-h-screen bg-white lg:hidden">
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-af-light-gray safe-top">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-af-light-gray safe-top">
           <div className="px-4 h-14 flex items-center justify-between">
             <Link to="/">
               <Logo size="sm" />
