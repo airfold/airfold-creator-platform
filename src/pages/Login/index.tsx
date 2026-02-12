@@ -31,6 +31,7 @@ export default function Login() {
               elements: {
                 card: 'shadow-none bg-transparent',
                 rootBox: 'w-full',
+                footerAction: { display: 'none' },
               },
             }}
           />
