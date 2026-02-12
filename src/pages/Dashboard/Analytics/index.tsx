@@ -34,8 +34,7 @@ export default function Analytics() {
   const dauData = analytics?.dau ?? [];
   const totalViews = analytics?.total_views ?? 0;
   const uniqueUsers = analytics?.unique_users ?? 0;
-  const geoData = analytics?.geo ?? [];
-  const deviceData = analytics?.devices ?? [];
+  // geo + device data removed — Airfold is USA-only
 
   const qauVsUnique = weeklyQAU.map((qau, i) => ({
     week: `W${i + 1}`,
@@ -133,35 +132,6 @@ export default function Analytics() {
           </ResponsiveContainer>
         </motion.div>
 
-        {/* Device breakdown from real API */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-4 md:col-span-2">
-          <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">Device & Geo Breakdown</h3>
-          <p className="text-xs text-af-medium-gray mb-3">{isLoading ? 'Loading...' : 'Live from analytics'}</p>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <h4 className="text-xs font-medium text-af-charcoal mb-2">Devices</h4>
-              <div className="space-y-1.5">
-                {(deviceData.length > 0 ? deviceData : [{ device_type: 'mobile', count: 0 }]).map(d => (
-                  <div key={d.device_type} className="flex justify-between text-xs">
-                    <span className="text-af-medium-gray capitalize">{d.device_type}</span>
-                    <span className="font-medium text-af-deep-charcoal">{d.count.toLocaleString()}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h4 className="text-xs font-medium text-af-charcoal mb-2">Top Countries</h4>
-              <div className="space-y-1.5">
-                {(geoData.length > 0 ? geoData.slice(0, 5) : [{ country: '—', users: 0 }]).map(g => (
-                  <div key={g.country} className="flex justify-between text-xs">
-                    <span className="text-af-medium-gray">{g.country}</span>
-                    <span className="font-medium text-af-deep-charcoal">{g.users.toLocaleString()}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </motion.div>
       </div>
     </div>
   );

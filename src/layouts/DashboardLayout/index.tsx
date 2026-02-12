@@ -4,6 +4,7 @@ import { UserButton } from '@clerk/clerk-react';
 import { useAuth, isDevMode, clearDevMode } from '../../context/AuthContext';
 import { setTokenGetter } from '../../services/api';
 import Logo from '../../components/Logo';
+import { haptic } from '../../utils/haptic';
 import DesktopBlocker from '../../components/DesktopBlocker';
 import { useSelectedApp } from '../../context/AppContext';
 import { useCurrentCreator } from '../../hooks/useCreatorData';
@@ -82,6 +83,7 @@ export default function DashboardLayout() {
                 key={item.to}
                 to={item.to}
                 end={item.to === '/dashboard'}
+                onClick={() => haptic()}
                 className={({ isActive }) =>
                   `flex flex-col items-center justify-center gap-0.5 py-1 px-2 rounded-xl text-[10px] font-medium transition-all min-w-[52px] ${
                     isActive

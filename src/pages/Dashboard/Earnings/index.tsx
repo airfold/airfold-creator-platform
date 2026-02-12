@@ -1,11 +1,9 @@
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import AppSelector from '../../../components/AppSelector';
-import { useCurrentCreator } from '../../../hooks/useCreatorData';
+import { useCreatorEarnings } from '../../../hooks/useCreatorData';
 import { useSelectedApp } from '../../../context/AppContext';
-import { getCreatorTotalQAU } from '../../../data/creators';
 import {
-  calculateWeeklyEarnings,
   calculateMonthlyEarnings,
   formatCurrency,
 } from '../../../utils/earnings';
@@ -19,31 +17,38 @@ const tooltipStyle = {
 };
 
 export default function Earnings() {
-  const creator = useCurrentCreator();
   const { selectedAppId } = useSelectedApp();
+  const { data: earningsData, isLoading } = useCreatorEarnings(selectedAppId);
 
-  const selectedApp = selectedAppId ? creator.apps.find(a => a.id === selectedAppId) : null;
-  const weeklyQAU = selectedApp ? selectedApp.weeklyQAU : getCreatorTotalQAU(creator);
-
-  const weeklyData = weeklyQAU.map((qau, i) => {
-    const e = calculateWeeklyEarnings(qau);
-    return {
-      week: `W${i + 1}`,
-      qau,
-      earnings: e.earnings,
-      payout: e.capped,
-    };
-  });
+  const weeklyData = (earningsData?.weekly ?? []).map((w, i) => ({
+    week: `W${i + 1}`,
+    qau: w.qau,
+    earnings: w.gross,
+    payout: w.capped,
+  }));
 
   const monthlyResult = calculateMonthlyEarnings(weeklyData.slice(-4).map(w => w.payout));
 
-  const subtitle = selectedApp ? selectedApp.appName : creator.apps.length > 1 ? 'All Apps' : creator.apps[0]?.appName ?? '';
+  const subtitle = selectedAppId
+    ? (earningsData?.weekly?.[0]?.app_name ?? 'App')
+    : 'All Apps';
+
+  if (isLoading) {
+    return (
+      <div className="space-y-5">
+        <div>
+          <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Earnings</h1>
+          <p className="text-sm text-af-medium-gray">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Earnings</h1>
-        <p className="text-sm text-af-medium-gray">{subtitle} · Weekly and monthly payouts</p>
+        <p className="text-sm text-af-medium-gray">{subtitle} · Paid monthly</p>
       </div>
 
       <AppSelector />
@@ -77,7 +82,7 @@ export default function Earnings() {
             </thead>
             <tbody>
               {weeklyData.map((w, i) => (
-                <tr key={i} className={`border-b border-af-light-gray ${i === 7 ? 'bg-af-tint-soft' : ''}`}>
+                <tr key={i} className={`border-b border-af-light-gray ${i === weeklyData.length - 1 ? 'bg-af-tint-soft' : ''}`}>
                   <td className="px-3 py-2.5 font-medium text-af-deep-charcoal">{w.week}</td>
                   <td className="text-right px-3 py-2.5 text-af-charcoal">{w.qau.toLocaleString()}</td>
                   <td className="text-right px-3 py-2.5 text-af-charcoal">{formatCurrency(w.earnings)}</td>
@@ -90,7 +95,9 @@ export default function Earnings() {
       </motion.div>
 
       {monthlyResult.capApplied && (
-        <p className="text-xs text-af-medium-gray text-center">Weekly earnings limit reached this period.</p>
+        <div className="bg-af-tint-soft rounded-xl p-3 text-xs text-af-tint">
+          Monthly cap reached. The excess {formatCurrency(monthlyResult.total - monthlyResult.capped)} will be added to your next month's payout cycle.
+        </div>
       )}
     </div>
   );

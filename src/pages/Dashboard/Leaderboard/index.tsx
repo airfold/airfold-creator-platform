@@ -1,33 +1,17 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useAllCreators } from '../../../hooks/useCreatorData';
-import { getCreatorTotalQAU } from '../../../data/creators';
-import { formatNumber, formatCurrency, calculateWeeklyEarnings } from '../../../utils/earnings';
+import { useLeaderboard } from '../../../hooks/useCreatorData';
+import { formatNumber, formatCurrency } from '../../../utils/earnings';
+import { haptic } from '../../../utils/haptic';
 
 type Period = 'week' | 'month' | 'all';
 
-function getQAU(totalWeeklyQAU: number[], period: Period): number {
-  switch (period) {
-    case 'week': return totalWeeklyQAU[7];
-    case 'month': return totalWeeklyQAU.slice(-4).reduce((s, v) => s + v, 0);
-    case 'all': return totalWeeklyQAU.reduce((s, v) => s + v, 0);
-  }
-}
-
 export default function Leaderboard() {
-  const { creators, currentCreatorId } = useAllCreators();
   const [period, setPeriod] = useState<Period>('week');
+  const { data: leaderboardData, isLoading } = useLeaderboard(period);
 
-  const sorted = [...creators]
-    .map(c => {
-      const totalQAU = getCreatorTotalQAU(c);
-      const qau = getQAU(totalQAU, period);
-      const earnings = calculateWeeklyEarnings(qau);
-      const appLabel = c.apps.length > 1 ? `${c.apps.length} apps` : c.apps[0]?.appName ?? '';
-      return { ...c, qau, earningsDisplay: earnings.capped, appLabel };
-    })
-    .sort((a, b) => b.qau - a.qau)
-    .slice(0, 20);
+  const entries = leaderboardData?.entries ?? [];
+  const myRank = leaderboardData?.my_rank;
 
   return (
     <div className="space-y-5">
@@ -38,7 +22,7 @@ export default function Leaderboard() {
           {(['week', 'month', 'all'] as Period[]).map(p => (
             <button
               key={p}
-              onClick={() => setPeriod(p)}
+              onClick={() => { haptic(); setPeriod(p); }}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border ${
                 period === p
                   ? 'bg-af-tint-soft text-af-tint border-af-tint/20'
@@ -51,48 +35,55 @@ export default function Leaderboard() {
         </div>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card overflow-hidden">
-        <div className="divide-y divide-af-light-gray">
-          {sorted.map((c, i) => {
-            const isCurrentUser = c.id === currentCreatorId;
+      {isLoading ? (
+        <div className="glass-card p-8 text-center text-af-medium-gray text-sm">Loading...</div>
+      ) : (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card overflow-hidden">
+          <div className="divide-y divide-af-light-gray">
+            {entries.map((entry, i) => {
+              const isCurrentUser = myRank != null && entry.rank === myRank.rank;
 
-            return (
-              <motion.div
-                key={c.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.02 }}
-                className={`flex items-center gap-3 px-4 py-3 ${
-                  isCurrentUser ? 'bg-af-tint-soft border-l-2 border-l-af-tint' : ''
-                }`}
-              >
-                <span className={`w-7 text-center font-bold text-af-deep-charcoal ${i < 3 ? 'text-base' : 'text-xs'}`}>
-                  {i === 0 && '🥇'}
-                  {i === 1 && '🥈'}
-                  {i === 2 && '🥉'}
-                  {i > 2 && `#${i + 1}`}
-                </span>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                  isCurrentUser ? 'bg-af-tint text-white' : 'bg-af-surface text-af-charcoal'
-                }`}>
-                  {c.name.charAt(0)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1">
-                    <span className={`text-sm font-medium truncate ${isCurrentUser ? 'text-af-tint' : 'text-af-deep-charcoal'}`}>{c.name}</span>
-                    {isCurrentUser && <span className="text-[10px] text-af-tint shrink-0">(You)</span>}
+              return (
+                <motion.div
+                  key={entry.user_id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.02 }}
+                  className={`flex items-center gap-3 px-4 py-3 ${
+                    isCurrentUser ? 'bg-af-tint-soft border-l-2 border-l-af-tint' : ''
+                  }`}
+                >
+                  <span className={`w-7 text-center font-bold ${i < 3 ? 'text-sm text-af-tint' : 'text-xs text-af-deep-charcoal'}`}>
+                    #{entry.rank}
+                  </span>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                    isCurrentUser ? 'bg-af-tint text-white' : 'bg-af-surface text-af-charcoal'
+                  }`}>
+                    {entry.avatar ? (
+                      <img src={entry.avatar} alt="" className="w-full h-full rounded-full object-cover" />
+                    ) : (
+                      entry.name.charAt(0)
+                    )}
                   </div>
-                  <span className="text-xs text-af-medium-gray truncate block">{c.appLabel}</span>
-                </div>
-                <div className="text-right shrink-0">
-                  <div className="text-sm font-bold text-af-tint">{formatCurrency(c.earningsDisplay)}</div>
-                  <div className="text-[10px] text-af-medium-gray">{formatNumber(c.qau)} QAU</div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </motion.div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1">
+                      <span className={`text-sm font-medium truncate ${isCurrentUser ? 'text-af-tint' : 'text-af-deep-charcoal'}`}>{entry.name}</span>
+                      {isCurrentUser && <span className="text-[10px] text-af-tint shrink-0">(You)</span>}
+                    </div>
+                    <span className="text-xs text-af-medium-gray truncate block">
+                      {entry.app_count > 1 ? `${entry.app_count} apps` : '1 app'}
+                    </span>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-sm font-bold text-af-tint">{formatCurrency(entry.earnings)}</div>
+                    <div className="text-[10px] text-af-medium-gray">{formatNumber(entry.qau)} QAU</div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }

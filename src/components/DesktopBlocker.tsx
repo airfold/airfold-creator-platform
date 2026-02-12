@@ -6,7 +6,11 @@ export default function DesktopBlocker() {
       <div className="text-center px-8 max-w-lg">
         <Logo size="lg" className="mb-10 inline-block" />
 
-        <div className="text-6xl mb-6">📱</div>
+        <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-af-tint-soft flex items-center justify-center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#BD295A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2" /><line x1="12" y1="18" x2="12.01" y2="18" />
+          </svg>
+        </div>
         <h1 className="text-3xl font-bold text-af-deep-charcoal mb-3">
           Mobile Access Only
         </h1>

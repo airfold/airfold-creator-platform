@@ -2,36 +2,50 @@ import { motion } from 'framer-motion';
 import Badge from '../../../components/Badge';
 import ProgressBar from '../../../components/ProgressBar';
 import AppSelector from '../../../components/AppSelector';
-import { useCurrentCreator } from '../../../hooks/useCreatorData';
+import { useCreatorHealth } from '../../../hooks/useCreatorData';
 import { useSelectedApp } from '../../../context/AppContext';
-import { getCreatorAvgHealthScore } from '../../../data/creators';
+
+function formatSessionTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
 
 export default function HealthScore() {
-  const creator = useCurrentCreator();
   const { selectedAppId } = useSelectedApp();
+  const { data: healthData, isLoading } = useCreatorHealth(selectedAppId);
 
-  const selectedApp = selectedAppId ? creator.apps.find(a => a.id === selectedAppId) : null;
-
-  const score = selectedApp ? selectedApp.healthScore : getCreatorAvgHealthScore(creator);
-  const rating = selectedApp ? selectedApp.rating : (creator.apps.reduce((s, a) => s + a.rating * a.weeklyQAU[7], 0) / Math.max(1, creator.apps.reduce((s, a) => s + a.weeklyQAU[7], 0)));
-  const ratingCount = selectedApp ? selectedApp.ratingCount : creator.apps.reduce((s, a) => s + a.ratingCount, 0);
-  const flags = selectedApp ? selectedApp.flags : [...new Set(creator.apps.flatMap(a => a.flags))];
+  const score = healthData?.score ?? 80;
+  const rating = healthData?.rating ?? 0;
+  const ratingCount = healthData?.rating_count ?? 0;
+  const flags = healthData?.flags ?? [];
 
   const scoreColor = score >= 80 ? '#22c55e' : score >= 50 ? '#f97316' : '#ef4444';
   const status = score >= 80 ? 'Eligible' : score >= 50 ? 'At Risk' : 'Under Review';
   const statusColor: 'green' | 'amber' | 'red' = score >= 80 ? 'green' : score >= 50 ? 'amber' : 'red';
 
   const metrics = {
-    sameIPPercent: flags.includes('same_ip_cluster') ? 42 : 3,
-    bounceRate: flags.includes('high_bounce_rate') ? 68 : 22,
-    avgSessionTime: flags.includes('low_session_time') ? '0:18' : '4:32',
+    sameIPPercent: healthData?.metrics.same_ip_percent ?? 0,
+    bounceRate: healthData?.metrics.bounce_rate ?? 0,
+    avgSessionTime: formatSessionTime(healthData?.metrics.avg_session_seconds ?? 0),
     rating: Math.round(rating * 10) / 10,
     ratingCount,
   };
 
   const ratingMeetsMinimum = metrics.rating >= 3.0 && metrics.ratingCount >= 15;
 
-  const subtitle = selectedApp ? selectedApp.appName : creator.apps.length > 1 ? 'All Apps' : creator.apps[0]?.appName ?? '';
+  const subtitle = selectedAppId ? 'Selected App' : 'All Apps';
+
+  if (isLoading) {
+    return (
+      <div className="space-y-5">
+        <div>
+          <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Health Score</h1>
+          <p className="text-sm text-af-medium-gray">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">

@@ -1,8 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
 import { isDevMode } from '../context/AuthContext';
-import { fetchMyApps, fetchCreatorAnalytics, fetchAppAnalytics } from '../services/api';
-import { getCurrentCreator, creators, platformStats } from '../data/creators';
-import type { AppResponse, CreatorAnalyticsResponse, AppAnalyticsResponse } from '../services/api';
+import {
+  fetchMyApps,
+  fetchCreatorAnalytics,
+  fetchAppAnalytics,
+  fetchCreatorEarnings,
+  fetchAppEarnings,
+  fetchCreatorHealth,
+  fetchAppHealth,
+  fetchLeaderboard,
+} from '../services/api';
+import { getCurrentCreator, getCreatorTotalQAU, getCreatorAvgHealthScore, creators, platformStats } from '../data/creators';
+import { calculateWeeklyEarnings } from '../utils/earnings';
+import type { AppResponse, CreatorAnalyticsResponse, AppAnalyticsResponse, CreatorEarningsResponse, CreatorHealthResponse, LeaderboardResponse } from '../services/api';
 import type { Creator } from '../types';
 
 // ─── Mock data generators (dev mode) ───
@@ -138,4 +148,135 @@ export function useAllCreators() {
 /** Platform stats — mock only (no backend endpoint) */
 export function usePlatformStats() {
   return platformStats;
+}
+
+// ─── Creator Dashboard Hooks (real API in prod, mock in dev) ───
+
+/** Mock earnings response from creator mock data */
+function mockCreatorEarningsResponse(appId?: string | null): CreatorEarningsResponse {
+  const creator = getCurrentCreator();
+  const apps = appId ? creator.apps.filter(a => a.id === appId) : creator.apps;
+  const weeklyQAU = appId
+    ? (apps[0]?.weeklyQAU ?? Array(8).fill(0))
+    : getCreatorTotalQAU(creator);
+
+  const weekly = weeklyQAU.map((qau, i) => {
+    const e = calculateWeeklyEarnings(qau);
+    const weekDate = new Date(Date.now() - (7 - i) * 7 * 86400000);
+    return {
+      week_start: weekDate.toISOString().split('T')[0],
+      app_id: appId ?? 'all',
+      app_name: appId ? (apps[0]?.appName ?? '') : 'All Apps',
+      qau,
+      gross: e.earnings,
+      capped: e.capped,
+    };
+  });
+  return {
+    weekly,
+    totals: {
+      total_qau: weekly.reduce((s, w) => s + w.qau, 0),
+      total_gross: weekly.reduce((s, w) => s + w.gross, 0),
+      total_capped: weekly.reduce((s, w) => s + w.capped, 0),
+    },
+  };
+}
+
+/** Fetch creator earnings — real API or mock in dev mode */
+export function useCreatorEarnings(appId?: string | null) {
+  return useQuery({
+    queryKey: ['creatorEarnings', appId],
+    queryFn: () => {
+      if (isDevMode()) return Promise.resolve(mockCreatorEarningsResponse(appId));
+      if (appId) return fetchAppEarnings(appId);
+      return fetchCreatorEarnings();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+/** Mock health response from creator mock data */
+function mockHealthResponse(appId?: string | null): CreatorHealthResponse {
+  const creator = getCurrentCreator();
+  const selectedApp = appId ? creator.apps.find(a => a.id === appId) : null;
+  const score = selectedApp ? selectedApp.healthScore : getCreatorAvgHealthScore(creator);
+  const rating = selectedApp
+    ? selectedApp.rating
+    : (creator.apps.reduce((s, a) => s + a.rating * a.weeklyQAU[7], 0) /
+       Math.max(1, creator.apps.reduce((s, a) => s + a.weeklyQAU[7], 0)));
+  const ratingCount = selectedApp ? selectedApp.ratingCount : creator.apps.reduce((s, a) => s + a.ratingCount, 0);
+  const flags = selectedApp ? selectedApp.flags : [...new Set(creator.apps.flatMap(a => a.flags))];
+
+  return {
+    score,
+    status: score >= 80 ? 'eligible' : score >= 50 ? 'at_risk' : 'under_review',
+    metrics: {
+      same_ip_percent: flags.includes('same_ip_cluster') ? 42 : 3,
+      bounce_rate: flags.includes('high_bounce_rate') ? 68 : 22,
+      avg_session_seconds: flags.includes('low_session_time') ? 18 : 272,
+    },
+    flags,
+    rating: Math.round(rating * 10) / 10,
+    rating_count: ratingCount,
+  };
+}
+
+/** Fetch creator health — real API or mock in dev mode */
+export function useCreatorHealth(appId?: string | null) {
+  return useQuery({
+    queryKey: ['creatorHealth', appId],
+    queryFn: () => {
+      if (isDevMode()) return Promise.resolve(mockHealthResponse(appId));
+      if (appId) return fetchAppHealth(appId);
+      return fetchCreatorHealth();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+/** Mock leaderboard response from creator mock data */
+function mockLeaderboardResponse(period: string): LeaderboardResponse {
+  const currentCreator = getCurrentCreator();
+
+  const sorted = [...creators]
+    .map(c => {
+      const totalQAU = getCreatorTotalQAU(c);
+      let qau: number;
+      if (period === 'week') qau = totalQAU[7];
+      else if (period === 'month') qau = totalQAU.slice(-4).reduce((s, v) => s + v, 0);
+      else qau = totalQAU.reduce((s, v) => s + v, 0);
+      const earnings = calculateWeeklyEarnings(qau);
+      return { ...c, qau, earningsValue: earnings.capped };
+    })
+    .sort((a, b) => b.qau - a.qau)
+    .slice(0, 20);
+
+  const entries = sorted.map((c, i) => ({
+    rank: i + 1,
+    user_id: c.id,
+    name: c.name,
+    avatar: c.avatar,
+    qau: c.qau,
+    earnings: c.earningsValue,
+    app_count: c.apps.length,
+  }));
+
+  const myEntry = entries.find(e => e.user_id === currentCreator.id);
+
+  return {
+    entries,
+    my_rank: myEntry ? { rank: myEntry.rank, qau: myEntry.qau, earnings: myEntry.earnings } : null,
+  };
+}
+
+/** Fetch leaderboard — real API or mock in dev mode */
+export function useLeaderboard(period: string = 'week') {
+  return useQuery({
+    queryKey: ['leaderboard', period],
+    queryFn: () => {
+      if (isDevMode()) return Promise.resolve(mockLeaderboardResponse(period));
+      return fetchLeaderboard(period);
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 }

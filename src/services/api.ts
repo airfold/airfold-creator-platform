@@ -84,6 +84,52 @@ export interface AppAnalyticsResponse {
   devices: DeviceEntry[];
 }
 
+// ─── Creator Dashboard Types ───
+
+export interface WeeklyEarningsEntry {
+  week_start: string;
+  app_id: string;
+  app_name: string;
+  qau: number;
+  gross: number;
+  capped: number;
+}
+
+export interface CreatorEarningsResponse {
+  weekly: WeeklyEarningsEntry[];
+  totals: { total_qau: number; total_gross: number; total_capped: number };
+}
+
+export interface HealthMetrics {
+  same_ip_percent: number;
+  bounce_rate: number;
+  avg_session_seconds: number;
+}
+
+export interface CreatorHealthResponse {
+  score: number;
+  status: string;
+  metrics: HealthMetrics;
+  flags: string[];
+  rating: number;
+  rating_count: number;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  user_id: string;
+  name: string;
+  avatar: string | null;
+  qau: number;
+  earnings: number;
+  app_count: number;
+}
+
+export interface LeaderboardResponse {
+  entries: LeaderboardEntry[];
+  my_rank: { rank: number; qau: number; earnings: number } | null;
+}
+
 // ─── API Methods ───
 
 export async function fetchMyApps(): Promise<AppResponse[]> {
@@ -97,4 +143,28 @@ export async function fetchCreatorAnalytics(period: string = '30d'): Promise<Cre
 
 export async function fetchAppAnalytics(appId: string, period: string = '30d'): Promise<AppAnalyticsResponse> {
   return request<AppAnalyticsResponse>(`/v1/analytics/app/${appId}?period=${period}`);
+}
+
+export async function fetchCreatorEarnings(period?: string): Promise<CreatorEarningsResponse> {
+  const params = period ? `?period=${period}` : '';
+  return request<CreatorEarningsResponse>(`/v1/creator/earnings${params}`);
+}
+
+export async function fetchAppEarnings(appId: string, period?: string): Promise<CreatorEarningsResponse> {
+  const params = period ? `?period=${period}` : '';
+  return request<CreatorEarningsResponse>(`/v1/creator/earnings/app/${appId}${params}`);
+}
+
+export async function fetchCreatorHealth(): Promise<CreatorHealthResponse> {
+  return request<CreatorHealthResponse>('/v1/creator/health');
+}
+
+export async function fetchAppHealth(appId: string): Promise<CreatorHealthResponse> {
+  return request<CreatorHealthResponse>(`/v1/app/${appId}/health`);
+}
+
+export async function fetchLeaderboard(period: string = 'week', limit?: number): Promise<LeaderboardResponse> {
+  const params = new URLSearchParams({ period });
+  if (limit) params.set('limit', String(limit));
+  return request<LeaderboardResponse>(`/v1/leaderboard?${params}`);
 }

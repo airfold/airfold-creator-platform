@@ -7,10 +7,9 @@ interface StatCardProps {
   prefix?: string;
   suffix?: string;
   change?: number;
-  icon?: React.ReactNode;
 }
 
-export default function StatCard({ label, value, prefix = '', suffix = '', change, icon }: StatCardProps) {
+export default function StatCard({ label, value, prefix = '', suffix = '', change }: StatCardProps) {
   const animated = useAnimatedNumber(value);
 
   return (
@@ -19,10 +18,7 @@ export default function StatCard({ label, value, prefix = '', suffix = '', chang
       animate={{ opacity: 1, y: 0 }}
       className="glass-card p-4"
     >
-      <div className="flex items-start justify-between mb-1.5">
-        <span className="text-xs text-af-medium-gray font-medium leading-tight">{label}</span>
-        {icon && <span className="text-af-tint">{icon}</span>}
-      </div>
+      <span className="text-xs text-af-medium-gray font-medium leading-tight block mb-1.5">{label}</span>
       <div className="flex items-end gap-2">
         <span className="text-2xl font-bold text-af-deep-charcoal">
           {prefix}{animated.toLocaleString()}{suffix}
