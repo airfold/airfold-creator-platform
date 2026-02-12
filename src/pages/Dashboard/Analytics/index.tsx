@@ -23,12 +23,11 @@ export default function Analytics() {
 
   const selectedApp = selectedAppId && apps ? apps.find(a => a.id === selectedAppId) : null;
 
-  const { data: creatorAnalytics, isLoading: creatorLoading, isFetching: creatorFetching, error: creatorError } = useCreatorAnalytics('30d');
-  const { data: appAnalytics, isLoading: appLoading, isFetching: appFetching } = useAppAnalytics(selectedAppId);
+  const { data: creatorAnalytics, isLoading: creatorLoading, error: creatorError } = useCreatorAnalytics('30d');
+  const { data: appAnalytics, isLoading: appLoading } = useAppAnalytics(selectedAppId);
 
   const analytics = selectedAppId ? appAnalytics : creatorAnalytics;
   const isLoading = selectedAppId ? appLoading : creatorLoading;
-  const isFetching = selectedAppId ? appFetching : creatorFetching;
   const error = selectedAppId ? null : creatorError;
 
   const dauData = analytics?.dau ?? [];
@@ -97,7 +96,7 @@ export default function Analytics() {
 
       <AppSelector />
 
-      <div className={`transition-opacity duration-200 space-y-5 ${isFetching ? 'opacity-50' : 'opacity-100'}`}>
+      <div className="space-y-5">
       {/* Summary stats */}
       <div className="grid grid-cols-2 gap-3">
         <div className="glass-card p-3 text-center">

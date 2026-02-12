@@ -43,16 +43,6 @@ function QAURulesSheet({ onClose }: { onClose: () => void }) {
 
           <div className="flex items-start gap-3 bg-af-surface rounded-xl p-3">
             <div className="w-8 h-8 rounded-full bg-af-tint-soft flex items-center justify-center shrink-0">
-              <svg className="w-4 h-4 text-af-tint" viewBox="0 0 16 16" fill="none"><path d="M11 7V5a3 3 0 00-6 0v2m-1 0h8a1 1 0 011 1v5a1 1 0 01-1 1H4a1 1 0 01-1-1V8a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-            </div>
-            <div>
-              <div className="text-sm font-semibold text-af-deep-charcoal">Authenticated</div>
-              <div className="text-xs text-af-medium-gray">Signed in via phone number or Apple ID</div>
-            </div>
-          </div>
-
-          <div className="flex items-start gap-3 bg-af-surface rounded-xl p-3">
-            <div className="w-8 h-8 rounded-full bg-af-tint-soft flex items-center justify-center shrink-0">
               <svg className="w-4 h-4 text-af-tint" viewBox="0 0 16 16" fill="none"><path d="M13.5 6.5a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0zM4 16c0-2.5 2.5-4.5 6-4.5s6 2 6 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
             </div>
             <div>
@@ -75,7 +65,7 @@ function QAURulesSheet({ onClose }: { onClose: () => void }) {
 
 export default function HealthScore() {
   const { selectedAppId } = useSelectedApp();
-  const { data: healthData, isLoading, isFetching } = useCreatorHealth(selectedAppId);
+  const { data: healthData, isLoading } = useCreatorHealth(selectedAppId);
   const [showRules, setShowRules] = useState(false);
 
   if (isLoading) {
@@ -121,7 +111,7 @@ export default function HealthScore() {
 
       <AppSelector />
 
-      <div className={`transition-opacity duration-200 space-y-4 ${isFetching ? 'opacity-50' : 'opacity-100'}`}>
+      <div className="space-y-4">
         {/* Score card */}
         <div className={`${scoreBg} rounded-2xl p-6 text-center`}>
           <div className="text-6xl font-black mb-1" style={{ color: scoreColor }}>{score}</div>

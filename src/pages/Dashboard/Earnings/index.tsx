@@ -17,7 +17,7 @@ const tooltipStyle = {
 
 export default function Earnings() {
   const { selectedAppId } = useSelectedApp();
-  const { data: earningsData, isLoading, isFetching } = useCreatorEarnings(selectedAppId);
+  const { data: earningsData, isLoading } = useCreatorEarnings(selectedAppId);
 
   // Aggregate by week_start (API returns per-app-per-week rows in "All Apps" view)
   const weeklyData = (() => {
@@ -75,7 +75,7 @@ export default function Earnings() {
 
       <AppSelector />
 
-      <div className={`transition-opacity duration-200 space-y-5 ${isFetching ? 'opacity-50' : 'opacity-100'}`}>
+      <div className="space-y-5">
       <div className="glass-card p-4">
         <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Weekly</h3>
         <ResponsiveContainer width="100%" height={240}>
