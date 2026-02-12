@@ -8,6 +8,18 @@ function formatSessionTime(seconds: number): string {
   return `${seconds}s`;
 }
 
+function getHealthPenalties(metrics: { same_ip_percent: number; bounce_rate: number; avg_session_seconds: number }) {
+  const session = metrics.avg_session_seconds;
+  const bounce = metrics.bounce_rate;
+  const sameIp = metrics.same_ip_percent;
+
+  const sessionPenalty = session < 30 ? -25 : session < 60 ? -10 : 0;
+  const bouncePenalty = bounce > 60 ? -25 : bounce > 40 ? -10 : 0;
+  const sameIpPenalty = sameIp > 30 ? -30 : sameIp > 15 ? -10 : 0;
+
+  return { sessionPenalty, bouncePenalty, sameIpPenalty };
+}
+
 function QAURulesSheet({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
@@ -78,6 +90,8 @@ export default function HealthScore() {
   const bounce = metrics?.bounce_rate ?? 0;
   const session = metrics?.avg_session_seconds ?? 0;
 
+  const penalties = metrics ? getHealthPenalties(metrics) : null;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -117,6 +131,78 @@ export default function HealthScore() {
             </>
           )}
         </div>
+
+        {/* Score breakdown */}
+        {!isLoading && penalties && (
+          <div className="glass-card p-4">
+            <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">How your score works</h3>
+            <div className="space-y-2">
+              {/* Starting score */}
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-af-medium-gray">Starting score</span>
+                <span className="font-bold text-af-deep-charcoal">100</span>
+              </div>
+
+              <div className="border-t border-af-light-gray" />
+
+              {/* Session time penalty */}
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  {penalties.sessionPenalty === 0 ? (
+                    <span className="w-5 h-5 rounded-full bg-green-50 flex items-center justify-center text-green-500 text-xs">✓</span>
+                  ) : (
+                    <span className="w-5 h-5 rounded-full bg-red-50 flex items-center justify-center text-red-500 text-xs">✗</span>
+                  )}
+                  <span className="text-af-charcoal">Time in app</span>
+                  <span className="text-xs text-af-medium-gray">({formatSessionTime(session)})</span>
+                </div>
+                <span className={`font-bold ${penalties.sessionPenalty === 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {penalties.sessionPenalty === 0 ? '—' : penalties.sessionPenalty}
+                </span>
+              </div>
+
+              {/* Bounce penalty */}
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  {penalties.bouncePenalty === 0 ? (
+                    <span className="w-5 h-5 rounded-full bg-green-50 flex items-center justify-center text-green-500 text-xs">✓</span>
+                  ) : (
+                    <span className="w-5 h-5 rounded-full bg-red-50 flex items-center justify-center text-red-500 text-xs">✗</span>
+                  )}
+                  <span className="text-af-charcoal">Returning users</span>
+                  <span className="text-xs text-af-medium-gray">({100 - bounce}% come back)</span>
+                </div>
+                <span className={`font-bold ${penalties.bouncePenalty === 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {penalties.bouncePenalty === 0 ? '—' : penalties.bouncePenalty}
+                </span>
+              </div>
+
+              {/* Same-IP penalty */}
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  {penalties.sameIpPenalty === 0 ? (
+                    <span className="w-5 h-5 rounded-full bg-green-50 flex items-center justify-center text-green-500 text-xs">✓</span>
+                  ) : (
+                    <span className="w-5 h-5 rounded-full bg-red-50 flex items-center justify-center text-red-500 text-xs">✗</span>
+                  )}
+                  <span className="text-af-charcoal">Real traffic</span>
+                  <span className="text-xs text-af-medium-gray">({100 - sameIp}% organic)</span>
+                </div>
+                <span className={`font-bold ${penalties.sameIpPenalty === 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {penalties.sameIpPenalty === 0 ? '—' : penalties.sameIpPenalty}
+                </span>
+              </div>
+
+              <div className="border-t border-af-light-gray" />
+
+              {/* Final score */}
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-semibold text-af-deep-charcoal">Your score</span>
+                <span className="text-lg font-black" style={{ color: scoreColor }}>{score}</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Metrics */}
         <div className="space-y-2.5">

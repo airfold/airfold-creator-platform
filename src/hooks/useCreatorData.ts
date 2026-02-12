@@ -173,21 +173,35 @@ export function useCreatorEarnings(appId?: string | null) {
   });
 }
 
+/** Compute health score from metrics (mirrors backend logic) */
+function computeScoreFromMetrics(metrics: { same_ip_percent: number; bounce_rate: number; avg_session_seconds: number }) {
+  let score = 100;
+  if (metrics.avg_session_seconds < 30) score -= 25;
+  else if (metrics.avg_session_seconds < 60) score -= 10;
+  if (metrics.bounce_rate > 60) score -= 25;
+  else if (metrics.bounce_rate > 40) score -= 10;
+  if (metrics.same_ip_percent > 30) score -= 30;
+  else if (metrics.same_ip_percent > 15) score -= 10;
+  return Math.max(0, Math.min(100, score));
+}
+
 /** Mock health response from creator mock data */
 function mockHealthResponse(appId?: string | null): CreatorHealthResponse {
   const creator = getCurrentCreator();
   const selectedApp = appId ? creator.apps.find(a => a.id === appId) : null;
-  const score = selectedApp ? selectedApp.healthScore : getCreatorAvgHealthScore(creator);
   const flags = selectedApp ? selectedApp.flags : [...new Set(creator.apps.flatMap(a => a.flags))];
+
+  const metrics = {
+    same_ip_percent: flags.includes('same_ip_cluster') ? 42 : 3,
+    bounce_rate: flags.includes('high_bounce_rate') ? 68 : 22,
+    avg_session_seconds: flags.includes('low_session_time') ? 18 : 272,
+  };
+  const score = computeScoreFromMetrics(metrics);
 
   return {
     score,
     status: score >= 80 ? 'eligible' : score >= 50 ? 'at_risk' : 'under_review',
-    metrics: {
-      same_ip_percent: flags.includes('same_ip_cluster') ? 42 : 3,
-      bounce_rate: flags.includes('high_bounce_rate') ? 68 : 22,
-      avg_session_seconds: flags.includes('low_session_time') ? 18 : 272,
-    },
+    metrics,
     flags,
   };
 }
