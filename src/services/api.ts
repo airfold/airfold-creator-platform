@@ -133,8 +133,8 @@ export interface LeaderboardResponse {
 // ─── API Methods ───
 
 export async function fetchMyApps(): Promise<AppResponse[]> {
-  const data = await request<{ apps: AppResponse[] }>('/v1/app');
-  return data.apps;
+  const data = await request<{ items: AppResponse[] }>('/v1/app');
+  return data.items;
 }
 
 export async function fetchCreatorAnalytics(period: string = '30d'): Promise<CreatorAnalyticsResponse> {
