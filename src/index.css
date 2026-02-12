@@ -31,6 +31,9 @@
     @apply bg-af-surface text-af-deep-charcoal font-sans antialiased m-0;
     -webkit-tap-highlight-color: transparent;
     -webkit-text-size-adjust: 100%;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
   }
 }
 

@@ -10,7 +10,7 @@ import Landing from './pages/Landing';
 import Overview from './pages/Dashboard/Overview';
 import Earnings from './pages/Dashboard/Earnings';
 import Analytics from './pages/Dashboard/Analytics';
-import Calculator from './pages/Dashboard/Calculator';
+import Leaderboard from './pages/Dashboard/Leaderboard';
 import HealthScore from './pages/Dashboard/HealthScore';
 import { isDevMode, isNativeMode, initNativeToken } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
@@ -45,7 +45,7 @@ function AppRoutes() {
         <Route index element={<Overview />} />
         <Route path="earnings" element={<Earnings />} />
         <Route path="analytics" element={<Analytics />} />
-        <Route path="calculator" element={<Calculator />} />
+        <Route path="leaderboard" element={<Leaderboard />} />
         <Route path="health" element={<HealthScore />} />
       </Route>
       {/* Catch old /login route */}
