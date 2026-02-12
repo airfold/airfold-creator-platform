@@ -9,7 +9,7 @@ export default function PublicLayout() {
   return (
     <>
       <DesktopBlocker />
-      <div className={`min-h-screen bg-white ${import.meta.env.PROD ? 'md:hidden' : ''}`}>
+      <div className="min-h-screen bg-white md:hidden">
         <nav className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-af-light-gray safe-top">
           <div className="px-4 h-14 flex items-center justify-between">
             <Link to="/">
