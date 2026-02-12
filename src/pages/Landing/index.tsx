@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '../../components/Logo';
 import SparklineChart from '../../components/SparklineChart';
 import { creators, platformStats } from '../../data/creators';
@@ -24,6 +25,14 @@ const steps = [
 ];
 
 export default function Landing() {
+  const [showTop, setShowTop] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 400);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
@@ -121,17 +130,6 @@ export default function Landing() {
         <img src="/banner.png" alt="The new era of social apps" className="w-full rounded-xl" />
       </section>
 
-      {/* CTA */}
-      <section className="px-5 py-12">
-        <div className="bg-af-tint-soft rounded-2xl p-8 text-center border border-af-tint/10">
-          <h2 className="text-2xl font-bold text-af-deep-charcoal mb-3">Ready to build?</h2>
-          <p className="text-af-charcoal text-sm mb-6">
-            Join hundreds of student creators earning real money by building apps their campus actually uses.
-          </p>
-          <Link to="/login" className="btn-primary text-base px-8 py-3.5">Creator Login</Link>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="border-t border-af-light-gray">
         <div className="px-5 py-8">
@@ -147,6 +145,21 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      {/* Back to top */}
+      <AnimatePresence>
+        {showTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="fixed bottom-20 right-4 z-50 w-11 h-11 rounded-full bg-af-tint text-white shadow-lg flex items-center justify-center active:scale-95 transition-transform"
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 15V5M10 5l-4 4M10 5l4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
