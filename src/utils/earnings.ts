@@ -9,7 +9,7 @@
  * QAU Definition:
  * A user who opens the creator's app on 3+ different days in a single week,
  * with each session lasting at least 1 minute. Must be authenticated with
- * a verified .edu email and not flagged as bot/fake traffic.
+ * an authenticated account (phone number or Apple ID) and not flagged as bot/fake traffic.
  */
 
 /** Rate per QAU per week in dollars */

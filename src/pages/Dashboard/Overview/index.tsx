@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import SparklineChart from '../../../components/SparklineChart';
@@ -14,14 +14,14 @@ import {
   percentChange,
 } from '../../../utils/earnings';
 
-const MAX_VISIBLE_APPS = 4;
+const COLLAPSED_COUNT = 4;
 const MONTHLY_CAP = 5000;
 
 export default function Overview() {
   const creator = useCurrentCreator();
   const navigate = useNavigate();
   const { setSelectedAppId } = useSelectedApp();
-  const [showAllApps, setShowAllApps] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const totalQAU = getCreatorTotalQAU(creator);
   const currentQAU = totalQAU[7];
@@ -33,8 +33,14 @@ export default function Overview() {
   const monthly = calculateMonthlyEarnings(last4Weeks);
   const healthScore = getCreatorAvgHealthScore(creator);
 
-  const visibleApps = showAllApps ? creator.apps : creator.apps.slice(0, MAX_VISIBLE_APPS);
-  const hasMoreApps = creator.apps.length > MAX_VISIBLE_APPS;
+  // Sort apps by current week QAU descending (top earners first)
+  const sortedApps = useMemo(
+    () => [...creator.apps].sort((a, b) => b.weeklyQAU[7] - a.weeklyQAU[7]),
+    [creator.apps],
+  );
+
+  const hasMoreApps = sortedApps.length > COLLAPSED_COUNT;
+  const visibleApps = expanded ? sortedApps : sortedApps.slice(0, COLLAPSED_COUNT);
 
   return (
     <div className="space-y-4">
@@ -122,10 +128,14 @@ export default function Overview() {
       >
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-semibold text-af-deep-charcoal">Your Apps</h3>
-          <span className="text-[11px] text-af-medium-gray">{creator.apps.length} app{creator.apps.length !== 1 ? 's' : ''}</span>
+          <span className="text-[11px] text-af-medium-gray">{sortedApps.length} app{sortedApps.length !== 1 ? 's' : ''}</span>
         </div>
 
-        <div className="space-y-1.5">
+        {/* Scrollable container when expanded with many apps */}
+        <div
+          className={`space-y-1.5 ${expanded && sortedApps.length > 8 ? 'max-h-[420px] overflow-y-auto overscroll-contain' : ''}`}
+          style={expanded && sortedApps.length > 8 ? { WebkitOverflowScrolling: 'touch' } : undefined}
+        >
           {visibleApps.map((app, idx) => {
             const appEarnings = calculateWeeklyEarnings(app.weeklyQAU[7]);
             const appChange = percentChange(app.weeklyQAU[7], app.weeklyQAU[6]);
@@ -134,7 +144,7 @@ export default function Overview() {
                 key={app.id}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.15 + idx * 0.03 }}
+                transition={{ delay: idx < COLLAPSED_COUNT ? 0.15 + idx * 0.03 : 0 }}
                 className="glass-card p-3 flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-transform"
                 onClick={() => { haptic(); setSelectedAppId(app.id); navigate('/dashboard/analytics'); }}
               >
@@ -143,7 +153,7 @@ export default function Overview() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-semibold text-af-deep-charcoal truncate">{app.appName}</h4>
-                  <p className="text-[11px] text-af-medium-gray">{formatNumber(app.weeklyQAU[7])} QAU this week</p>
+                  <p className="text-[11px] text-af-medium-gray">{formatNumber(app.weeklyQAU[7])} QAU</p>
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-sm font-bold text-af-tint">{formatCurrency(appEarnings.capped)}</p>
@@ -160,10 +170,10 @@ export default function Overview() {
 
         {hasMoreApps && (
           <button
-            onClick={() => { haptic(); setShowAllApps(!showAllApps); }}
+            onClick={() => { haptic(); setExpanded(!expanded); }}
             className="w-full text-center text-xs font-medium text-af-tint mt-2 py-2 cursor-pointer active:opacity-70"
           >
-            {showAllApps ? 'Show less' : `Show all ${creator.apps.length} apps`}
+            {expanded ? 'Show less' : `Show all ${sortedApps.length} apps`}
           </button>
         )}
       </motion.div>

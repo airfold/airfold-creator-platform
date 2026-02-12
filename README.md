@@ -84,7 +84,7 @@ Traffic quality dashboard. Shows an overall health score (0-100), eligibility st
 
 1. **3+ different days** in a single week (Mon–Sun) — opening the app once doesn't count
 2. **Minimum 1 minute per session** — quick bounces are filtered out
-3. **Verified .edu email** — must be authenticated with a real student account
+3. **Authenticated** — signed in via phone number or Apple ID (Clerk)
 4. **Not flagged** — no bot traffic, no fake accounts, no same-IP farming
 
 If a user opens your app twice on Monday and once on Tuesday, that's only 2 days — not a QAU. They need to come back on a third day, spending at least 1 minute each time.
