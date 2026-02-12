@@ -1,5 +1,3 @@
-import { useUser, useClerk, useAuth as useClerkAuth } from '@clerk/clerk-react';
-
 /** Check if dev skip mode is active */
 export function isDevMode(): boolean {
   return localStorage.getItem('dev_skip') === '1';
@@ -41,18 +39,13 @@ export function isNativeMode(): boolean {
 }
 
 /**
- * Wraps Clerk hooks with a stable interface for the app.
- * In dev skip mode, returns a mock user.
+ * Auth hook — dev mode returns mock user, native mode uses iOS JWT.
+ * No web sign-in flow; dashboard is only accessible from the iOS app.
  */
 export function useAuth() {
-  const { user, isLoaded, isSignedIn } = useUser();
-  const { signOut } = useClerk();
-  const { getToken } = useClerkAuth();
-
-  const devMode = isDevMode();
   const nativeToken = getNativeToken();
 
-  if (devMode) {
+  if (isDevMode()) {
     return {
       user: {
         id: 'dev_9',
@@ -67,7 +60,6 @@ export function useAuth() {
     };
   }
 
-  // Native mode — opened from iOS app with a JWT
   if (nativeToken) {
     return {
       user: {
@@ -84,15 +76,10 @@ export function useAuth() {
   }
 
   return {
-    user: isSignedIn && user ? {
-      id: user.id,
-      email: user.primaryEmailAddress?.emailAddress ?? '',
-      name: user.fullName ?? user.firstName ?? 'Creator',
-      avatar: user.imageUrl,
-    } : null,
-    isAuthenticated: !!isSignedIn,
-    isLoaded,
-    logout: () => signOut(),
-    getToken: () => getToken(),
+    user: null,
+    isAuthenticated: false,
+    isLoaded: true,
+    logout: () => {},
+    getToken: () => Promise.resolve(null as string | null),
   };
 }

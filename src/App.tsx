@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ClerkProvider } from '@clerk/clerk-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import PublicLayout from './layouts/PublicLayout';
 import DashboardLayout from './layouts/DashboardLayout';
@@ -19,8 +18,6 @@ import { AppProvider } from './context/AppContext';
 
 // Pick up native token from iOS WKWebView sessionStorage injection
 initNativeToken();
-
-const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (isDevMode() || isNativeMode()) {
@@ -61,12 +58,10 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <ClerkProvider publishableKey={CLERK_KEY} afterSignOutUrl="/">
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </QueryClientProvider>
-    </ClerkProvider>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
