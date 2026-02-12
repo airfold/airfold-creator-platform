@@ -19,7 +19,7 @@ const stats = [
 ];
 
 const steps = [
-  { num: '01', title: 'Build an app', desc: 'Create a mini-app for your campus community using our tools and templates.' },
+  { num: '01', title: 'Create an app', desc: 'Create an app for your campus community using our tools and templates.' },
   { num: '02', title: 'Grow your users', desc: 'Promote your app on campus. Every qualified active user counts toward your earnings.' },
   { num: '03', title: 'Get paid', desc: '100 QAU = $200/week. 500 QAU = $1,000/week. Cash out every week.' },
 ];
@@ -45,10 +45,10 @@ export default function Landing() {
               <span className="text-xs text-af-charcoal">34,000+ students on campus</span>
             </div>
             <h1 className="text-4xl font-black mb-4 leading-tight text-af-deep-charcoal">
-              <span className="text-af-tint">Build.</span> Launch. <span className="text-af-tint">Earn.</span>
+              <span className="text-af-tint">Create.</span> Launch. <span className="text-af-tint">Earn.</span>
             </h1>
             <p className="text-base text-af-medium-gray max-w-sm mx-auto mb-8">
-              Create mini-apps for your campus, grow real users, and earn based on engagement.
+              Create apps for your campus, grow real users, and earn based on engagement.
             </p>
             <div className="flex flex-col md:flex-row md:justify-center items-center gap-3">
               <Link to="/login" className="btn-primary text-base px-8 py-3.5 w-full max-w-xs">Start Creating</Link>
