@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import AppSelector from '../../../components/AppSelector';
 import { useCreatorEarnings } from '../../../hooks/useCreatorData';
@@ -53,7 +52,7 @@ export default function Earnings() {
 
       <AppSelector />
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-4">
+      <div className="glass-card p-4">
         <h3 className="text-base font-semibold text-af-deep-charcoal mb-4">Weekly Earnings</h3>
         <ResponsiveContainer width="100%" height={240}>
           <BarChart data={weeklyData}>
@@ -64,9 +63,9 @@ export default function Earnings() {
             <Bar dataKey="payout" fill="#BD295A" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
-      </motion.div>
+      </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card overflow-hidden">
+      <div className="glass-card overflow-hidden">
         <div className="p-4 pb-0">
           <h3 className="text-base font-semibold text-af-deep-charcoal mb-3">Weekly Breakdown</h3>
         </div>
@@ -92,7 +91,7 @@ export default function Earnings() {
             </tbody>
           </table>
         </div>
-      </motion.div>
+      </div>
 
       {monthlyResult.capApplied && (
         <div className="bg-af-tint-soft rounded-xl p-3 text-xs text-af-tint">

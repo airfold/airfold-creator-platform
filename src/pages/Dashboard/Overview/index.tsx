@@ -45,11 +45,7 @@ export default function Overview() {
   return (
     <div className="space-y-4">
       {/* Hero — the money */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl bg-gradient-to-br from-af-tint to-[#8B1D42] p-5 text-white relative overflow-hidden"
-      >
+      <div className="rounded-2xl bg-gradient-to-br from-af-tint to-[#8B1D42] p-5 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
         <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
 
@@ -100,13 +96,10 @@ export default function Overview() {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* QAU Trend — mini sparkline */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+      <div
         className="glass-card p-3 flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-transform"
         onClick={() => { haptic(); navigate('/dashboard/earnings'); }}
       >
@@ -118,14 +111,10 @@ export default function Overview() {
           <SparklineChart data={totalQAU} height={36} />
         </div>
         <svg className="w-4 h-4 text-af-medium-gray shrink-0" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-      </motion.div>
+      </div>
 
       {/* Apps */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-      >
+      <div>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-semibold text-af-deep-charcoal">Your Apps</h3>
           <span className="text-[11px] text-af-medium-gray">{sortedApps.length} app{sortedApps.length !== 1 ? 's' : ''}</span>
@@ -136,15 +125,12 @@ export default function Overview() {
           className={`space-y-1.5 ${expanded && sortedApps.length > 8 ? 'max-h-[420px] overflow-y-auto overscroll-contain' : ''}`}
           style={expanded && sortedApps.length > 8 ? { WebkitOverflowScrolling: 'touch' } : undefined}
         >
-          {visibleApps.map((app, idx) => {
+          {visibleApps.map((app) => {
             const appEarnings = calculateWeeklyEarnings(app.weeklyQAU[7]);
             const appChange = percentChange(app.weeklyQAU[7], app.weeklyQAU[6]);
             return (
-              <motion.div
+              <div
                 key={app.id}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx < COLLAPSED_COUNT ? 0.15 + idx * 0.03 : 0 }}
                 className="glass-card p-3 flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-transform"
                 onClick={() => { haptic(); setSelectedAppId(app.id); navigate('/dashboard/analytics'); }}
               >
@@ -163,7 +149,7 @@ export default function Overview() {
                     </p>
                   )}
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
@@ -176,7 +162,7 @@ export default function Overview() {
             {expanded ? 'Show less' : `Show all ${sortedApps.length} apps`}
           </button>
         )}
-      </motion.div>
+      </div>
     </div>
   );
 }

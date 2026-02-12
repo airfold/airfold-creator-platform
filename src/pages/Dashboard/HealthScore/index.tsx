@@ -56,7 +56,7 @@ export default function HealthScore() {
 
       <AppSelector />
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-6 flex flex-col items-center">
+      <div className="glass-card p-6 flex flex-col items-center">
         <div className="relative w-32 h-32 mb-4">
           <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
             <circle cx="60" cy="60" r="52" fill="none" stroke="#E5E5EA" strokeWidth="8" />
@@ -86,10 +86,10 @@ export default function HealthScore() {
               ? 'Some metrics need attention. Your account may be reviewed.'
               : 'Your account is under review due to suspicious patterns.'}
         </p>
-      </motion.div>
+      </div>
 
       <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-4">
+        <div className="glass-card p-4">
           <h3 className="text-base font-semibold text-af-deep-charcoal mb-3">Traffic Quality Flags</h3>
           <div className="space-y-5">
             <div>
@@ -139,9 +139,9 @@ export default function HealthScore() {
               </p>
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-4">
+        <div className="glass-card p-4">
           <h3 className="text-base font-semibold text-af-deep-charcoal mb-3">App Rating Status</h3>
 
           <div className="flex items-center gap-3 mb-4">
@@ -189,7 +189,7 @@ export default function HealthScore() {
               {status}
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

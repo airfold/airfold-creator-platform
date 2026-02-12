@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import {
   LineChart, Line, AreaChart, Area,
   BarChart, Bar,
@@ -34,7 +33,6 @@ export default function Analytics() {
   const dauData = analytics?.dau ?? [];
   const totalViews = analytics?.total_views ?? 0;
   const uniqueUsers = analytics?.unique_users ?? 0;
-  // geo + device data removed — Airfold is USA-only
 
   const qauVsUnique = weeklyQAU.map((qau, i) => ({
     week: `W${i + 1}`,
@@ -62,18 +60,18 @@ export default function Analytics() {
 
       {/* Summary stats */}
       <div className="grid grid-cols-2 gap-3">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-3 text-center">
+        <div className="glass-card p-3 text-center">
           <div className="text-xs text-af-medium-gray mb-0.5">Total Views (30d)</div>
           <div className="text-xl font-bold text-af-tint">{isLoading ? '—' : totalViews.toLocaleString()}</div>
-        </motion.div>
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="glass-card p-3 text-center">
+        </div>
+        <div className="glass-card p-3 text-center">
           <div className="text-xs text-af-medium-gray mb-0.5">Unique Users (30d)</div>
           <div className="text-xl font-bold text-af-tint">{isLoading ? '—' : uniqueUsers.toLocaleString()}</div>
-        </motion.div>
+        </div>
       </div>
 
       {/* DAU from real API */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-4">
+      <div className="glass-card p-4">
         <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">Daily Active Users (30d)</h3>
         <p className="text-xs text-af-medium-gray mb-3">
           {isLoading ? 'Loading...' : error ? 'Using cached data' : 'Live from analytics'}
@@ -97,11 +95,11 @@ export default function Analytics() {
             </AreaChart>
           </ResponsiveContainer>
         )}
-      </motion.div>
+      </div>
 
       <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
-        {/* QAU vs Unique Users (mock) */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-4">
+        {/* QAU vs Unique Users */}
+        <div className="glass-card p-4">
           <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">QAU vs Unique Users</h3>
           <p className="text-xs text-af-medium-gray mb-3">How many unique users qualify as QAU</p>
           <ResponsiveContainer width="100%" height={180}>
@@ -115,10 +113,10 @@ export default function Analytics() {
               <Bar dataKey="qau" name="QAU" fill="#BD295A" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-        </motion.div>
+        </div>
 
-        {/* Retention (mock) */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="glass-card p-4">
+        {/* Retention */}
+        <div className="glass-card p-4">
           <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">Retention Curve</h3>
           <p className="text-xs text-af-medium-gray mb-3">User retention across weeks</p>
           <ResponsiveContainer width="100%" height={180}>
@@ -130,8 +128,7 @@ export default function Analytics() {
               <Line type="monotone" dataKey="retention" stroke="#22c55e" strokeWidth={3} dot={{ r: 4, fill: '#22c55e' }} />
             </LineChart>
           </ResponsiveContainer>
-        </motion.div>
-
+        </div>
       </div>
     </div>
   );

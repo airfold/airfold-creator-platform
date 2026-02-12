@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { useLeaderboard } from '../../../hooks/useCreatorData';
 import { formatNumber, formatCurrency } from '../../../utils/earnings';
 import { haptic } from '../../../utils/haptic';
@@ -38,22 +37,19 @@ export default function Leaderboard() {
       {isLoading ? (
         <div className="glass-card p-8 text-center text-af-medium-gray text-sm">Loading...</div>
       ) : (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card overflow-hidden">
+        <div className="glass-card overflow-hidden">
           <div className="divide-y divide-af-light-gray">
-            {entries.map((entry, i) => {
+            {entries.map((entry) => {
               const isCurrentUser = myRank != null && entry.rank === myRank.rank;
 
               return (
-                <motion.div
+                <div
                   key={entry.user_id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.02 }}
                   className={`flex items-center gap-3 px-4 py-3 ${
                     isCurrentUser ? 'bg-af-tint-soft border-l-2 border-l-af-tint' : ''
                   }`}
                 >
-                  <span className={`w-7 text-center font-bold ${i < 3 ? 'text-sm text-af-tint' : 'text-xs text-af-deep-charcoal'}`}>
+                  <span className={`w-7 text-center font-bold ${entry.rank <= 3 ? 'text-sm text-af-tint' : 'text-xs text-af-deep-charcoal'}`}>
                     #{entry.rank}
                   </span>
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
@@ -78,11 +74,11 @@ export default function Leaderboard() {
                     <div className="text-sm font-bold text-af-tint">{formatCurrency(entry.earnings)}</div>
                     <div className="text-[10px] text-af-medium-gray">{formatNumber(entry.qau)} QAU</div>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
-        </motion.div>
+        </div>
       )}
     </div>
   );

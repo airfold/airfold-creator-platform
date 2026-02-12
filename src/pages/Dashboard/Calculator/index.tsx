@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import {
   calculateWeeklyEarnings,
   calculateMonthlyEarnings,
@@ -19,7 +18,7 @@ export default function Calculator() {
         <p className="text-sm text-af-medium-gray">Estimate your potential earnings</p>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-4 space-y-5">
+      <div className="glass-card p-4 space-y-5">
         <div>
           <div className="flex justify-between mb-2">
             <label className="text-sm font-medium text-af-charcoal">Expected QAU / Week</label>
@@ -41,31 +40,31 @@ export default function Calculator() {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-4">
+        <div className="glass-card p-4">
           <h3 className="text-xs text-af-medium-gray mb-1">Weekly Payout</h3>
           <span className="text-2xl font-bold text-af-tint">{formatCurrency(earnings.capped)}</span>
           <div className="text-[10px] text-af-medium-gray mt-1">{qau.toLocaleString()} QAU x $2</div>
-        </motion.div>
+        </div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="glass-card p-4">
+        <div className="glass-card p-4">
           <h3 className="text-xs text-af-medium-gray mb-1">Monthly Projection</h3>
           <span className="text-2xl font-bold text-af-tint">{formatCurrency(monthlyProjection.capped)}</span>
           <div className="text-[10px] text-af-medium-gray mt-1">per month</div>
-        </motion.div>
+        </div>
       </div>
 
       {(earnings.capApplied || monthlyProjection.capApplied) && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-3 flex items-start gap-2.5">
+        <div className="glass-card p-3 flex items-start gap-2.5">
           <span className="text-base mt-0.5">💡</span>
           <div className="text-xs text-af-charcoal leading-relaxed">
             {earnings.capApplied && <p className="font-medium">Weekly cap reached at this QAU level.</p>}
             {monthlyProjection.capApplied && <p className="font-medium">Monthly cap reached at this rate.</p>}
             <p className="text-af-medium-gray mt-1">Any excess automatically rolls over to your next month's payout cycle — nothing is lost.</p>
           </div>
-        </motion.div>
+        </div>
       )}
     </div>
   );
