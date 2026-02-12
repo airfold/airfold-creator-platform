@@ -17,18 +17,18 @@ export default function StatCard({ label, value, prefix = '', suffix = '', chang
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-card p-6"
+      className="glass-card p-4"
     >
-      <div className="flex items-start justify-between mb-3">
-        <span className="text-sm text-af-medium-gray font-medium">{label}</span>
+      <div className="flex items-start justify-between mb-1.5">
+        <span className="text-xs text-af-medium-gray font-medium leading-tight">{label}</span>
         {icon && <span className="text-af-tint">{icon}</span>}
       </div>
-      <div className="flex items-end gap-3">
-        <span className="text-3xl font-bold text-af-deep-charcoal">
+      <div className="flex items-end gap-2">
+        <span className="text-2xl font-bold text-af-deep-charcoal">
           {prefix}{animated.toLocaleString()}{suffix}
         </span>
         {change !== undefined && (
-          <span className={`text-sm font-semibold mb-1 ${change >= 0 ? 'text-success' : 'text-danger'}`}>
+          <span className={`text-xs font-semibold mb-0.5 ${change >= 0 ? 'text-success' : 'text-danger'}`}>
             {change >= 0 ? '+' : ''}{change}%
           </span>
         )}

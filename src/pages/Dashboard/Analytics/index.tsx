@@ -45,20 +45,20 @@ export default function Analytics() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <div>
-        <h1 className="text-3xl font-bold text-af-deep-charcoal mb-1">Analytics</h1>
-        <p className="text-af-medium-gray">Deep dive into your app's performance</p>
+        <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Analytics</h1>
+        <p className="text-sm text-af-medium-gray">Deep dive into your app's performance</p>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-6">
-        <h3 className="text-lg font-semibold text-af-deep-charcoal mb-1">Daily Active Users (Last 30 Days)</h3>
-        <p className="text-sm text-af-medium-gray mb-4">Unique users engaging with your app daily</p>
-        <ResponsiveContainer width="100%" height={280}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-4">
+        <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">Daily Active Users (30d)</h3>
+        <p className="text-xs text-af-medium-gray mb-3">Unique users engaging with your app daily</p>
+        <ResponsiveContainer width="100%" height={180}>
           <AreaChart data={dauData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
-            <XAxis dataKey="day" stroke="#8E8E93" fontSize={11} />
-            <YAxis stroke="#8E8E93" fontSize={11} />
+            <XAxis dataKey="day" stroke="#8E8E93" fontSize={10} />
+            <YAxis stroke="#8E8E93" fontSize={10} width={35} />
             <Tooltip contentStyle={tooltipStyle} />
             <defs>
               <linearGradient id="dauGrad" x1="0" y1="0" x2="0" y2="1">
@@ -71,45 +71,45 @@ export default function Analytics() {
         </ResponsiveContainer>
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-af-deep-charcoal mb-1">QAU vs Total Unique Users</h3>
-          <p className="text-sm text-af-medium-gray mb-4">How many unique users qualify as QAU</p>
-          <ResponsiveContainer width="100%" height={240}>
+      <div className="space-y-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-4">
+          <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">QAU vs Unique Users</h3>
+          <p className="text-xs text-af-medium-gray mb-3">How many unique users qualify as QAU</p>
+          <ResponsiveContainer width="100%" height={180}>
             <BarChart data={qauVsUnique}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
-              <XAxis dataKey="week" stroke="#8E8E93" fontSize={11} />
-              <YAxis stroke="#8E8E93" fontSize={11} />
+              <XAxis dataKey="week" stroke="#8E8E93" fontSize={10} />
+              <YAxis stroke="#8E8E93" fontSize={10} width={35} />
               <Tooltip contentStyle={tooltipStyle} />
-              <Legend />
-              <Bar dataKey="uniqueUsers" name="Unique Users" fill="#E5E5EA" radius={[4, 4, 0, 0]} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Bar dataKey="uniqueUsers" name="Unique" fill="#E5E5EA" radius={[4, 4, 0, 0]} />
               <Bar dataKey="qau" name="QAU" fill="#BD295A" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="glass-card p-6">
-          <h3 className="text-lg font-semibold text-af-deep-charcoal mb-1">Retention Curve</h3>
-          <p className="text-sm text-af-medium-gray mb-4">User retention across weeks</p>
-          <ResponsiveContainer width="100%" height={240}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="glass-card p-4">
+          <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">Retention Curve</h3>
+          <p className="text-xs text-af-medium-gray mb-3">User retention across weeks</p>
+          <ResponsiveContainer width="100%" height={180}>
             <LineChart data={retentionData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
-              <XAxis dataKey="week" stroke="#8E8E93" fontSize={11} />
-              <YAxis stroke="#8E8E93" fontSize={11} unit="%" />
+              <XAxis dataKey="week" stroke="#8E8E93" fontSize={10} />
+              <YAxis stroke="#8E8E93" fontSize={10} unit="%" width={35} />
               <Tooltip contentStyle={tooltipStyle} />
-              <Line type="monotone" dataKey="retention" stroke="#22c55e" strokeWidth={3} dot={{ r: 5, fill: '#22c55e' }} />
+              <Line type="monotone" dataKey="retention" stroke="#22c55e" strokeWidth={3} dot={{ r: 4, fill: '#22c55e' }} />
             </LineChart>
           </ResponsiveContainer>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-6 lg:col-span-2">
-          <h3 className="text-lg font-semibold text-af-deep-charcoal mb-1">Session Duration</h3>
-          <p className="text-sm text-af-medium-gray mb-4">Distribution of user session lengths (sessions under 1 min do not count toward QAU)</p>
-          <ResponsiveContainer width="100%" height={240}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-4">
+          <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">Session Duration</h3>
+          <p className="text-xs text-af-medium-gray mb-3">Sessions under 1 min don't count toward QAU</p>
+          <ResponsiveContainer width="100%" height={180}>
             <BarChart data={sessionData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
-              <XAxis dataKey="range" stroke="#8E8E93" fontSize={11} />
-              <YAxis stroke="#8E8E93" fontSize={11} />
+              <XAxis dataKey="range" stroke="#8E8E93" fontSize={10} />
+              <YAxis stroke="#8E8E93" fontSize={10} width={35} />
               <Tooltip contentStyle={tooltipStyle} />
               <Bar dataKey="count" fill="#E8739F" radius={[4, 4, 0, 0]} />
             </BarChart>

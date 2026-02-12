@@ -20,7 +20,17 @@
 @layer base {
   body {
     @apply bg-af-surface text-af-deep-charcoal font-sans antialiased m-0;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
   }
+}
+
+@utility safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+@utility safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 @utility glass-card {

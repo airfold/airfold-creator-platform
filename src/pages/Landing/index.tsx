@@ -29,22 +29,21 @@ export default function Landing() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-af-tint-soft/50 via-white to-white" />
-        <div className="relative max-w-7xl mx-auto px-6 pt-32 pb-24 text-center">
+        <div className="relative max-w-7xl mx-auto px-5 pt-20 pb-16 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <div className="inline-flex items-center gap-2 bg-af-tint-soft rounded-full px-4 py-2 mb-8 border border-af-tint/10">
+            <div className="inline-flex items-center gap-2 bg-af-tint-soft rounded-full px-3 py-1.5 mb-6 border border-af-tint/10">
               <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              <span className="text-sm text-af-charcoal">34,000+ students on campus</span>
+              <span className="text-xs text-af-charcoal">34,000+ students on campus</span>
             </div>
-            <h1 className="text-6xl md:text-8xl font-black mb-6 leading-tight text-af-deep-charcoal">
+            <h1 className="text-4xl font-black mb-4 leading-tight text-af-deep-charcoal">
               <span className="text-af-tint">Build.</span> Launch. <span className="text-af-tint">Earn.</span>
             </h1>
-            <p className="text-xl text-af-medium-gray max-w-2xl mx-auto mb-10">
+            <p className="text-base text-af-medium-gray max-w-sm mx-auto mb-8">
               Create mini-apps for your campus, grow real users, and earn based on engagement.
-              The creator economy, powered by <Logo size="sm" />.
             </p>
-            <div className="flex items-center justify-center gap-4">
-              <Link to="/login" className="btn-primary text-lg px-8 py-4">Start Creating</Link>
-              <a href="#how-it-works" className="btn-secondary text-lg px-8 py-4">Learn More</a>
+            <div className="flex flex-col items-center gap-3">
+              <Link to="/login" className="btn-primary text-base px-8 py-3.5 w-full max-w-xs">Start Creating</Link>
+              <a href="#how-it-works" className="btn-secondary text-base px-8 py-3.5 w-full max-w-xs text-center">Learn More</a>
             </div>
           </motion.div>
         </div>
@@ -52,36 +51,36 @@ export default function Landing() {
 
       {/* Stats bar */}
       <section className="border-y border-af-light-gray bg-af-surface">
-        <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="max-w-7xl mx-auto px-5 py-5 grid grid-cols-2 gap-4">
           {stats.map((s, i) => (
             <motion.div key={s.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="text-center">
-              <div className="text-3xl font-bold text-af-tint">{s.value}</div>
-              <div className="text-sm text-af-medium-gray mt-1">{s.label}</div>
+              <div className="text-xl font-bold text-af-tint">{s.value}</div>
+              <div className="text-xs text-af-medium-gray mt-0.5">{s.label}</div>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* Featured Creator Apps */}
-      <section className="max-w-7xl mx-auto px-6 py-24">
-        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-af-deep-charcoal mb-4">Featured Creator Apps</h2>
-          <p className="text-af-medium-gray text-lg">Top performing apps built by student creators</p>
+      <section className="max-w-7xl mx-auto px-5 py-12">
+        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-af-deep-charcoal mb-2">Featured Creator Apps</h2>
+          <p className="text-af-medium-gray text-sm">Top performing apps built by student creators</p>
         </motion.div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-3">
           {featuredCreators.map((creator, i) => (
-            <motion.div key={creator.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="glass-card-hover p-6">
-              <div className="flex items-start justify-between mb-4">
+            <motion.div key={creator.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="glass-card-hover p-4">
+              <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h3 className="font-bold text-lg text-af-deep-charcoal">{creator.appName}</h3>
-                  <p className="text-sm text-af-medium-gray">by {creator.name}</p>
+                  <h3 className="font-bold text-base text-af-deep-charcoal">{creator.appName}</h3>
+                  <p className="text-xs text-af-medium-gray">by {creator.name}</p>
                 </div>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-af-tint-soft text-af-tint border border-af-tint/10">
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-af-tint-soft text-af-tint border border-af-tint/10">
                   {formatNumber(creator.weeklyQAU[7])} QAU
                 </span>
               </div>
-              <div className="mb-4"><SparklineChart data={creator.weeklyQAU} /></div>
-              <div className="flex items-center justify-between text-sm">
+              <div className="mb-3"><SparklineChart data={creator.weeklyQAU} height={50} /></div>
+              <div className="flex items-center justify-between text-xs">
                 <div>
                   <span className="text-af-medium-gray">Earning: </span>
                   <span className="font-semibold text-af-deep-charcoal">{formatCurrency(creator.weeklyQAU[7] * 2)}/wk</span>
@@ -98,18 +97,18 @@ export default function Landing() {
 
       {/* How it works */}
       <section id="how-it-works" className="bg-af-surface">
-        <div className="max-w-7xl mx-auto px-6 py-24">
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-af-deep-charcoal mb-4">How It Works</h2>
-            <p className="text-af-medium-gray text-lg">Three steps to start earning as a creator</p>
+        <div className="max-w-7xl mx-auto px-5 py-12">
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-af-deep-charcoal mb-2">How It Works</h2>
+            <p className="text-af-medium-gray text-sm">Three steps to start earning as a creator</p>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="space-y-3">
             {steps.map((step, i) => (
-              <motion.div key={step.num} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }} className="glass-card p-8 relative overflow-hidden">
-                <span className="absolute top-4 right-6 text-6xl font-black text-af-light-gray/50">{step.num}</span>
+              <motion.div key={step.num} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="glass-card p-5 relative overflow-hidden">
+                <span className="absolute top-3 right-4 text-4xl font-black text-af-light-gray/50">{step.num}</span>
                 <div className="relative">
-                  <h3 className="text-xl font-bold mb-3 text-af-tint">{step.title}</h3>
-                  <p className="text-af-charcoal leading-relaxed">{step.desc}</p>
+                  <h3 className="text-base font-bold mb-1.5 text-af-tint">{step.title}</h3>
+                  <p className="text-sm text-af-charcoal leading-relaxed">{step.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -118,33 +117,33 @@ export default function Landing() {
       </section>
 
       {/* Banner */}
-      <section className="max-w-7xl mx-auto px-6 py-12">
-        <img src="/banner.png" alt="The new era of social apps" className="w-full rounded-2xl" />
+      <section className="px-5 py-8">
+        <img src="/banner.png" alt="The new era of social apps" className="w-full rounded-xl" />
       </section>
 
       {/* CTA */}
-      <section className="max-w-7xl mx-auto px-6 py-24">
-        <div className="bg-af-tint-soft rounded-2xl p-16 text-center border border-af-tint/10">
-          <h2 className="text-4xl font-bold text-af-deep-charcoal mb-4">Ready to build?</h2>
-          <p className="text-af-charcoal text-lg mb-8 max-w-xl mx-auto">
+      <section className="px-5 py-12">
+        <div className="bg-af-tint-soft rounded-2xl p-8 text-center border border-af-tint/10">
+          <h2 className="text-2xl font-bold text-af-deep-charcoal mb-3">Ready to build?</h2>
+          <p className="text-af-charcoal text-sm mb-6">
             Join hundreds of student creators earning real money by building apps their campus actually uses.
           </p>
-          <Link to="/login" className="btn-primary text-lg px-10 py-4">Creator Login</Link>
+          <Link to="/login" className="btn-primary text-base px-8 py-3.5">Creator Login</Link>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="border-t border-af-light-gray">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="px-5 py-8">
+          <div className="flex flex-col items-center gap-4 text-center">
             <Logo size="sm" />
-            <div className="flex items-center gap-8 text-sm text-af-medium-gray">
-              <span className="hover:text-af-deep-charcoal cursor-pointer transition-colors">About</span>
-              <span className="hover:text-af-deep-charcoal cursor-pointer transition-colors">Terms</span>
-              <span className="hover:text-af-deep-charcoal cursor-pointer transition-colors">Privacy</span>
-              <span className="hover:text-af-deep-charcoal cursor-pointer transition-colors">Support</span>
+            <div className="flex items-center gap-6 text-xs text-af-medium-gray">
+              <span className="active:text-af-deep-charcoal cursor-pointer">About</span>
+              <span className="active:text-af-deep-charcoal cursor-pointer">Terms</span>
+              <span className="active:text-af-deep-charcoal cursor-pointer">Privacy</span>
+              <span className="active:text-af-deep-charcoal cursor-pointer">Support</span>
             </div>
-            <p className="text-sm text-af-medium-gray">&copy; 2026 Airfold. All rights reserved.</p>
+            <p className="text-xs text-af-medium-gray">&copy; 2026 Airfold. All rights reserved.</p>
           </div>
         </div>
       </footer>
