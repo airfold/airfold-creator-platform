@@ -7,7 +7,7 @@ import { creators, platformStats } from '../../data/creators';
 import { formatNumber, formatCurrency } from '../../utils/earnings';
 
 const featuredCreators = creators
-  .filter(c => c.healthScore > 80 && c.weeklyQAU[7] > 200)
+  .filter(c => c.healthScore > 80 && c.weeklyQAU[7] > 20)
   .sort((a, b) => b.weeklyQAU[7] - a.weeklyQAU[7])
   .slice(0, 6);
 
