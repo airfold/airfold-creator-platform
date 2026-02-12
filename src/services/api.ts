@@ -1,4 +1,7 @@
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL as string | undefined;
+if (!API_URL && import.meta.env.PROD) {
+  console.error('VITE_API_URL is not set — API calls will fail');
+}
 
 type GetToken = () => Promise<string | null>;
 
@@ -119,13 +122,12 @@ export interface LeaderboardEntry {
   name: string;
   avatar: string | null;
   qau: number;
-  earnings: number;
   app_count: number;
 }
 
 export interface LeaderboardResponse {
   entries: LeaderboardEntry[];
-  my_rank: { rank: number; qau: number; earnings: number } | null;
+  my_rank: { rank: number; qau: number } | null;
 }
 
 // ─── API Methods ───

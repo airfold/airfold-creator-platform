@@ -161,7 +161,9 @@ export default function Overview() {
             <div className="flex-1">
               <p className="text-white/50 text-[10px] mb-0.5">Health</p>
               <p className="text-base font-bold">
-                {healthScore !== null ? <>{healthScore}<span className="text-xs font-normal text-white/50">/100</span></> : '—'}
+                {healthScore !== null
+                  ? healthScore >= 80 ? 'Good' : healthScore >= 50 ? 'At risk' : 'Paused'
+                  : '—'}
               </p>
             </div>
           </div>
@@ -193,7 +195,7 @@ export default function Overview() {
         </div>
 
         <div
-          className={`space-y-1.5 ${expanded && sortedApps.length > 8 ? 'max-h-[420px] overflow-y-auto overscroll-contain' : ''}`}
+          className={`space-y-1.5 ${expanded && sortedApps.length > 8 ? 'max-h-[50vh] overflow-y-auto overscroll-contain' : ''}`}
           style={expanded && sortedApps.length > 8 ? { WebkitOverflowScrolling: 'touch' } : undefined}
         >
           {visibleApps.map((app) => {

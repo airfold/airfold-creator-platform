@@ -230,8 +230,7 @@ function mockLeaderboardResponse(period: string): LeaderboardResponse {
       if (period === 'week') qau = totalQAU[7];
       else if (period === 'month') qau = totalQAU.slice(-4).reduce((s, v) => s + v, 0);
       else qau = totalQAU.reduce((s, v) => s + v, 0);
-      const earnings = calculateWeeklyEarnings(qau);
-      return { ...c, qau, earningsValue: earnings.capped };
+      return { ...c, qau };
     })
     .sort((a, b) => b.qau - a.qau)
     .slice(0, 20);
@@ -242,7 +241,6 @@ function mockLeaderboardResponse(period: string): LeaderboardResponse {
     name: c.name,
     avatar: c.avatar,
     qau: c.qau,
-    earnings: c.earningsValue,
     app_count: c.apps.length,
   }));
 
@@ -250,7 +248,7 @@ function mockLeaderboardResponse(period: string): LeaderboardResponse {
 
   return {
     entries,
-    my_rank: myEntry ? { rank: myEntry.rank, qau: myEntry.qau, earnings: myEntry.earnings } : null,
+    my_rank: myEntry ? { rank: myEntry.rank, qau: myEntry.qau } : null,
   };
 }
 

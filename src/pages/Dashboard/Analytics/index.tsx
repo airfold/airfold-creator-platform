@@ -1,7 +1,6 @@
 import {
   AreaChart, Area,
   BarChart, Bar,
-  LineChart, Line,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
 } from 'recharts';
 import AppSelector from '../../../components/AppSelector';
@@ -24,11 +23,11 @@ export default function Analytics() {
   const selectedApp = selectedAppId && apps ? apps.find(a => a.id === selectedAppId) : null;
 
   const { data: creatorAnalytics, isLoading: creatorLoading, error: creatorError } = useCreatorAnalytics('30d');
-  const { data: appAnalytics, isLoading: appLoading } = useAppAnalytics(selectedAppId);
+  const { data: appAnalytics, isLoading: appLoading, error: appError } = useAppAnalytics(selectedAppId);
 
   const analytics = selectedAppId ? appAnalytics : creatorAnalytics;
   const isLoading = selectedAppId ? appLoading : creatorLoading;
-  const error = selectedAppId ? null : creatorError;
+  const error = selectedAppId ? appError : creatorError;
 
   const dauData = analytics?.dau ?? [];
   const totalViews = analytics?.total_views ?? 0;
@@ -53,13 +52,6 @@ export default function Analytics() {
     const totalQAU = apps?.reduce((sum, a) => sum + (a.user_count ?? 0), 0) ?? 0;
     return [{ week: 'Now', qau: totalQAU, uniqueUsers: Math.round(totalQAU * 1.5) }];
   })();
-
-  const retentionData = [
-    { week: 'Week 1', retention: 100 },
-    { week: 'Week 2', retention: 68 },
-    { week: 'Week 3', retention: 52 },
-    { week: 'Week 4', retention: 41 },
-  ];
 
   const subtitle = selectedApp
     ? selectedApp.name
@@ -123,44 +115,24 @@ export default function Analytics() {
         )}
       </div>
 
-      <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
-        {/* QAU vs Unique Users */}
-        <div className="glass-card p-4">
-          <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">QAU vs Unique</h3>
-          {isLoading ? (
-            <div className="h-[180px] rounded-xl animate-pulse bg-af-surface" />
-          ) : (
-            <ResponsiveContainer width="100%" height={180}>
-              <BarChart data={qauVsUnique}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
-                <XAxis dataKey="week" stroke="#8E8E93" fontSize={10} />
-                <YAxis stroke="#8E8E93" fontSize={10} width={35} />
-                <Tooltip contentStyle={tooltipStyle} />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
-                <Bar dataKey="uniqueUsers" name="Unique" fill="#E5E5EA" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="qau" name="QAU" fill="#BD295A" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          )}
-        </div>
-
-        {/* Retention */}
-        <div className="glass-card p-4">
-          <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Retention</h3>
-          {isLoading ? (
-            <div className="h-[180px] rounded-xl animate-pulse bg-af-surface" />
-          ) : (
-            <ResponsiveContainer width="100%" height={180}>
-              <LineChart data={retentionData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
-                <XAxis dataKey="week" stroke="#8E8E93" fontSize={10} />
-                <YAxis stroke="#8E8E93" fontSize={10} unit="%" width={35} />
-                <Tooltip contentStyle={tooltipStyle} />
-                <Line type="monotone" dataKey="retention" stroke="#22c55e" strokeWidth={3} dot={{ r: 4, fill: '#22c55e' }} />
-              </LineChart>
-            </ResponsiveContainer>
-          )}
-        </div>
+      {/* QAU vs Unique Users */}
+      <div className="glass-card p-4">
+        <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">QAU vs Unique</h3>
+        {isLoading ? (
+          <div className="h-[180px] rounded-xl animate-pulse bg-af-surface" />
+        ) : (
+          <ResponsiveContainer width="100%" height={180}>
+            <BarChart data={qauVsUnique}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
+              <XAxis dataKey="week" stroke="#8E8E93" fontSize={10} />
+              <YAxis stroke="#8E8E93" fontSize={10} width={35} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Bar dataKey="uniqueUsers" name="Unique" fill="#E5E5EA" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="qau" name="QAU" fill="#BD295A" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
       </div>
     </div>

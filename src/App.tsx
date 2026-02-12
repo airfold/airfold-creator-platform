@@ -1,3 +1,5 @@
+import { Component } from 'react';
+import type { ReactNode, ErrorInfo } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import PublicLayout from './layouts/PublicLayout';
@@ -14,6 +16,29 @@ import Leaderboard from './pages/Dashboard/Leaderboard';
 import HealthScore from './pages/Dashboard/HealthScore';
 import { isDevMode, isNativeMode, initNativeToken } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
+
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch(error: Error, info: ErrorInfo) { console.error('Dashboard error:', error, info); }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center">
+          <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-4">
+            <svg className="w-6 h-6 text-red-500" viewBox="0 0 24 24" fill="none"><path d="M6 18L18 6M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/></svg>
+          </div>
+          <h2 className="text-lg font-bold text-af-deep-charcoal mb-1">Something went wrong</h2>
+          <p className="text-sm text-af-medium-gray mb-4">Try refreshing the page</p>
+          <button onClick={() => window.location.reload()} className="px-4 py-2 rounded-xl bg-af-tint text-white text-sm font-semibold cursor-pointer active:opacity-80">
+            Refresh
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // Pick up native token from iOS WKWebView sessionStorage injection
 initNativeToken();
@@ -56,10 +81,12 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
