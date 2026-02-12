@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import AppSelector from '../../../components/AppSelector';
-import { useCreatorEarnings } from '../../../hooks/useCreatorData';
+import { useCreatorEarnings, usePayoutStatus } from '../../../hooks/useCreatorData';
+import { startConnectOnboarding, refreshOnboardingLink } from '../../../services/api';
 import { useSelectedApp } from '../../../context/AppContext';
 import {
   calculateMonthlyEarnings,
@@ -14,6 +16,106 @@ const tooltipStyle = {
   color: '#1A1A1A',
   boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
 };
+
+function PayoutCard() {
+  const { data: status, isLoading } = usePayoutStatus();
+  const [busy, setBusy] = useState(false);
+
+  if (isLoading || !status) {
+    return (
+      <div className="glass-card p-4">
+        <div className="h-12 rounded-xl animate-pulse bg-af-surface" />
+      </div>
+    );
+  }
+
+  const handleSetup = async () => {
+    setBusy(true);
+    try {
+      const res = await startConnectOnboarding();
+      window.location.href = res.url;
+    } catch {
+      setBusy(false);
+    }
+  };
+
+  const handleComplete = async () => {
+    setBusy(true);
+    try {
+      const res = await refreshOnboardingLink();
+      window.location.href = res.url;
+    } catch {
+      setBusy(false);
+    }
+  };
+
+  // State 3: Connected & enabled
+  if (status.onboarding_complete && status.payouts_enabled) {
+    return (
+      <div className="glass-card p-4 flex items-center gap-3">
+        <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+          <svg className="w-4 h-4 text-green-600" viewBox="0 0 24 24" fill="none">
+            <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-af-deep-charcoal">Payouts active</p>
+          <p className="text-xs text-af-medium-gray">Your Stripe account is connected and ready to receive payouts.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // State 2: Onboarding incomplete
+  if (status.has_account && !status.onboarding_complete) {
+    return (
+      <div className="glass-card p-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
+            <svg className="w-4 h-4 text-amber-600" viewBox="0 0 24 24" fill="none">
+              <path d="M12 9v4m0 4h.01M12 3l9.66 16.5H2.34L12 3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-af-deep-charcoal">Setup incomplete</p>
+            <p className="text-xs text-af-medium-gray">Finish your Stripe account setup to receive payouts.</p>
+          </div>
+        </div>
+        <button
+          onClick={handleComplete}
+          disabled={busy}
+          className="px-4 py-2 rounded-xl bg-af-tint text-white text-xs font-semibold cursor-pointer active:opacity-80 disabled:opacity-50 flex-shrink-0"
+        >
+          {busy ? 'Loading...' : 'Complete setup'}
+        </button>
+      </div>
+    );
+  }
+
+  // State 1: Not connected
+  return (
+    <div className="glass-card p-4 flex items-center justify-between gap-3">
+      <div className="flex items-center gap-3">
+        <div className="w-8 h-8 rounded-full bg-af-tint-soft flex items-center justify-center flex-shrink-0">
+          <svg className="w-4 h-4 text-af-tint" viewBox="0 0 24 24" fill="none">
+            <path d="M2 10h20M2 14h20M6 18V6M18 18V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-af-deep-charcoal">Set up payouts</p>
+          <p className="text-xs text-af-medium-gray">Connect a Stripe account to receive your earnings.</p>
+        </div>
+      </div>
+      <button
+        onClick={handleSetup}
+        disabled={busy}
+        className="px-4 py-2 rounded-xl bg-af-tint text-white text-xs font-semibold cursor-pointer active:opacity-80 disabled:opacity-50 flex-shrink-0"
+      >
+        {busy ? 'Loading...' : 'Set up'}
+      </button>
+    </div>
+  );
+}
 
 export default function Earnings() {
   const { selectedAppId } = useSelectedApp();
@@ -50,6 +152,8 @@ export default function Earnings() {
         <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Earnings</h1>
         <p className="text-sm text-af-medium-gray">{subtitle}</p>
       </div>
+
+      <PayoutCard />
 
       <AppSelector />
 

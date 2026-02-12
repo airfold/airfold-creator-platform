@@ -14,6 +14,7 @@ import Earnings from './pages/Dashboard/Earnings';
 import Analytics from './pages/Dashboard/Analytics';
 import Leaderboard from './pages/Dashboard/Leaderboard';
 import HealthScore from './pages/Dashboard/HealthScore';
+import StripeCallback from './pages/Dashboard/StripeCallback';
 import { isDevMode, isNativeMode, initNativeToken } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 
@@ -72,6 +73,7 @@ function AppRoutes() {
         <Route path="analytics" element={<Analytics />} />
         <Route path="leaderboard" element={<Leaderboard />} />
         <Route path="health" element={<HealthScore />} />
+        <Route path="stripe-callback" element={<StripeCallback />} />
       </Route>
       {/* Catch old /login route */}
       <Route path="/login" element={<Navigate to="/" replace />} />

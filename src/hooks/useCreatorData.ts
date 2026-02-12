@@ -9,10 +9,11 @@ import {
   fetchCreatorHealth,
   fetchAppHealth,
   fetchLeaderboard,
+  fetchConnectStatus,
 } from '../services/api';
 import { getCurrentCreator, getCreatorTotalQAU, getCreatorAvgHealthScore, creators } from '../data/creators';
 import { calculateWeeklyEarnings } from '../utils/earnings';
-import type { AppResponse, CreatorAnalyticsResponse, AppAnalyticsResponse, CreatorEarningsResponse, CreatorHealthResponse, LeaderboardResponse } from '../services/api';
+import type { AppResponse, CreatorAnalyticsResponse, AppAnalyticsResponse, CreatorEarningsResponse, CreatorHealthResponse, LeaderboardResponse, ConnectAccountStatus } from '../services/api';
 
 // ─── Mock data generators (dev mode) ───
 
@@ -250,6 +251,25 @@ function mockLeaderboardResponse(period: string): LeaderboardResponse {
     entries,
     my_rank: myEntry ? { rank: myEntry.rank, qau: myEntry.qau } : null,
   };
+}
+
+/** Mock payout status for dev mode */
+function mockPayoutStatus(): ConnectAccountStatus {
+  return {
+    has_account: false,
+    onboarding_complete: false,
+    payouts_enabled: false,
+    details_submitted: false,
+  };
+}
+
+/** Fetch Stripe Connect payout status — real API or mock in dev mode */
+export function usePayoutStatus() {
+  return useQuery({
+    queryKey: ['payoutStatus'],
+    queryFn: () => isDevMode() ? Promise.resolve(mockPayoutStatus()) : fetchConnectStatus(),
+    staleTime: 5 * 60 * 1000,
+  });
 }
 
 /** Fetch leaderboard — real API or mock in dev mode */

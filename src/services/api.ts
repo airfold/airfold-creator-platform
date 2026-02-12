@@ -130,6 +130,19 @@ export interface LeaderboardResponse {
   my_rank: { rank: number; qau: number } | null;
 }
 
+// ─── Stripe Connect Types ───
+
+export interface ConnectAccountStatus {
+  has_account: boolean;
+  onboarding_complete: boolean;
+  payouts_enabled: boolean;
+  details_submitted: boolean;
+}
+
+export interface OnboardingLinkResponse {
+  url: string;
+}
+
 // ─── API Methods ───
 
 export async function fetchMyApps(): Promise<AppResponse[]> {
@@ -167,4 +180,18 @@ export async function fetchLeaderboard(period: string = 'week', limit?: number):
   const params = new URLSearchParams({ period });
   if (limit) params.set('limit', String(limit));
   return request<LeaderboardResponse>(`/v1/leaderboard?${params}`);
+}
+
+// ─── Stripe Connect ───
+
+export async function fetchConnectStatus(): Promise<ConnectAccountStatus> {
+  return request<ConnectAccountStatus>('/v1/stripe/connect/status');
+}
+
+export async function startConnectOnboarding(): Promise<OnboardingLinkResponse> {
+  return request<OnboardingLinkResponse>('/v1/stripe/connect/onboard', { method: 'POST' });
+}
+
+export async function refreshOnboardingLink(): Promise<OnboardingLinkResponse> {
+  return request<OnboardingLinkResponse>('/v1/stripe/connect/refresh-link', { method: 'POST' });
 }
