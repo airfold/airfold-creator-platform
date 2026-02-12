@@ -10,38 +10,6 @@ Creator dashboard for the airfold mini-app platform. Creators sign in with the s
   <img src="public/banner.png" alt="The new era of social apps" width="100%" />
 </p>
 
-## Dashboard Tabs
-
-### Overview
-The main dashboard screen. Shows a monthly payout summary (total earned, cap usage with rollover messaging), a horizontal scrollable row of compact app cards (QAU + earnings per app), and key stats (total QAU, active apps, health score, monthly earnings). If a creator has more than 4 apps, a "Show all" toggle expands the full list.
-
-**API**: `GET /v1/creator/earnings` — returns weekly earnings breakdown for all apps.
-
-### Earnings
-Detailed earnings view with a bar chart showing weekly QAU and earnings over the last 8 weeks, plus a weekly breakdown table. Shows cap progress — when the monthly $5,000 cap is hit, it tells the creator the excess rolls over to the next month's payout cycle. Supports per-app filtering via the app selector.
-
-**API**: `GET /v1/creator/earnings` (all apps) or `GET /v1/creator/earnings/app/{appId}` (single app).
-
-### Analytics
-Usage analytics: DAU sparkline, retention rate, average session duration, and total sessions. Displays weekly trends in a line chart. Per-app filtering supported.
-
-**API**: `GET /v1/analytics/creator` — aggregates from ClickHouse `app_events`.
-
-### Leaderboard
-Ranked list of top creators by QAU. Supports weekly/monthly/all-time period switching. Shows the current creator's rank highlighted. Top 3 get colored rank badges.
-
-**API**: `GET /v1/leaderboard?period={week|month|all}&limit=20`
-
-### Calculator
-Interactive earnings estimator. Drag a slider to set projected QAU, see estimated weekly and monthly earnings with cap visualization. Pure client-side — no API calls.
-
-### Health Score
-Traffic quality dashboard. Shows an overall health score (0-100), eligibility status, and individual metrics: same-IP percentage, bounce rate, average session duration, app rating, and any flags. Per-app filtering supported.
-
-**API**: `GET /v1/creator/health` (aggregated) or `GET /v1/app/{appId}/health` (single app).
-
----
-
 ## Architecture
 
 ```
@@ -74,6 +42,40 @@ The creator platform uses **the same Clerk instance** (`clerk.airfold.co`) as th
 
 A "DEV SKIP" button on the login page enables dev mode, which bypasses Clerk auth and uses mock data for all API calls. This lets you run the dashboard without a backend.
 
+---
+
+## Dashboard Tabs
+
+### Overview
+Hero earnings card showing the big number (this month's total), a progress bar toward the $5,000 monthly cap, and inline stats (this week's earnings, QAU count, health score). Below that, a tappable 8-week QAU sparkline linking to the Earnings tab, and a list of all your apps with per-app earnings and growth percentage. "Show all" toggle if you have more than 4 apps.
+
+**API**: `GET /v1/creator/earnings`
+
+### Earnings
+Detailed earnings view with a bar chart showing weekly QAU and earnings over the last 8 weeks, plus a weekly breakdown table. Shows cap progress — when the monthly $5,000 cap is hit, it tells the creator the excess rolls over to the next month's payout cycle. Supports per-app filtering via the app selector.
+
+**API**: `GET /v1/creator/earnings` (all apps) or `GET /v1/creator/earnings/app/{appId}` (single app)
+
+### Analytics
+Usage analytics: DAU sparkline, retention rate, average session duration, and total sessions. Displays weekly trends in a line chart. Per-app filtering supported.
+
+**API**: `GET /v1/analytics/creator` — aggregates from ClickHouse `app_events`
+
+### Leaderboard
+Ranked list of top creators by QAU. Supports weekly/monthly/all-time period switching. Shows the current creator's rank highlighted. Top 3 get colored rank badges.
+
+**API**: `GET /v1/leaderboard?period={week|month|all}&limit=20`
+
+### Calculator
+Interactive earnings estimator. Drag a slider to set projected QAU, see estimated weekly and monthly earnings with cap visualization. Pure client-side — no API calls.
+
+### Health Score
+Traffic quality dashboard. Shows an overall health score (0-100), eligibility status, and individual metrics: same-IP percentage, bounce rate, average session duration, app rating, and any flags. Per-app filtering supported.
+
+**API**: `GET /v1/creator/health` (aggregated) or `GET /v1/app/{appId}/health` (single app)
+
+---
+
 ## QAU Definition
 
 **QAU** = **Qualified Active User** — a user who opens a creator's app on **3+ different days** in a week, with each session **at least 1 minute** long. Must be authenticated with a verified .edu email and not flagged as bot/fake traffic.
@@ -90,7 +92,7 @@ A "DEV SKIP" button on the login page enables dev mode, which bypasses Clerk aut
 - **React 18** + **Vite** + **TypeScript**
 - **@clerk/clerk-react** — authentication (same Clerk instance as iOS app)
 - **Tailwind CSS v4** — airfold light theme with custom `@theme` variables
-- **Recharts** — charts (bar, line, area)
+- **Recharts** — charts (bar, line, area, sparklines)
 - **React Router v6** — client-side routing
 - **Framer Motion** — page animations and transitions
 - **Croogla 4F** — custom brand font for "airfold" text
@@ -135,9 +137,9 @@ npm run build
 
 ```
 src/
-  components/          # Shared UI (Logo, StatCard, Badge, Charts, AppSelector)
+  components/          # Shared UI (Logo, StatCard, SparklineChart, AppSelector)
   context/             # Auth hooks (wraps Clerk, dev mode toggle)
-  data/                # Mock data (18 creators with varied patterns)
+  data/                # Mock data (9 creators, early-stage platform)
   hooks/               # Custom hooks (useAnimatedNumber, useCreatorData)
   services/            # API client (sends Clerk JWT to backend)
   layouts/
@@ -147,7 +149,7 @@ src/
     Landing/           # Platform home with featured creators
     Login/             # Clerk SignIn + dev skip
     Dashboard/
-      Overview/        # Monthly payout summary, horizontal app cards, stats
+      Overview/        # Hero earnings card, app list, QAU sparkline
       Earnings/        # Weekly charts, breakdown table, cap rollover
       Analytics/       # DAU, retention, sessions
       Leaderboard/     # Top creators ranking with period filter

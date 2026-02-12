@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import StatCard from '../../../components/StatCard';
+import SparklineChart from '../../../components/SparklineChart';
 import { useCurrentCreator } from '../../../hooks/useCreatorData';
 import { useSelectedApp } from '../../../context/AppContext';
-import { getCreatorTotalQAU } from '../../../data/creators';
+import { getCreatorTotalQAU, getCreatorAvgHealthScore } from '../../../data/creators';
 import { haptic } from '../../../utils/haptic';
 import {
   calculateWeeklyEarnings,
@@ -15,6 +15,7 @@ import {
 } from '../../../utils/earnings';
 
 const MAX_VISIBLE_APPS = 4;
+const MONTHLY_CAP = 5000;
 
 export default function Overview() {
   const creator = useCurrentCreator();
@@ -26,158 +27,144 @@ export default function Overview() {
   const currentQAU = totalQAU[7];
   const lastWeekQAU = totalQAU[6];
   const qauChange = percentChange(currentQAU, lastWeekQAU);
-  const earnings = calculateWeeklyEarnings(currentQAU);
+  const weekly = calculateWeeklyEarnings(currentQAU);
 
-  // Monthly calculation from last 4 weeks
   const last4Weeks = totalQAU.slice(-4).map(q => calculateWeeklyEarnings(q).capped);
   const monthly = calculateMonthlyEarnings(last4Weeks);
+  const healthScore = getCreatorAvgHealthScore(creator);
 
   const visibleApps = showAllApps ? creator.apps : creator.apps.slice(0, MAX_VISIBLE_APPS);
   const hasMoreApps = creator.apps.length > MAX_VISIBLE_APPS;
 
   return (
-    <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Overview</h1>
-        <p className="text-sm text-af-medium-gray">Welcome back, {creator.name.split(' ')[0]}</p>
-      </div>
+    <div className="space-y-4">
+      {/* Hero — the money */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="rounded-2xl bg-gradient-to-br from-af-tint to-[#8B1D42] p-5 text-white relative overflow-hidden"
+      >
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
 
-      {/* App cards — horizontal scroll on mobile */}
-      <div>
+        <div className="relative">
+          <p className="text-white/70 text-xs font-medium mb-1">This month</p>
+          <div className="flex items-baseline gap-2">
+            <span className="text-4xl font-black tracking-tight">{formatCurrency(monthly.capped)}</span>
+            {qauChange !== 0 && (
+              <span className={`text-sm font-semibold px-2 py-0.5 rounded-full ${qauChange >= 0 ? 'bg-white/20 text-white' : 'bg-red-400/30 text-red-100'}`}>
+                {qauChange >= 0 ? '+' : ''}{qauChange}%
+              </span>
+            )}
+          </div>
+
+          <div className="mt-4 mb-1 flex items-center justify-between text-[11px]">
+            <span className="text-white/60">{formatCurrency(monthly.capped)} of {formatCurrency(MONTHLY_CAP)}</span>
+            <span className="text-white/80 font-medium">{Math.min(Math.round((monthly.capped / MONTHLY_CAP) * 100), 100)}%</span>
+          </div>
+          <div className="h-1.5 bg-white/15 rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${Math.min((monthly.capped / MONTHLY_CAP) * 100, 100)}%` }}
+              transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
+              className="h-full rounded-full bg-white/90"
+            />
+          </div>
+
+          {monthly.capApplied && (
+            <p className="text-[11px] text-white/70 mt-2">
+              Cap reached — excess {formatCurrency(monthly.total - monthly.capped)} rolls to next month
+            </p>
+          )}
+
+          <div className="flex items-center gap-4 mt-4 pt-3 border-t border-white/10">
+            <div className="flex-1">
+              <p className="text-white/50 text-[10px] mb-0.5">This week</p>
+              <p className="text-base font-bold">{formatCurrency(weekly.capped)}</p>
+            </div>
+            <div className="w-px h-8 bg-white/15" />
+            <div className="flex-1">
+              <p className="text-white/50 text-[10px] mb-0.5">QAU</p>
+              <p className="text-base font-bold">{formatNumber(currentQAU)}</p>
+            </div>
+            <div className="w-px h-8 bg-white/15" />
+            <div className="flex-1">
+              <p className="text-white/50 text-[10px] mb-0.5">Health</p>
+              <p className="text-base font-bold">{healthScore}<span className="text-xs font-normal text-white/50">/100</span></p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* QAU Trend — mini sparkline */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="glass-card p-3 flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-transform"
+        onClick={() => { haptic(); navigate('/dashboard/earnings'); }}
+      >
+        <div className="flex-1 min-w-0">
+          <p className="text-[11px] text-af-medium-gray mb-0.5">8-week trend</p>
+          <p className="text-sm font-bold text-af-deep-charcoal">{formatNumber(currentQAU)} QAU this week</p>
+        </div>
+        <div className="w-24 shrink-0">
+          <SparklineChart data={totalQAU} height={36} />
+        </div>
+        <svg className="w-4 h-4 text-af-medium-gray shrink-0" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+      </motion.div>
+
+      {/* Apps */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+      >
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-sm font-semibold text-af-deep-charcoal">Your Apps</h3>
-          <span className="text-xs text-af-medium-gray">{creator.apps.length} app{creator.apps.length !== 1 ? 's' : ''}</span>
+          <span className="text-[11px] text-af-medium-gray">{creator.apps.length} app{creator.apps.length !== 1 ? 's' : ''}</span>
         </div>
-        <div className="flex gap-2.5 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide snap-x snap-mandatory">
+
+        <div className="space-y-1.5">
           {visibleApps.map((app, idx) => {
             const appEarnings = calculateWeeklyEarnings(app.weeklyQAU[7]);
             const appChange = percentChange(app.weeklyQAU[7], app.weeklyQAU[6]);
             return (
               <motion.div
                 key={app.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: idx * 0.04 }}
-                className="glass-card p-3 min-w-[140px] max-w-[160px] shrink-0 snap-start cursor-pointer active:scale-[0.97] transition-transform"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.15 + idx * 0.03 }}
+                className="glass-card p-3 flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-transform"
                 onClick={() => { haptic(); setSelectedAppId(app.id); navigate('/dashboard/analytics'); }}
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-7 h-7 rounded-lg bg-af-tint-soft flex items-center justify-center shrink-0">
-                    <span className="text-af-tint text-[10px] font-bold">{app.appName.charAt(0)}</span>
-                  </div>
-                  <div className="min-w-0">
-                    <h4 className="text-xs font-bold text-af-deep-charcoal truncate">{app.appName}</h4>
-                    <p className="text-[9px] text-af-medium-gray">{app.category}</p>
-                  </div>
+                <div className="w-9 h-9 rounded-xl bg-af-tint-soft flex items-center justify-center shrink-0">
+                  <span className="text-af-tint text-xs font-bold">{app.appName.charAt(0)}</span>
                 </div>
-                <div className="flex items-end justify-between">
-                  <div>
-                    <div className="text-sm font-bold text-af-tint">{formatCurrency(appEarnings.capped)}</div>
-                    <div className="text-[10px] text-af-medium-gray">{formatNumber(app.weeklyQAU[7])} QAU</div>
-                  </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-semibold text-af-deep-charcoal truncate">{app.appName}</h4>
+                  <p className="text-[11px] text-af-medium-gray">{formatNumber(app.weeklyQAU[7])} QAU this week</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-sm font-bold text-af-tint">{formatCurrency(appEarnings.capped)}</p>
                   {appChange !== 0 && (
-                    <span className={`text-[10px] font-semibold ${appChange >= 0 ? 'text-success' : 'text-danger'}`}>
+                    <p className={`text-[10px] font-semibold ${appChange >= 0 ? 'text-success' : 'text-danger'}`}>
                       {appChange >= 0 ? '+' : ''}{appChange}%
-                    </span>
+                    </p>
                   )}
                 </div>
               </motion.div>
             );
           })}
         </div>
-        {hasMoreApps && !showAllApps && (
+
+        {hasMoreApps && (
           <button
-            onClick={() => { haptic(); setShowAllApps(true); }}
-            className="text-xs font-medium text-af-tint mt-1 cursor-pointer"
+            onClick={() => { haptic(); setShowAllApps(!showAllApps); }}
+            className="w-full text-center text-xs font-medium text-af-tint mt-2 py-2 cursor-pointer active:opacity-70"
           >
-            Show all {creator.apps.length} apps
+            {showAllApps ? 'Show less' : `Show all ${creator.apps.length} apps`}
           </button>
-        )}
-        {showAllApps && hasMoreApps && (
-          <button
-            onClick={() => { haptic(); setShowAllApps(false); }}
-            className="text-xs font-medium text-af-medium-gray mt-1 cursor-pointer"
-          >
-            Show less
-          </button>
-        )}
-      </div>
-
-      {/* Stats grid */}
-      <div className="grid grid-cols-2 gap-3">
-        <StatCard label="This Month" value={monthly.capped} prefix="$" />
-        <StatCard label="QAU This Week" value={currentQAU} change={qauChange} />
-        <StatCard label="Weekly Earnings" value={earnings.capped} prefix="$" />
-        <StatCard label="Total Apps" value={creator.apps.length} />
-      </div>
-
-      {/* Monthly Payout Summary */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="glass-card p-4">
-        <h3 className="text-base font-semibold text-af-deep-charcoal mb-3">Monthly Payout</h3>
-
-        <div className="bg-af-surface rounded-xl p-3 mb-3">
-          <div className="text-xs text-af-medium-gray mb-0.5">Current cycle</div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold text-af-tint">{formatCurrency(monthly.capped)}</span>
-            {monthly.capApplied && (
-              <span className="text-[10px] text-warning font-medium">Cap reached</span>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-1.5 text-xs">
-          <div className="flex justify-between">
-            <span className="text-af-medium-gray">Weekly cap</span>
-            <span className="text-af-deep-charcoal font-medium">$2,000 / week</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-af-medium-gray">Monthly cap</span>
-            <span className="text-af-deep-charcoal font-medium">$5,000 / month</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-af-medium-gray">Rate</span>
-            <span className="text-af-deep-charcoal font-medium">$2 per QAU</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-af-medium-gray">Payout schedule</span>
-            <span className="text-af-deep-charcoal font-medium">Monthly</span>
-          </div>
-          <div className="flex justify-between pt-1.5 border-t border-af-light-gray font-semibold">
-            <span className="text-af-deep-charcoal">Next payout</span>
-            <span className="text-af-tint">{formatCurrency(monthly.capped)}</span>
-          </div>
-        </div>
-
-        {monthly.capApplied && (
-          <div className="mt-3 bg-af-tint-soft rounded-xl p-3 text-xs text-af-tint">
-            You earned {formatCurrency(monthly.total)} this month but the monthly cap is $5,000. The excess {formatCurrency(monthly.total - monthly.capped)} will be added to your next month's payout cycle.
-          </div>
-        )}
-      </motion.div>
-
-      {/* Earnings breakdown */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="glass-card p-4">
-        <h3 className="text-base font-semibold text-af-deep-charcoal mb-3">This Week</h3>
-
-        <div className="space-y-1.5 text-xs">
-          <div className="flex justify-between">
-            <span className="text-af-medium-gray">QAU count</span>
-            <span className="text-af-deep-charcoal font-medium">{formatNumber(currentQAU)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-af-medium-gray">Gross earnings</span>
-            <span className="text-af-deep-charcoal font-medium">{formatCurrency(earnings.earnings)}</span>
-          </div>
-          <div className="flex justify-between pt-1.5 border-t border-af-light-gray font-semibold">
-            <span className="text-af-deep-charcoal">Payout</span>
-            <span className="text-af-tint">{formatCurrency(earnings.capped)}</span>
-          </div>
-        </div>
-
-        {earnings.capApplied && (
-          <div className="mt-3 bg-af-tint-soft rounded-xl p-3 text-xs text-af-tint">
-            Weekly cap reached. The excess {formatCurrency(earnings.earnings - earnings.capped)} will be added to your next month's payout cycle.
-          </div>
         )}
       </motion.div>
     </div>
