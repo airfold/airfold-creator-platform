@@ -62,13 +62,31 @@ Usage analytics: DAU area chart (30 days), summary stats (views + unique users),
 **API**: `GET /v1/analytics/creator`, `GET /v1/analytics/app/{appId}`
 
 ### Health
-Traffic quality dashboard with plain-language metrics instead of raw numbers. Shows an overall health score (0–100) with color-coded status (green/orange/red), and three metric cards:
+Traffic quality dashboard. Tells creators whether their app usage is healthy enough to qualify for payouts — shown in plain language, not raw numbers. Per-app filtering supported.
 
-- **Avg time in app** — session duration with "Users are sticking around" / "Users leave too quickly"
-- **One-time visitors** — bounce rate framed as retention
-- **User authenticity** — shows organic traffic percentage (inverted from same-IP %)
+**How the score works:**
 
-Flags section uses friendly explanations (e.g., "Sessions are under 1 minute — add more content to keep users in"). An **(i)** info button opens a bottom sheet explaining QAU qualification rules. Per-app filtering supported.
+The API queries the last 7 days of `app_events` from ClickHouse and computes three metrics:
+
+| Metric | What it measures | Penalty |
+|--------|-----------------|---------|
+| Same-IP % | % of users with >5 views from one source — detects bot/fake traffic | >30% → −30 pts, >15% → −10 pts |
+| Bounce rate | % of users who only visited once — no repeat usage | >60% → −25 pts, >40% → −10 pts |
+| Avg session time | Average seconds per session (first to last event per user per day) | <30s → −25 pts, <60s → −10 pts |
+
+Score starts at 100, penalties are subtracted, then clamped to 0–100:
+- **80–100** → Eligible (green) — qualifies for payouts
+- **50–79** → At risk (orange) — needs improvement
+- **0–49** → Under review (red) — payouts paused
+
+**What the creator sees:**
+
+- Big color-coded score (80 = green, 55 = orange, 30 = red)
+- **Avg time in app** — "Users are sticking around" or "Users leave too quickly"
+- **One-time visitors** — bounce rate framed as retention (are users coming back?)
+- **User authenticity** — organic traffic % (inverted from same-IP %, so 97% = good)
+- **Flags** — friendly fix suggestions (e.g., "Sessions are under 1 minute — add more content to keep users in")
+- **(i) info button** — bottom sheet explaining the 3 QAU rules (3+ days/week, 1 min/session, not flagged)
 
 **API**: `GET /v1/creator/health` (aggregated) or `GET /v1/creator/health/app/{appId}` (single app)
 
