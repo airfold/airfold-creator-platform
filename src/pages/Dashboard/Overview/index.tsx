@@ -50,7 +50,7 @@ export default function Overview() {
         <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
 
         <div className="relative">
-          <p className="text-white/70 text-xs font-medium mb-1">This month</p>
+          <p className="text-white/70 text-xs font-medium mb-1">This Month</p>
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-black tracking-tight">{formatCurrency(monthly.capped)}</span>
             {qauChange !== 0 && (

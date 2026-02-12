@@ -14,8 +14,7 @@ export default function Calculator() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Earnings Calculator</h1>
-        <p className="text-sm text-af-medium-gray">Estimate your potential earnings</p>
+        <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Calculator</h1>
       </div>
 
       <div className="glass-card p-4 space-y-5">
@@ -31,14 +30,9 @@ export default function Calculator() {
           </div>
         </div>
 
-        <div className="bg-af-surface rounded-xl p-4">
-          <h4 className="text-xs font-medium text-af-charcoal mb-2">Payment Structure</h4>
-          <div className="space-y-1.5 text-xs">
-            <div className="flex justify-between">
-              <span className="text-af-medium-gray">Rate</span>
-              <span className="text-af-deep-charcoal font-medium">$2 per QAU / week</span>
-            </div>
-          </div>
+        <div className="bg-af-surface rounded-xl p-3 flex justify-between text-xs">
+          <span className="text-af-medium-gray">Rate</span>
+          <span className="text-af-deep-charcoal font-semibold">$2 / QAU / week</span>
         </div>
       </div>
 
@@ -62,7 +56,7 @@ export default function Calculator() {
           <div className="text-xs text-af-charcoal leading-relaxed">
             {earnings.capApplied && <p className="font-medium">Weekly cap reached at this QAU level.</p>}
             {monthlyProjection.capApplied && <p className="font-medium">Monthly cap reached at this rate.</p>}
-            <p className="text-af-medium-gray mt-1">Any excess automatically rolls over to your next month's payout cycle — nothing is lost.</p>
+            <p className="text-af-medium-gray mt-1">Excess rolls to next month — nothing lost.</p>
           </div>
         </div>
       )}

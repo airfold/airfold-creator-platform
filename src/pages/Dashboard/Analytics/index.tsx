@@ -53,7 +53,7 @@ export default function Analytics() {
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Analytics</h1>
-        <p className="text-sm text-af-medium-gray">{subtitle} · Performance deep dive</p>
+        <p className="text-sm text-af-medium-gray">{subtitle}</p>
       </div>
 
       <AppSelector />
@@ -61,21 +61,18 @@ export default function Analytics() {
       {/* Summary stats */}
       <div className="grid grid-cols-2 gap-3">
         <div className="glass-card p-3 text-center">
-          <div className="text-xs text-af-medium-gray mb-0.5">Total Views (30d)</div>
+          <div className="text-xs text-af-medium-gray mb-0.5">Views (30d)</div>
           <div className="text-xl font-bold text-af-tint">{isLoading ? '—' : totalViews.toLocaleString()}</div>
         </div>
         <div className="glass-card p-3 text-center">
-          <div className="text-xs text-af-medium-gray mb-0.5">Unique Users (30d)</div>
+          <div className="text-xs text-af-medium-gray mb-0.5">Unique (30d)</div>
           <div className="text-xl font-bold text-af-tint">{isLoading ? '—' : uniqueUsers.toLocaleString()}</div>
         </div>
       </div>
 
       {/* DAU from real API */}
       <div className="glass-card p-4">
-        <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">Daily Active Users (30d)</h3>
-        <p className="text-xs text-af-medium-gray mb-3">
-          {isLoading ? 'Loading...' : error ? 'Using cached data' : 'Live from analytics'}
-        </p>
+        <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">DAU (30d)</h3>
         {isLoading ? (
           <div className="h-[180px] flex items-center justify-center text-af-medium-gray text-sm">Loading...</div>
         ) : (
@@ -100,8 +97,7 @@ export default function Analytics() {
       <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
         {/* QAU vs Unique Users */}
         <div className="glass-card p-4">
-          <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">QAU vs Unique Users</h3>
-          <p className="text-xs text-af-medium-gray mb-3">How many unique users qualify as QAU</p>
+          <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">QAU vs Unique</h3>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={qauVsUnique}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
@@ -117,8 +113,7 @@ export default function Analytics() {
 
         {/* Retention */}
         <div className="glass-card p-4">
-          <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">Retention Curve</h3>
-          <p className="text-xs text-af-medium-gray mb-3">User retention across weeks</p>
+          <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Retention</h3>
           <ResponsiveContainer width="100%" height={180}>
             <LineChart data={retentionData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />

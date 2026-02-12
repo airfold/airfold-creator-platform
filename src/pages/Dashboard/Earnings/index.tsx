@@ -47,13 +47,13 @@ export default function Earnings() {
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Earnings</h1>
-        <p className="text-sm text-af-medium-gray">{subtitle} · Paid monthly</p>
+        <p className="text-sm text-af-medium-gray">{subtitle}</p>
       </div>
 
       <AppSelector />
 
       <div className="glass-card p-4">
-        <h3 className="text-base font-semibold text-af-deep-charcoal mb-4">Weekly Earnings</h3>
+        <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Weekly</h3>
         <ResponsiveContainer width="100%" height={240}>
           <BarChart data={weeklyData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
@@ -67,7 +67,7 @@ export default function Earnings() {
 
       <div className="glass-card overflow-hidden">
         <div className="p-4 pb-0">
-          <h3 className="text-base font-semibold text-af-deep-charcoal mb-3">Weekly Breakdown</h3>
+          <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Breakdown</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
@@ -95,7 +95,7 @@ export default function Earnings() {
 
       {monthlyResult.capApplied && (
         <div className="bg-af-tint-soft rounded-xl p-3 text-xs text-af-tint">
-          Monthly cap reached. The excess {formatCurrency(monthlyResult.total - monthlyResult.capped)} will be added to your next month's payout cycle.
+          Cap reached — {formatCurrency(monthlyResult.total - monthlyResult.capped)} rolls to next month.
         </div>
       )}
     </div>

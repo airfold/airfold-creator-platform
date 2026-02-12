@@ -15,8 +15,7 @@ export default function Leaderboard() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Leaderboard</h1>
-        <p className="text-sm text-af-medium-gray mb-3">Top creators ranked by QAU</p>
+        <h1 className="text-2xl font-bold text-af-deep-charcoal mb-3">Leaderboard</h1>
         <div className="flex gap-2">
           {(['week', 'month', 'all'] as Period[]).map(p => (
             <button

@@ -40,7 +40,7 @@ export default function HealthScore() {
     return (
       <div className="space-y-5">
         <div>
-          <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Health Score</h1>
+          <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Health</h1>
           <p className="text-sm text-af-medium-gray">Loading...</p>
         </div>
       </div>
@@ -50,8 +50,8 @@ export default function HealthScore() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Health Score</h1>
-        <p className="text-sm text-af-medium-gray">{subtitle} · Traffic quality and eligibility</p>
+        <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Health</h1>
+        <p className="text-sm text-af-medium-gray">{subtitle}</p>
       </div>
 
       <AppSelector />
@@ -79,18 +79,11 @@ export default function HealthScore() {
         </div>
 
         <Badge label={status} color={statusColor} />
-        <p className="text-xs text-af-medium-gray mt-2 text-center">
-          {score >= 80
-            ? "Your traffic looks healthy. You're eligible for full payouts."
-            : score >= 50
-              ? 'Some metrics need attention. Your account may be reviewed.'
-              : 'Your account is under review due to suspicious patterns.'}
-        </p>
       </div>
 
       <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
         <div className="glass-card p-4">
-          <h3 className="text-base font-semibold text-af-deep-charcoal mb-3">Traffic Quality Flags</h3>
+          <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Traffic Quality</h3>
           <div className="space-y-5">
             <div>
               <div className="flex justify-between mb-2">
@@ -100,9 +93,6 @@ export default function HealthScore() {
                 </span>
               </div>
               <ProgressBar value={metrics.sameIPPercent} max={100} showValue={false} color={metrics.sameIPPercent > 20 ? '#ef4444' : undefined} />
-              <p className="text-xs text-af-medium-gray mt-1">
-                {metrics.sameIPPercent > 20 ? 'High same-IP traffic detected' : 'Normal distribution'}
-              </p>
             </div>
 
             <div>
@@ -113,9 +103,6 @@ export default function HealthScore() {
                 </span>
               </div>
               <ProgressBar value={metrics.bounceRate} max={100} showValue={false} color={metrics.bounceRate > 50 ? '#ef4444' : undefined} />
-              <p className="text-xs text-af-medium-gray mt-1">
-                {metrics.bounceRate > 50 ? 'Users leaving quickly' : 'Good engagement'}
-              </p>
             </div>
 
             <div>
@@ -134,15 +121,12 @@ export default function HealthScore() {
                   }}
                 />
               </div>
-              <p className="text-xs text-af-medium-gray mt-1">
-                {metrics.avgSessionTime < '1:00' ? 'Very short sessions' : 'Healthy session lengths'}
-              </p>
             </div>
           </div>
         </div>
 
         <div className="glass-card p-4">
-          <h3 className="text-base font-semibold text-af-deep-charcoal mb-3">App Rating Status</h3>
+          <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Rating</h3>
 
           <div className="flex items-center gap-3 mb-4">
             <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-xl font-black ${
@@ -159,21 +143,21 @@ export default function HealthScore() {
           </div>
 
           {ratingMeetsMinimum ? (
-            <div className="bg-green-50 border border-success/20 rounded-xl p-3 text-xs text-success">
-              Your rating meets the minimum requirement.
+            <div className="bg-green-50 border border-success/20 rounded-xl p-2.5 text-xs text-success font-medium">
+              Meets minimum
             </div>
           ) : (
-            <div className="bg-orange-50 border border-warning/20 rounded-xl p-3 text-xs text-warning">
+            <div className="bg-orange-50 border border-warning/20 rounded-xl p-2.5 text-xs text-warning font-medium">
               {metrics.ratingCount < 15
-                ? `Need ${15 - metrics.ratingCount} more ratings to qualify.`
-                : 'Rating is below the 3.0 minimum.'}
+                ? `${15 - metrics.ratingCount} more ratings needed`
+                : 'Below 3.0 minimum'}
             </div>
           )}
 
           <div className="mt-4 pt-3 border-t border-af-light-gray">
             <h4 className="text-xs font-medium text-af-medium-gray mb-2">Active Flags</h4>
             {flags.length === 0 ? (
-              <p className="text-sm text-success">No flags — you're in good standing.</p>
+              <p className="text-sm text-success">None</p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {flags.map(flag => (
