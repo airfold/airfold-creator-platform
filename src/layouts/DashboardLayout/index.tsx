@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { UserButton } from '@clerk/clerk-react';
 import { useAuth } from '../../context/AuthContext';
+import { setTokenGetter } from '../../services/api';
 import Logo from '../../components/Logo';
 
 const navItems = [
@@ -12,19 +15,18 @@ const navItems = [
 ];
 
 export default function DashboardLayout() {
-  const { user, logout } = useAuth();
+  const { user, getToken } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  useEffect(() => {
+    setTokenGetter(getToken);
+  }, [getToken]);
 
   return (
     <div className="min-h-screen bg-af-surface flex">
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-af-light-gray flex flex-col z-40">
-        <div className="p-6 border-b border-af-light-gray">
+        <div className="p-6 border-b border-af-light-gray cursor-pointer" onClick={() => navigate('/dashboard')}>
           <Logo size="md" />
         </div>
         <nav className="flex-1 p-4 space-y-1">
@@ -61,14 +63,13 @@ export default function DashboardLayout() {
         <header className="sticky top-0 z-30 bg-af-surface/80 backdrop-blur-xl border-b border-af-light-gray">
           <div className="h-16 px-8 flex items-center justify-between">
             <div />
-            <div className="flex items-center gap-4">
-              <div className="w-8 h-8 rounded-full bg-af-tint flex items-center justify-center text-sm font-bold text-white">
-                {user?.name?.charAt(0) || 'U'}
-              </div>
-              <button onClick={handleLogout} className="text-sm text-af-medium-gray hover:text-af-deep-charcoal transition-colors cursor-pointer bg-transparent border-none">
-                Logout
-              </button>
-            </div>
+            <UserButton
+              afterSignOutUrl="/"
+              appearance={{
+                variables: { colorPrimary: '#BD295A' },
+                elements: { avatarBox: 'w-8 h-8' },
+              }}
+            />
           </div>
         </header>
 

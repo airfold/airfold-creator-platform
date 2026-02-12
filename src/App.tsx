@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { ClerkProvider, SignedIn, SignedOut } from '@clerk/clerk-react';
 import PublicLayout from './layouts/PublicLayout';
 import DashboardLayout from './layouts/DashboardLayout';
 import Landing from './pages/Landing';
@@ -10,12 +10,16 @@ import Analytics from './pages/Dashboard/Analytics';
 import Leaderboard from './pages/Dashboard/Leaderboard';
 import Calculator from './pages/Dashboard/Calculator';
 import HealthScore from './pages/Dashboard/HealthScore';
-import type { ReactNode } from 'react';
 
-function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { isAuthenticated } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  return <>{children}</>;
+const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <SignedIn>{children}</SignedIn>
+      <SignedOut><Navigate to="/login" replace /></SignedOut>
+    </>
+  );
 }
 
 function AppRoutes() {
@@ -46,10 +50,10 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
+    <ClerkProvider publishableKey={CLERK_KEY} afterSignOutUrl="/">
+      <BrowserRouter>
         <AppRoutes />
-      </AuthProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ClerkProvider>
   );
 }

@@ -1,46 +1,24 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { useUser, useClerk, useAuth as useClerkAuth } from '@clerk/clerk-react';
 
-interface User {
-  email: string;
-  name: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  login: (email: string) => void;
-  logout: () => void;
-  isAuthenticated: boolean;
-}
-
-const AuthContext = createContext<AuthContextType | null>(null);
-
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    const stored = localStorage.getItem('airfold_user');
-    return stored ? JSON.parse(stored) : null;
-  });
-
-  const login = (email: string) => {
-    const name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    const u = { email, name };
-    setUser(u);
-    localStorage.setItem('airfold_user', JSON.stringify(u));
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('airfold_user');
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
+/**
+ * Wraps Clerk hooks with a stable interface for the app.
+ * Replaces the old custom AuthContext.
+ */
 export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
+  const { user, isLoaded, isSignedIn } = useUser();
+  const { signOut } = useClerk();
+  const { getToken } = useClerkAuth();
+
+  return {
+    user: isSignedIn && user ? {
+      id: user.id,
+      email: user.primaryEmailAddress?.emailAddress ?? '',
+      name: user.fullName ?? user.firstName ?? 'Creator',
+      avatar: user.imageUrl,
+    } : null,
+    isAuthenticated: !!isSignedIn,
+    isLoaded,
+    logout: () => signOut(),
+    getToken: () => getToken(),
+  };
 }

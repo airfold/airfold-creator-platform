@@ -1,6 +1,6 @@
 # Airfold Creator Platform
 
-University platform where creators build mini-apps and earn based on real user engagement. Serving 34K+ students across campus.
+Creator dashboard for the Airfold mini-app platform. Creators sign in with the same account they use in the Airfold iOS app and see real analytics, earnings, and health scores for their published apps.
 
 <p align="center">
   <img src="public/icon.png" alt="Airfold" width="80" />
@@ -10,120 +10,75 @@ University platform where creators build mini-apps and earn based on real user e
   <img src="public/banner.png" alt="The new era of social apps" width="100%" />
 </p>
 
-## What is Airfold?
+## Architecture
 
-Airfold is a university platform with 34,000+ students. Inside Airfold, creators can build and publish mini-apps — anything from campus food delivery to study groups to confession boards. Creators who promote their apps and drive engagement get paid based on **Qualified Active Users (QAU)**.
+### How It Works Under the Hood
+
+```
+┌──────────────────┐      Clerk JWT       ┌────────────────────┐
+│  Creator Platform │ ──────────────────▶  │   Airfold API      │
+│  (React SPA)      │                      │   (FastAPI/GCR)    │
+└──────────┬────────┘                      └────────┬───────────┘
+           │                                        │
+           │  GET /v1/app         (my apps)         │ Neon PostgreSQL
+           │  GET /v1/analytics/* (dashboard stats) │   ↕
+           │                                        │ ClickHouse Cloud
+           │                                        │   ↕
+           │                                        │ app_events table
+           └────────────────────────────────────────┘
+                                                      ↑
+                                              Cloudflare Dispatcher
+                                              writes 'view' event on
+                                              every mini-app request
+```
+
+### Authentication (Clerk SSO)
+
+The creator platform uses **the same Clerk instance** (`clerk.airfold.co`) as the main Airfold iOS app. This means:
+
+1. **Single identity** — a creator who signs up in the iOS app already has an account. They sign into the web dashboard with the same credentials (Google, Apple, email, etc.).
+2. **JWT flow** — Clerk issues a JWT on sign-in. The React app sends it as `Authorization: Bearer <jwt>` to the Airfold API. The API validates it against Clerk's JWKS endpoint and resolves the user.
+3. **No separate registration** — there is no `.edu` gate or separate sign-up. If you have an Airfold account, you can access the creator dashboard.
+
+### Data Flow
+
+| Data | Source | How |
+|------|--------|-----|
+| **My Apps** | Neon PostgreSQL via API | `GET /v1/app` returns all apps owned by the authenticated user |
+| **Analytics** | ClickHouse via API | `GET /v1/analytics/creator` aggregates `app_events` by the creator's `worker_name`s |
+| **App Events** | Cloudflare Dispatcher | Every request to `*.apps.airfold.co` writes a `view` event with user_id, timestamp, geo, device |
+| **User Profile** | Clerk | Name, email, avatar fetched client-side via `useUser()` |
+
+### Key Environment Variables
+
+| Variable | Value |
+|----------|-------|
+| `VITE_CLERK_PUBLISHABLE_KEY` | Clerk publishable key (same instance as iOS app) |
+| `VITE_API_URL` | Airfold API endpoint (Cloud Run) |
 
 ## QAU Definition
 
-**QAU** stands for **Qualified Active User**.
-
-A QAU is a user who opens the creator's app on **3 or more different days** in a single week. Each session must be **at least 1 minute long** to count as a valid open. The user must have a verified `.edu` email to be eligible.
-
-### How It Works
-
-- A **week** runs Monday 00:00 UTC through Sunday 23:59 UTC.
-- A **session** is counted when a user opens the app and stays for at least 1 minute.
-- The **same day** only counts once — if a user opens the app 5 times on Tuesday, that's still 1 day.
-- A user must open the app on **3 or more separate days** within the same week to be counted as a QAU for that week.
-
-### Examples
-
-| User | Mon | Tue | Wed | Thu | Fri | Days Active | QAU? |
-|------|-----|-----|-----|-----|-----|-------------|------|
-| Alice | 3min | — | 2min | — | 5min | 3 | Yes |
-| Bob | 45sec | 2min | — | — | — | 1 (Mon doesn't count — under 1min) | No |
-| Carol | 1min | 1min | 30sec | — | — | 2 (Wed doesn't count — under 1min) | No |
-| Dave | 2min | 4min | 1min | 3min | — | 4 | Yes |
-
-### Key Rules
-
-- Sessions under 1 minute **do not count** toward that day.
-- Only verified `.edu` email users are eligible.
-- Bot traffic and flagged accounts are excluded.
-
-## App Flow
-
-```
-Landing Page → Creator Login (.edu) → Creator Dashboard
-```
-
-### Landing Page
-- Hero section with platform stats
-- Featured creator apps with sparkline charts
-- How it works (3-step creator program explanation)
-- Call to action for creator sign-up
-
-### Creator Login
-- `.edu` email validation
-- Redirects to dashboard on success
-- Demo: any `.edu` email + any password works
-
-### Creator Dashboard
-Six pages accessible via sidebar navigation:
-
-| Page | Description |
-|------|-------------|
-| **Overview** | Earnings this week, QAU count, weekly cap usage |
-| **Earnings** | Weekly earnings chart, detailed payout table, cap progress |
-| **Analytics** | DAU trends, QAU vs unique users, retention curve, session duration |
-| **Leaderboard** | Top 20 creators ranked by QAU with earnings |
-| **Calculator** | Interactive earnings estimator with QAU slider |
-| **Health Score** | Traffic quality score, anti-gaming flags, rating status, eligibility |
+**QAU** = **Qualified Active User** — a user who opens a creator's app on **3+ different days** in a week, with each session **at least 1 minute** long.
 
 ## Payment Structure
 
-### Rate
-- **$2 per QAU per week** — simple, flat rate
-
-### Caps
-- Weekly cap: **$2,000**
-- Monthly cap: **$5,000**
-
-### How Payouts Work
-1. Count QAU for the week
-2. Multiply by $2
-3. Cap at $2,000 per week
-4. Monthly total capped at $5,000
-
-### Example
-
-| Week | QAU | QAU x $2 | Payout |
-|------|-----|----------|--------|
-| W1 | 400 | $800 | $800 |
-| W2 | 650 | $1,300 | $1,300 |
-| W3 | 1,200 | $2,400 | $2,000 (capped) |
-| W4 | 500 | $1,000 | $900 (monthly cap hit at $5,000) |
-| **Total** | | | **$5,000** |
-
-## Anti-Gaming Rules
-
-Traffic quality is monitored via the Health Score system:
-
-| Metric | Threshold |
-|--------|-----------|
-| Same IP cluster | < 20% of traffic |
-| Bounce rate | < 50% |
-| Avg session time | > 1 minute |
-| App rating | >= 3.0 from 15+ ratings |
-
-Creators flagged for suspicious activity enter review. Repeated violations result in payout suspension.
+- **$2 per QAU per week** — flat rate
+- Weekly cap: **$2,000** | Monthly cap: **$5,000**
 
 ## Tech Stack
 
-- **React 18** + **Vite** — fast dev and builds
-- **TypeScript** — type safety throughout
-- **Tailwind CSS v4** — utility-first styling with light Airfold theme
+- **React 18** + **Vite** + **TypeScript**
+- **@clerk/clerk-react** — authentication (same Clerk instance as iOS app)
+- **Tailwind CSS v4** — Airfold light theme
 - **Recharts** — charts (bar, line, area)
-- **React Router** — client-side routing
+- **React Router v6** — client-side routing
 - **Framer Motion** — animations
-- **Mock data** — 18 creators with varied engagement patterns
 
 ## Getting Started
 
 ### Prerequisites
 - Node.js 18+
-- npm or yarn
+- npm
 
 ### Install
 ```bash
@@ -132,37 +87,43 @@ cd airfold-creator-platform
 npm install
 ```
 
+### Environment
+```bash
+cp .env.example .env
+# Edit .env if needed (defaults point to production)
+```
+
 ### Development
 ```bash
 npm run dev
 ```
 Open [http://localhost:5173](http://localhost:5173)
 
+### Network Access (LAN)
+```bash
+npx vite --host 0.0.0.0
+```
+
 ### Build
 ```bash
 npm run build
-```
-
-### Preview Production Build
-```bash
-npm run preview
 ```
 
 ## Folder Structure
 
 ```
 src/
-  assets/              # Static assets (icon, banner)
   components/          # Shared UI (Logo, StatCard, Badge, Charts, ProgressBar)
-  context/             # Auth context (login state management)
+  context/             # Auth hooks (wraps Clerk)
   data/                # Mock data (18 creators with varied patterns)
   hooks/               # Custom hooks (useAnimatedNumber)
+  services/            # API client (sends Clerk JWT to backend)
   layouts/
-    PublicLayout/      # Landing + Login (no sidebar)
+    PublicLayout/      # Landing + Login
     DashboardLayout/   # Sidebar + topbar (post-login)
   pages/
-    Landing/           # Airfold platform home
-    Login/             # .edu login form
+    Landing/           # Platform home
+    Login/             # Clerk SignIn component
     Dashboard/
       Overview/        # Earnings summary, QAU trend, cap usage
       Earnings/        # Charts, tables, cap progress
@@ -172,29 +133,19 @@ src/
       HealthScore/     # Traffic quality, flags, eligibility
   types/               # TypeScript interfaces
   utils/               # Earnings calculations
-  App.tsx              # Router setup
+  App.tsx              # ClerkProvider + Router setup
   main.tsx             # Entry point
   index.css            # Tailwind config + custom utilities
 ```
 
-## Mock Data
-
-18 creators with realistic patterns:
-- **Steady growers**: Maya Chen, Priya Patel, David Park
-- **Plateau**: Chris Taylor, Marcus Johnson
-- **Declining**: Tyler Kim
-- **Near weekly cap**: Aisha Okafor
-- **Suspicious/flagged**: Alex Volkov (same IP cluster, bot pattern), Diego Morales (suspicious spike)
-- **Brand new (Week 1)**: Sam Fisher
-
 ## Roadmap
 
-- [ ] Real authentication (Clerk)
+- [x] Clerk authentication (same SSO as iOS app)
+- [x] API service layer (JWT-authenticated calls to backend)
+- [x] Analytics endpoints (ClickHouse queries via API)
+- [ ] Wire dashboard pages to real API data (replace mock data)
 - [ ] Stripe payout integration
-- [ ] `.edu` email verification
 - [ ] Admin panel for reviewing flagged creators
-- [ ] Creator app submission flow
-- [ ] App review and approval system
 - [ ] Real-time QAU tracking
 - [ ] Creator messaging / support chat
 - [ ] Public creator profiles
