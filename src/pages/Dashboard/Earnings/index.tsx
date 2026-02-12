@@ -49,8 +49,9 @@ function PayoutCard() {
     try {
       const res = await startConnectOnboarding();
       window.location.href = res.url;
-    } catch {
-      setActionError('Failed to start setup. Try again.');
+    } catch (err) {
+      console.error('Stripe onboarding failed:', err);
+      setActionError(`Failed to start setup. ${err instanceof Error ? err.message : 'Try again.'}`);
       setBusy(false);
     }
   };
@@ -61,8 +62,9 @@ function PayoutCard() {
     try {
       const res = await refreshOnboardingLink();
       window.location.href = res.url;
-    } catch {
-      setActionError('Failed to load setup. Try again.');
+    } catch (err) {
+      console.error('Stripe refresh link failed:', err);
+      setActionError(`Failed to load setup. ${err instanceof Error ? err.message : 'Try again.'}`);
       setBusy(false);
     }
   };
