@@ -41,7 +41,7 @@ export default function Landing() {
               Build Apps.<br /><span className="text-af-tint">Get Paid.</span>
             </h1>
             <p className="text-sm text-af-medium-gray max-w-xs mx-auto mb-7">
-              AI builds it. You grow it. We pay you.
+              airfold AI builds it. You grow it. We pay you.
             </p>
             <a href="https://apps.apple.com/app/airfold" className="btn-primary text-base px-8 py-3.5 inline-block">Start Creating</a>
           </motion.div>
@@ -97,7 +97,7 @@ export default function Landing() {
             <div className="glass-card p-4 relative overflow-hidden">
               <span className="absolute top-2 right-3 text-3xl font-black text-af-light-gray/40">01</span>
               <h3 className="text-sm font-bold text-af-tint mb-0.5">Create</h3>
-              <p className="text-xs text-af-charcoal">Describe your idea. AI builds it.</p>
+              <p className="text-xs text-af-charcoal">Describe your idea. airfold AI builds it.</p>
             </div>
             <div className="glass-card p-4 relative overflow-hidden">
               <span className="absolute top-2 right-3 text-3xl font-black text-af-light-gray/40">02</span>
