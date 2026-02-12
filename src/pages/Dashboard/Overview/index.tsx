@@ -67,8 +67,45 @@ export default function Overview() {
   if (appsLoading) {
     return (
       <div className="space-y-4">
-        <div className="rounded-2xl bg-gradient-to-br from-af-tint to-[#8B1D42] p-5 text-white h-52 animate-pulse" />
-        <div className="glass-card p-3 h-16 animate-pulse" />
+        {/* Hero skeleton */}
+        <div className="rounded-2xl bg-gradient-to-br from-af-tint/60 to-[#8B1D42]/60 p-5 h-52">
+          <div className="h-3 w-20 rounded bg-white/20 animate-pulse mb-2" />
+          <div className="h-10 w-32 rounded bg-white/20 animate-pulse mb-6" />
+          <div className="h-1.5 w-full rounded-full bg-white/15 animate-pulse mb-4" />
+          <div className="flex gap-4 pt-3 border-t border-white/10">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex-1 space-y-1">
+                <div className="h-2.5 w-12 rounded bg-white/15 animate-pulse" />
+                <div className="h-5 w-16 rounded bg-white/20 animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Trend skeleton */}
+        <div className="glass-card p-3 flex items-center gap-3">
+          <div className="flex-1 space-y-1.5">
+            <div className="h-3 w-20 rounded animate-pulse bg-af-surface" />
+            <div className="h-4 w-28 rounded animate-pulse bg-af-surface" />
+          </div>
+          <div className="w-24 h-9 rounded animate-pulse bg-af-surface" />
+        </div>
+        {/* Apps skeleton */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <div className="h-4 w-20 rounded animate-pulse bg-af-surface" />
+            <div className="h-3 w-12 rounded animate-pulse bg-af-surface" />
+          </div>
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="glass-card p-3 flex items-center gap-3 mb-1.5">
+              <div className="w-9 h-9 rounded-xl animate-pulse bg-af-surface" />
+              <div className="flex-1 space-y-1.5">
+                <div className="h-3.5 w-24 rounded animate-pulse bg-af-surface" />
+                <div className="h-3 w-14 rounded animate-pulse bg-af-surface" />
+              </div>
+              <div className="h-4 w-16 rounded animate-pulse bg-af-surface" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

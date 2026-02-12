@@ -51,20 +51,6 @@ export default function Leaderboard() {
         <div className="glass-card p-8 text-center text-af-medium-gray text-sm">No creators yet</div>
       ) : (
         <div className={`transition-opacity duration-200 ${isFetching ? 'opacity-50' : 'opacity-100'}`}>
-          {/* My rank banner */}
-          {myRank && (
-            <div className="bg-af-tint-soft rounded-xl p-3 flex items-center justify-between mb-4">
-              <div>
-                <span className="text-xs text-af-tint font-medium">Your Rank</span>
-                <div className="text-lg font-bold text-af-tint">#{myRank.rank}</div>
-              </div>
-              <div className="text-right">
-                <span className="text-xs text-af-medium-gray">{myRank.qau.toLocaleString()} QAU</span>
-                <div className="text-sm font-bold text-af-tint">{formatCurrency(myRank.earnings)}</div>
-              </div>
-            </div>
-          )}
-
           <div className="glass-card overflow-hidden">
             <div className="divide-y divide-af-light-gray">
               {entries.map((entry) => {
