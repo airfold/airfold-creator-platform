@@ -15,13 +15,16 @@ import Analytics from './pages/Dashboard/Analytics';
 import Leaderboard from './pages/Dashboard/Leaderboard';
 import Calculator from './pages/Dashboard/Calculator';
 import HealthScore from './pages/Dashboard/HealthScore';
-import { isDevMode } from './context/AuthContext';
+import { isDevMode, isNativeMode, initNativeToken } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
+
+// Pick up ?__clerk_token= from iOS app before React renders
+initNativeToken();
 
 const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  if (isDevMode()) {
+  if (isDevMode() || isNativeMode()) {
     return <>{children}</>;
   }
   return (
