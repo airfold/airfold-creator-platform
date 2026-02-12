@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchConnectStatus } from '../../../services/api';
 import { isDevMode } from '../../../context/AuthContext';
@@ -6,6 +6,7 @@ import { isDevMode } from '../../../context/AuthContext';
 export default function StripeCallback() {
   const navigate = useNavigate();
   const [status, setStatus] = useState<'verifying' | 'success' | 'timeout'>('verifying');
+  const cancelledRef = useRef(false);
 
   useEffect(() => {
     if (isDevMode()) {
@@ -15,30 +16,39 @@ export default function StripeCallback() {
 
     let attempts = 0;
     const maxAttempts = 10;
+    let timeoutId: ReturnType<typeof setTimeout>;
 
     const poll = async () => {
+      if (cancelledRef.current) return;
+
       try {
         const result = await fetchConnectStatus();
+        if (cancelledRef.current) return;
         if (result.onboarding_complete || result.details_submitted) {
           setStatus('success');
-          setTimeout(() => navigate('/dashboard/earnings', { replace: true }), 1500);
+          timeoutId = setTimeout(() => navigate('/dashboard/earnings', { replace: true }), 1500);
           return;
         }
       } catch {
-        // ignore fetch errors, keep polling
+        if (cancelledRef.current) return;
       }
 
       attempts++;
       if (attempts >= maxAttempts) {
         setStatus('timeout');
-        setTimeout(() => navigate('/dashboard/earnings', { replace: true }), 2000);
+        timeoutId = setTimeout(() => navigate('/dashboard/earnings', { replace: true }), 2000);
         return;
       }
 
-      setTimeout(poll, 2000);
+      timeoutId = setTimeout(poll, 2000);
     };
 
     poll();
+
+    return () => {
+      cancelledRef.current = true;
+      clearTimeout(timeoutId);
+    };
   }, [navigate]);
 
   return (

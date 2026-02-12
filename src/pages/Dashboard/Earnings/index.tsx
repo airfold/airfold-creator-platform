@@ -18,10 +18,11 @@ const tooltipStyle = {
 };
 
 function PayoutCard() {
-  const { data: status, isLoading } = usePayoutStatus();
+  const { data: status, isLoading, error } = usePayoutStatus();
   const [busy, setBusy] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  if (isLoading || !status) {
+  if (isLoading) {
     return (
       <div className="glass-card p-4">
         <div className="h-12 rounded-xl animate-pulse bg-af-surface" />
@@ -29,22 +30,39 @@ function PayoutCard() {
     );
   }
 
+  if (error || !status) {
+    return (
+      <div className="glass-card p-4 flex items-center gap-3">
+        <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+          <svg className="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none">
+            <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
+          </svg>
+        </div>
+        <p className="text-xs text-af-medium-gray">Could not load payout status. Try refreshing.</p>
+      </div>
+    );
+  }
+
   const handleSetup = async () => {
     setBusy(true);
+    setActionError(null);
     try {
       const res = await startConnectOnboarding();
       window.location.href = res.url;
     } catch {
+      setActionError('Failed to start setup. Try again.');
       setBusy(false);
     }
   };
 
   const handleComplete = async () => {
     setBusy(true);
+    setActionError(null);
     try {
       const res = await refreshOnboardingLink();
       window.location.href = res.url;
     } catch {
+      setActionError('Failed to load setup. Try again.');
       setBusy(false);
     }
   };
@@ -94,25 +112,28 @@ function PayoutCard() {
 
   // State 1: Not connected
   return (
-    <div className="glass-card p-4 flex items-center justify-between gap-3">
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-af-tint-soft flex items-center justify-center flex-shrink-0">
-          <svg className="w-4 h-4 text-af-tint" viewBox="0 0 24 24" fill="none">
-            <path d="M2 10h20M2 14h20M6 18V6M18 18V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
+    <div className="space-y-2">
+      <div className="glass-card p-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-af-tint-soft flex items-center justify-center flex-shrink-0">
+            <svg className="w-4 h-4 text-af-tint" viewBox="0 0 24 24" fill="none">
+              <path d="M2 10h20M2 14h20M6 18V6M18 18V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-af-deep-charcoal">Set up payouts</p>
+            <p className="text-xs text-af-medium-gray">Connect a Stripe account to receive your earnings.</p>
+          </div>
         </div>
-        <div>
-          <p className="text-sm font-semibold text-af-deep-charcoal">Set up payouts</p>
-          <p className="text-xs text-af-medium-gray">Connect a Stripe account to receive your earnings.</p>
-        </div>
+        <button
+          onClick={handleSetup}
+          disabled={busy}
+          className="px-4 py-2 rounded-xl bg-af-tint text-white text-xs font-semibold cursor-pointer active:opacity-80 disabled:opacity-50 flex-shrink-0"
+        >
+          {busy ? 'Loading...' : 'Set up'}
+        </button>
       </div>
-      <button
-        onClick={handleSetup}
-        disabled={busy}
-        className="px-4 py-2 rounded-xl bg-af-tint text-white text-xs font-semibold cursor-pointer active:opacity-80 disabled:opacity-50 flex-shrink-0"
-      >
-        {busy ? 'Loading...' : 'Set up'}
-      </button>
+      {actionError && <p className="text-xs text-red-500 px-1">{actionError}</p>}
     </div>
   );
 }
