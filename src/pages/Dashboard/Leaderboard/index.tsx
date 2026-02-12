@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useLeaderboard } from '../../../hooks/useCreatorData';
-
+import { formatCurrency } from '../../../utils/earnings';
 import { haptic } from '../../../utils/haptic';
 
 type Period = 'week' | 'month' | 'all';
 
 export default function Leaderboard() {
   const [period, setPeriod] = useState<Period>('week');
-  const { data: leaderboardData, isLoading } = useLeaderboard(period);
+  const { data: leaderboardData, isLoading, isFetching } = useLeaderboard(period);
 
   const entries = leaderboardData?.entries ?? [];
   const myRank = leaderboardData?.my_rank;
@@ -34,45 +34,76 @@ export default function Leaderboard() {
       </div>
 
       {isLoading ? (
-        <div className="glass-card p-8 text-center text-af-medium-gray text-sm">Loading...</div>
+        <div className="glass-card overflow-hidden divide-y divide-af-light-gray">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="flex items-center gap-3 px-4 py-3">
+              <div className="w-7 h-4 rounded animate-pulse bg-af-surface" />
+              <div className="w-8 h-8 rounded-full animate-pulse bg-af-surface" />
+              <div className="flex-1 space-y-1.5">
+                <div className="h-3.5 w-24 rounded animate-pulse bg-af-surface" />
+                <div className="h-3 w-12 rounded animate-pulse bg-af-surface" />
+              </div>
+              <div className="h-4 w-14 rounded animate-pulse bg-af-surface" />
+            </div>
+          ))}
+        </div>
+      ) : entries.length === 0 ? (
+        <div className="glass-card p-8 text-center text-af-medium-gray text-sm">No creators yet</div>
       ) : (
-        <div className="glass-card overflow-hidden">
-          <div className="divide-y divide-af-light-gray">
-            {entries.map((entry) => {
-              const isCurrentUser = myRank != null && entry.rank === myRank.rank;
+        <div className={`transition-opacity duration-200 ${isFetching ? 'opacity-50' : 'opacity-100'}`}>
+          {/* My rank banner */}
+          {myRank && (
+            <div className="bg-af-tint-soft rounded-xl p-3 flex items-center justify-between mb-4">
+              <div>
+                <span className="text-xs text-af-tint font-medium">Your Rank</span>
+                <div className="text-lg font-bold text-af-tint">#{myRank.rank}</div>
+              </div>
+              <div className="text-right">
+                <span className="text-xs text-af-medium-gray">{myRank.qau.toLocaleString()} QAU</span>
+                <div className="text-sm font-bold text-af-tint">{formatCurrency(myRank.earnings)}</div>
+              </div>
+            </div>
+          )}
 
-              return (
-                <div
-                  key={entry.user_id}
-                  className={`flex items-center gap-3 px-4 py-3 ${
-                    isCurrentUser ? 'bg-af-tint-soft border-l-2 border-l-af-tint' : ''
-                  }`}
-                >
-                  <span className={`w-7 text-center font-bold ${entry.rank <= 3 ? 'text-sm text-af-tint' : 'text-xs text-af-deep-charcoal'}`}>
-                    #{entry.rank}
-                  </span>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                    isCurrentUser ? 'bg-af-tint text-white' : 'bg-af-surface text-af-charcoal'
-                  }`}>
-                    {entry.avatar ? (
-                      <img src={entry.avatar} alt="" className="w-full h-full rounded-full object-cover" />
-                    ) : (
-                      entry.name.charAt(0)
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1">
-                      <span className={`text-sm font-medium truncate ${isCurrentUser ? 'text-af-tint' : 'text-af-deep-charcoal'}`}>{entry.name}</span>
-                      {isCurrentUser && <span className="text-[10px] text-af-tint shrink-0">(You)</span>}
+          <div className="glass-card overflow-hidden">
+            <div className="divide-y divide-af-light-gray">
+              {entries.map((entry) => {
+                const isCurrentUser = myRank != null && entry.rank === myRank.rank;
+
+                return (
+                  <div
+                    key={entry.user_id}
+                    className={`flex items-center gap-3 px-4 py-3 ${
+                      isCurrentUser ? 'bg-af-tint-soft border-l-2 border-l-af-tint' : ''
+                    }`}
+                  >
+                    <span className={`w-7 text-center font-bold ${entry.rank <= 3 ? 'text-sm text-af-tint' : 'text-xs text-af-deep-charcoal'}`}>
+                      #{entry.rank}
+                    </span>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                      isCurrentUser ? 'bg-af-tint text-white' : 'bg-af-surface text-af-charcoal'
+                    }`}>
+                      {entry.avatar ? (
+                        <img src={entry.avatar} alt="" className="w-full h-full rounded-full object-cover" />
+                      ) : (
+                        entry.name.charAt(0)
+                      )}
                     </div>
-                    <span className="text-xs text-af-medium-gray truncate block">{entry.app_count} app{entry.app_count !== 1 ? 's' : ''}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1">
+                        <span className={`text-sm font-medium truncate ${isCurrentUser ? 'text-af-tint' : 'text-af-deep-charcoal'}`}>{entry.name}</span>
+                        {isCurrentUser && <span className="text-[10px] text-af-tint shrink-0">(You)</span>}
+                      </div>
+                      <span className="text-xs text-af-medium-gray">{entry.qau.toLocaleString()} QAU</span>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="text-sm font-bold text-af-deep-charcoal">{formatCurrency(entry.earnings)}</div>
+                      <div className="text-[10px] text-af-medium-gray">{entry.app_count} app{entry.app_count !== 1 ? 's' : ''}</div>
+                    </div>
                   </div>
-                  <div className="text-right shrink-0">
-                    <div className="text-xs text-af-medium-gray">{entry.app_count > 1 ? `${entry.app_count} apps` : '1 app'}</div>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

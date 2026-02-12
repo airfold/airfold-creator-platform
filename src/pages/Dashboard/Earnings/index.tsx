@@ -17,14 +17,26 @@ const tooltipStyle = {
 
 export default function Earnings() {
   const { selectedAppId } = useSelectedApp();
-  const { data: earningsData, isLoading } = useCreatorEarnings(selectedAppId);
+  const { data: earningsData, isLoading, isFetching } = useCreatorEarnings(selectedAppId);
 
-  const weeklyData = (earningsData?.weekly ?? []).map((w, i) => ({
-    week: `W${i + 1}`,
-    qau: w.qau,
-    earnings: w.gross,
-    payout: w.capped,
-  }));
+  // Aggregate by week_start (API returns per-app-per-week rows in "All Apps" view)
+  const weeklyData = (() => {
+    const byWeek = new Map<string, { qau: number; earnings: number; payout: number }>();
+    for (const w of earningsData?.weekly ?? []) {
+      const existing = byWeek.get(w.week_start);
+      if (existing) {
+        existing.qau += w.qau;
+        existing.earnings += w.gross;
+        existing.payout += w.capped;
+      } else {
+        byWeek.set(w.week_start, { qau: w.qau, earnings: w.gross, payout: w.capped });
+      }
+    }
+    return Array.from(byWeek.entries()).map(([, data], i) => ({
+      week: `W${i + 1}`,
+      ...data,
+    }));
+  })();
 
   const monthlyResult = calculateMonthlyEarnings(weeklyData.slice(-4).map(w => w.payout));
 
@@ -37,7 +49,18 @@ export default function Earnings() {
       <div className="space-y-5">
         <div>
           <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Earnings</h1>
-          <p className="text-sm text-af-medium-gray">Loading...</p>
+          <p className="text-sm text-af-medium-gray">All Apps</p>
+        </div>
+        <div className="h-10 rounded-xl animate-pulse bg-af-surface" />
+        <div className="glass-card p-4">
+          <div className="h-4 w-16 rounded animate-pulse bg-af-surface mb-3" />
+          <div className="h-[240px] rounded-xl animate-pulse bg-af-surface" />
+        </div>
+        <div className="glass-card p-4">
+          <div className="h-4 w-24 rounded animate-pulse bg-af-surface mb-3" />
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-8 rounded animate-pulse bg-af-surface mb-2" />
+          ))}
         </div>
       </div>
     );
@@ -52,6 +75,7 @@ export default function Earnings() {
 
       <AppSelector />
 
+      <div className={`transition-opacity duration-200 space-y-5 ${isFetching ? 'opacity-50' : 'opacity-100'}`}>
       <div className="glass-card p-4">
         <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Weekly</h3>
         <ResponsiveContainer width="100%" height={240}>
@@ -98,6 +122,7 @@ export default function Earnings() {
           Cap reached — {formatCurrency(monthlyResult.total - monthlyResult.capped)} rolls to next month.
         </div>
       )}
+      </div>
     </div>
   );
 }

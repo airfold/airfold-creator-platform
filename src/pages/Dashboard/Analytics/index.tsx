@@ -23,11 +23,12 @@ export default function Analytics() {
 
   const selectedApp = selectedAppId && apps ? apps.find(a => a.id === selectedAppId) : null;
 
-  const { data: creatorAnalytics, isLoading: creatorLoading, error: creatorError } = useCreatorAnalytics('30d');
-  const { data: appAnalytics, isLoading: appLoading } = useAppAnalytics(selectedAppId);
+  const { data: creatorAnalytics, isLoading: creatorLoading, isFetching: creatorFetching, error: creatorError } = useCreatorAnalytics('30d');
+  const { data: appAnalytics, isLoading: appLoading, isFetching: appFetching } = useAppAnalytics(selectedAppId);
 
   const analytics = selectedAppId ? appAnalytics : creatorAnalytics;
   const isLoading = selectedAppId ? appLoading : creatorLoading;
+  const isFetching = selectedAppId ? appFetching : creatorFetching;
   const error = selectedAppId ? null : creatorError;
 
   const dauData = analytics?.dau ?? [];
@@ -67,6 +68,26 @@ export default function Analytics() {
       ? 'All Apps'
       : apps?.[0]?.name ?? '';
 
+  if (isLoading) {
+    return (
+      <div className="space-y-5">
+        <div>
+          <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Analytics</h1>
+          <p className="text-sm text-af-medium-gray">All Apps</p>
+        </div>
+        <div className="h-10 rounded-xl animate-pulse bg-af-surface" />
+        <div className="grid grid-cols-2 gap-3">
+          <div className="glass-card p-3 h-16 animate-pulse" />
+          <div className="glass-card p-3 h-16 animate-pulse" />
+        </div>
+        <div className="glass-card p-4">
+          <div className="h-4 w-20 rounded animate-pulse bg-af-surface mb-3" />
+          <div className="h-[180px] rounded-xl animate-pulse bg-af-surface" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-5">
       <div>
@@ -76,6 +97,7 @@ export default function Analytics() {
 
       <AppSelector />
 
+      <div className={`transition-opacity duration-200 space-y-5 ${isFetching ? 'opacity-50' : 'opacity-100'}`}>
       {/* Summary stats */}
       <div className="grid grid-cols-2 gap-3">
         <div className="glass-card p-3 text-center">
@@ -91,9 +113,7 @@ export default function Analytics() {
       {/* DAU from real API */}
       <div className="glass-card p-4">
         <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">DAU (30d)</h3>
-        {isLoading ? (
-          <div className="h-[180px] flex items-center justify-center text-af-medium-gray text-sm">Loading...</div>
-        ) : error ? (
+        {error ? (
           <div className="h-[180px] flex items-center justify-center text-af-medium-gray text-sm">No data available</div>
         ) : (
           <ResponsiveContainer width="100%" height={180}>
@@ -144,6 +164,7 @@ export default function Analytics() {
             </LineChart>
           </ResponsiveContainer>
         </div>
+      </div>
       </div>
     </div>
   );

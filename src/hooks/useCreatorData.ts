@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { isDevMode } from '../context/AuthContext';
 import {
   fetchMyApps,
@@ -112,6 +112,7 @@ export function useCreatorAnalytics(period: string = '30d') {
     queryKey: ['creatorAnalytics', period],
     queryFn: () => isDevMode() ? Promise.resolve(mockCreatorAnalytics()) : fetchCreatorAnalytics(period),
     staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -125,6 +126,7 @@ export function useAppAnalytics(appId: string | null, period: string = '30d') {
     },
     enabled: !!appId,
     staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -170,6 +172,7 @@ export function useCreatorEarnings(appId?: string | null) {
       return fetchCreatorEarnings();
     },
     staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -202,6 +205,7 @@ export function useCreatorHealth(appId?: string | null) {
       return fetchCreatorHealth();
     },
     staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -249,5 +253,6 @@ export function useLeaderboard(period: string = 'week') {
       return fetchLeaderboard(period);
     },
     staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 }
