@@ -139,6 +139,107 @@ If a user opens your app twice on Monday and once on Tuesday, that's only 2 days
 - If you hit the monthly cap, the excess rolls over to the next month's payout cycle
 - Earnings are per-creator (summed across all your apps), not per-app
 
+## Stripe Connect Payouts
+
+Creators receive payouts via **Stripe Connect Express**. Stripe handles KYC, identity verification, and bank account setup. Airfold handles earnings calculation and payout execution.
+
+### How it works
+
+```
+┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+│  Creator      │    │  airfold API │    │    Stripe    │    │  Creator's   │
+│  Dashboard    │───▶│  (FastAPI)   │───▶│   Connect    │───▶│  Bank Acct   │
+│  Earnings tab │    │              │    │              │    │              │
+└──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
+     Setup ▲              │                    │
+     button │         Transfer $           Auto-payout
+             │         (weekly)            to bank
+             └─────────────────────────────────┘
+                    Stripe hosted onboarding
+```
+
+### Creator onboarding flow
+
+1. Creator opens the **Earnings** tab in the dashboard
+2. Sees a **"Set up payouts"** card at the top (if no Stripe account connected)
+3. Taps the button → redirected to Stripe's hosted onboarding (KYC, bank details, tax info)
+4. Stripe redirects back to `/dashboard/stripe-callback`
+5. Callback page polls the API until the account is verified, then redirects to Earnings
+6. Card now shows **"Payouts active"** with a green checkmark
+
+Three card states:
+- **Not connected** — "Set up payouts" button
+- **Onboarding incomplete** — "Complete setup" button (warns them to finish)
+- **Connected & enabled** — "Payouts active" (green checkmark)
+
+### Stripe Connect API endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/v1/stripe/connect/status` | GET | Current account status (has_account, onboarding_complete, payouts_enabled) |
+| `/v1/stripe/connect/onboard` | POST | Create Express account + return Stripe onboarding URL |
+| `/v1/stripe/connect/refresh-link` | POST | Generate new onboarding link (if previous expired) |
+| `/v1/stripe/webhooks` | POST | Stripe webhook — handles `account.updated` events (no auth, verified by signature) |
+
+### Weekly admin payout
+
+Payouts are triggered manually via an admin endpoint — not automated, so you control when money goes out.
+
+```bash
+# Pay all eligible creators for last completed week
+curl -X POST https://airfold-api-mfyi64k65q-uc.a.run.app/v1/admin/run-payouts \
+  -H "x-admin-secret: $ADMIN_SECRET"
+
+# Pay for a specific week
+curl -X POST "https://airfold-api-mfyi64k65q-uc.a.run.app/v1/admin/run-payouts?week_start=2026-02-03" \
+  -H "x-admin-secret: $ADMIN_SECRET"
+```
+
+**What it does:**
+1. Queries ClickHouse for all published apps' QAU for the target week
+2. Groups by creator and computes capped earnings ($2/QAU, $2,000/app/week cap)
+3. For each creator with a connected Stripe account (`payouts_enabled = true`):
+   - Skips if already paid for that week (idempotent — safe to re-run)
+   - Creates a Stripe Transfer from your balance → creator's connected account
+   - Records the payout in the `payouts` table
+4. Returns a summary: creators paid, total amount, skipped, errors
+
+**Response example:**
+```json
+{
+  "week_start": "2026-02-03",
+  "total_paid_cents": 124000,
+  "creators_paid": 8,
+  "creators_skipped": 3,
+  "payouts": [
+    { "user_id": "...", "amount_cents": 24000, "total_qau": 120, "app_count": 2, "stripe_transfer_id": "tr_..." }
+  ],
+  "errors": []
+}
+```
+
+**Prerequisites:**
+- Stripe balance must have enough funds (top up via Stripe Dashboard → Balance → Add to balance)
+- Creators must have completed Stripe onboarding (`payouts_enabled = true`)
+- `ADMIN_SECRET` env var must be set on the API
+
+### Stripe environment variables (API)
+
+| Variable | Description |
+|----------|-------------|
+| `STRIPE_SECRET_KEY` | Stripe API secret key (`sk_test_...` or `sk_live_...`) |
+| `STRIPE_WEBHOOK_SECRET` | Webhook signing secret (`whsec_...`) |
+| `STRIPE_CONNECT_RETURN_URL` | Where Stripe redirects after onboarding (default: `https://creators.airfold.co/dashboard/stripe-callback`) |
+| `STRIPE_CONNECT_REFRESH_URL` | Where Stripe redirects if link expires (default: `https://creators.airfold.co/dashboard/earnings`) |
+| `ADMIN_SECRET` | Secret key for admin endpoints (`x-admin-secret` header) |
+
+### Database tables
+
+- **`stripe_connect_accounts`** — Maps users to Stripe Express accounts (onboarding status, payouts_enabled)
+- **`payouts`** — Payout history (amount, week, transfer ID). Unique constraint on `(user_id, week_start)` prevents double-paying.
+
+---
+
 ## Tech Stack
 
 - **React 18** + **Vite** + **TypeScript**
@@ -202,7 +303,8 @@ src/
     Landing/           # Marketing page with featured creators + App Store link
     Dashboard/
       Overview/        # Hero earnings card, QAU sparkline, app list
-      Earnings/        # Weekly bar chart, breakdown table, cap rollover
+      Earnings/        # Weekly bar chart, breakdown table, cap rollover, payout status card
+      StripeCallback/  # Post-onboarding verification page (polls status, redirects to earnings)
       Analytics/       # DAU, QAU vs unique, retention
       HealthScore/     # Plain-language metrics, flags, QAU rules info sheet
       Leaderboard/     # Creator ranking with period filter
@@ -229,6 +331,11 @@ public/
 | `/v1/analytics/creator` | GET | Creator analytics (DAU, views, geo, devices) |
 | `/v1/analytics/app/{appId}` | GET | Per-app analytics |
 | `/v1/app` | GET | List of creator's published apps |
+| `/v1/stripe/connect/status` | GET | Stripe Connect account status |
+| `/v1/stripe/connect/onboard` | POST | Create account + onboarding URL |
+| `/v1/stripe/connect/refresh-link` | POST | New onboarding link (if expired) |
+| `/v1/stripe/webhooks` | POST | Stripe webhook (no auth) |
+| `/v1/admin/run-payouts` | POST | Execute weekly payouts (admin secret required) |
 
 ## Deployment
 
@@ -252,7 +359,8 @@ Pushes to `main` auto-deploy to **Cloudflare Pages** at `creators.airfold.co`.
 - [x] Remove standalone web login (app-only access)
 - [x] Cloudflare Pages deployment
 - [ ] Health score computation pipeline (scheduled job)
-- [ ] Stripe payout integration
+- [x] Stripe Connect Express payout integration
+- [x] Admin weekly payout endpoint
 - [ ] Admin panel for reviewing flagged creators
 - [ ] Real-time QAU tracking
 - [ ] Creator messaging / support chat
