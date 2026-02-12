@@ -71,7 +71,6 @@ export default function HealthScore() {
 
   const score = healthData?.score ?? 80;
   const metrics = healthData?.metrics;
-  const scoreColor = score >= 80 ? '#22c55e' : score >= 50 ? '#f97316' : '#ef4444';
   const scoreBg = score >= 80 ? 'bg-green-50' : score >= 50 ? 'bg-orange-50' : 'bg-red-50';
 
   const sameIp = metrics?.same_ip_percent ?? 0;
@@ -108,22 +107,35 @@ export default function HealthScore() {
       <AppSelector />
 
       <div className="space-y-4">
-        {/* Score card */}
-        <div className={`${isLoading ? 'bg-af-surface' : scoreBg} rounded-2xl p-6 text-center`}>
+        {/* Status card */}
+        <div className={`${isLoading ? 'bg-af-surface' : scoreBg} rounded-2xl p-5 flex items-center gap-4`}>
           {isLoading ? (
             <>
-              <div className="h-14 w-20 rounded mx-auto mb-1 animate-pulse bg-af-light-gray" />
-              <div className="h-4 w-24 rounded mx-auto mb-1 animate-pulse bg-af-light-gray" />
-              <div className="h-3 w-40 rounded mx-auto animate-pulse bg-af-light-gray" />
+              <div className="w-12 h-12 rounded-full animate-pulse bg-af-light-gray shrink-0" />
+              <div className="flex-1 space-y-1.5">
+                <div className="h-4 w-28 rounded animate-pulse bg-af-light-gray" />
+                <div className="h-3 w-44 rounded animate-pulse bg-af-light-gray" />
+              </div>
             </>
           ) : (
             <>
-              <div className="text-6xl font-black mb-1" style={{ color: scoreColor }}>{score}</div>
-              <div className="text-sm font-semibold text-af-deep-charcoal">
-                {score >= 80 ? 'Looking great' : score >= 50 ? 'Needs attention' : 'Action required'}
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${score >= 80 ? 'bg-green-100' : score >= 50 ? 'bg-orange-100' : 'bg-red-100'}`}>
+                <svg className={`w-6 h-6 ${score >= 80 ? 'text-green-500' : score >= 50 ? 'text-orange-500' : 'text-red-500'}`} viewBox="0 0 24 24" fill="none">
+                  {score >= 80
+                    ? <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    : score >= 50
+                      ? <><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/><path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></>
+                      : <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
+                  }
+                </svg>
               </div>
-              <div className="text-xs text-af-medium-gray mt-0.5">
-                {score >= 80 ? 'Your app qualifies for payouts' : score >= 50 ? 'Improve the flagged areas to stay eligible' : 'Fix the issues below to keep earning'}
+              <div>
+                <div className="text-lg font-bold text-af-deep-charcoal">
+                  {score >= 80 ? 'Looking great' : score >= 50 ? 'Needs attention' : 'Payouts paused'}
+                </div>
+                <div className="text-xs text-af-medium-gray">
+                  {score >= 80 ? 'Your app qualifies for payouts' : score >= 50 ? 'Fix the flagged areas to stay eligible' : 'Fix the issues below to resume earning'}
+                </div>
               </div>
             </>
           )}
