@@ -26,7 +26,7 @@ export default function DashboardLayout() {
   return (
     <>
       <DesktopBlocker />
-      <div className="min-h-screen bg-af-surface md:hidden">
+      <div className={`min-h-screen bg-af-surface ${import.meta.env.PROD ? 'md:hidden' : ''}`}>
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-af-light-gray safe-top">
           <div className="h-14 px-4 flex items-center justify-between">

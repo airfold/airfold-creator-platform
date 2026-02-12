@@ -1,6 +1,8 @@
 import Logo from './Logo';
 
 export default function DesktopBlocker() {
+  if (import.meta.env.DEV) return null;
+
   return (
     <div className="hidden md:flex fixed inset-0 z-[100] bg-gradient-to-b from-af-tint-soft/50 via-white to-white items-center justify-center">
       <div className="text-center px-8 max-w-lg">
