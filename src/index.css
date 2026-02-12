@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Croogla';
+  src: url('/fonts/croogla_4f-regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --color-af-tint: #BD295A;
   --color-af-tint-light: #E8739F;
@@ -15,6 +23,7 @@
   --color-danger: #ef4444;
   --color-warning: #f97316;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-brand: 'Croogla', system-ui, sans-serif;
 }
 
 @layer base {

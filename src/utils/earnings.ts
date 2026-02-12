@@ -1,5 +1,5 @@
 /**
- * Airfold Creator Earnings Calculator
+ * airfold Creator Earnings Calculator
  *
  * Payment Structure:
  * - $2 per Qualified Active User (QAU) per week

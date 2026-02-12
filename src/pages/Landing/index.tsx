@@ -19,7 +19,7 @@ const stats = [
 ];
 
 const steps = [
-  { num: '01', title: 'Create an app', desc: 'Describe your idea and Airfold AI builds it for you. No coding required.' },
+  { num: '01', title: 'Create an app', desc: 'Describe your idea and airfold AI builds it for you. No coding required.' },
   { num: '02', title: 'Grow your users', desc: 'Promote your app on campus. Every qualified active user counts toward your earnings.' },
   { num: '03', title: 'Get paid', desc: 'Earn up to $5,000/month. Weekly payouts based on how many users you keep coming back.' },
 ];
@@ -136,7 +136,7 @@ export default function Landing() {
               <span className="active:text-af-deep-charcoal cursor-pointer">Privacy</span>
               <span className="active:text-af-deep-charcoal cursor-pointer">Support</span>
             </div>
-            <p className="text-xs text-af-medium-gray">&copy; 2026 Airfold. All rights reserved.</p>
+            <p className="text-xs text-af-medium-gray">&copy; 2026 <span className="font-brand">airfold</span>. All rights reserved.</p>
           </div>
         </div>
       </footer>

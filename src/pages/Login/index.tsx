@@ -28,7 +28,7 @@ export default function Login() {
         >
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-af-deep-charcoal">Creator Dashboard</h1>
-            <p className="text-af-medium-gray text-sm mt-2">Sign in with your Airfold account</p>
+            <p className="text-af-medium-gray text-sm mt-2">Sign in with your <span className="font-brand text-af-tint">airfold</span> account</p>
           </div>
           <SignIn
             routing="hash"

@@ -15,7 +15,7 @@ export default function DesktopBlocker() {
           Mobile Access Only
         </h1>
         <p className="text-af-medium-gray leading-relaxed text-lg mb-10 max-w-sm mx-auto">
-          The Airfold Creator Dashboard is built for on-the-go creators. Open this page on your phone to get started.
+          The <span className="font-brand text-af-tint">airfold</span> Creator Dashboard is built for on-the-go creators. Open this page on your phone to get started.
         </p>
 
         <a

@@ -11,9 +11,9 @@ const sizes = {
 
 export default function Logo({ size = 'md', className = '' }: LogoProps) {
   return (
-    <span className={`inline-flex items-center gap-2 font-black tracking-tight ${sizes[size].text} ${className}`}>
-      <img src="/icon.png" alt="Airfold" className={`${sizes[size].icon} rounded-lg`} />
-      <span className="text-af-tint">airfold</span>
+    <span className={`inline-flex items-center gap-2 tracking-tight ${sizes[size].text} ${className}`}>
+      <img src="/icon.png" alt="airfold" className={`${sizes[size].icon} rounded-lg`} />
+      <span className="font-brand text-af-tint">airfold</span>
     </span>
   );
 }
