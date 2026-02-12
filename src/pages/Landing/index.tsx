@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '../../components/Logo';
 import SparklineChart from '../../components/SparklineChart';
-import { creators, platformStats } from '../../data/creators';
+import { creators, platformStats, getCreatorTotalQAU, getCreatorAvgHealthScore } from '../../data/creators';
 import { formatNumber, formatCurrency } from '../../utils/earnings';
 
 const featuredCreators = creators
-  .filter(c => c.healthScore > 80 && c.weeklyQAU[7] > 20)
-  .sort((a, b) => b.weeklyQAU[7] - a.weeklyQAU[7])
+  .filter(c => getCreatorAvgHealthScore(c) > 80 && getCreatorTotalQAU(c)[7] > 20)
+  .sort((a, b) => getCreatorTotalQAU(b)[7] - getCreatorTotalQAU(a)[7])
   .slice(0, 4);
 
 const stats = [
@@ -19,9 +19,9 @@ const stats = [
 ];
 
 const steps = [
-  { num: '01', title: 'Create an app', desc: 'Create an app for your campus community using our tools and templates.' },
+  { num: '01', title: 'Create an app', desc: 'Describe your idea and Airfold AI builds it for you. No coding required.' },
   { num: '02', title: 'Grow your users', desc: 'Promote your app on campus. Every qualified active user counts toward your earnings.' },
-  { num: '03', title: 'Get paid', desc: '100 QAU = $200/week. 500 QAU = $1,000/week. Cash out every week.' },
+  { num: '03', title: 'Get paid', desc: 'Earn $2 per qualified active user, every week. Weekly payouts, no cap games.' },
 ];
 
 export default function Landing() {
@@ -77,26 +77,30 @@ export default function Landing() {
           <p className="text-af-medium-gray text-sm">Top performing apps built by student creators</p>
         </motion.div>
         <div className="space-y-2 md:grid md:grid-cols-2 md:gap-3 md:space-y-0">
-          {featuredCreators.map((creator, i) => (
+          {featuredCreators.map((creator, i) => {
+            const totalQAU = getCreatorTotalQAU(creator);
+            const primaryApp = creator.apps[0];
+            return (
             <motion.div key={creator.id} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="glass-card-hover p-3 flex items-center gap-3">
               <div className="w-16 shrink-0">
-                <SparklineChart data={creator.weeklyQAU} height={32} />
+                <SparklineChart data={totalQAU} height={32} />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <h3 className="font-bold text-sm text-af-deep-charcoal truncate">{creator.appName}</h3>
+                  <h3 className="font-bold text-sm text-af-deep-charcoal truncate">{primaryApp?.appName ?? creator.name}</h3>
                   <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-af-tint-soft text-af-tint border border-af-tint/10 shrink-0">
-                    {formatNumber(creator.weeklyQAU[7])} QAU
+                    {formatNumber(totalQAU[7])} QAU
                   </span>
                 </div>
                 <p className="text-[11px] text-af-medium-gray">by {creator.name}</p>
               </div>
               <div className="text-right shrink-0">
-                <div className="text-sm font-bold text-af-tint">{formatCurrency(creator.weeklyQAU[7] * 2)}</div>
+                <div className="text-sm font-bold text-af-tint">{formatCurrency(totalQAU[7] * 2)}</div>
                 <div className="text-[10px] text-af-medium-gray">/week</div>
               </div>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
