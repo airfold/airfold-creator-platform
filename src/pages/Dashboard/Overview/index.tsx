@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import StatCard from '../../../components/StatCard';
 import SparklineChart from '../../../components/SparklineChart';
 import ProgressBar from '../../../components/ProgressBar';
-import { getCurrentCreator } from '../../../data/creators';
+import { useCurrentCreator, useMyApps } from '../../../hooks/useCreatorData';
 import {
   calculateWeeklyEarnings,
   formatCurrency,
@@ -12,7 +12,9 @@ import {
 } from '../../../utils/earnings';
 
 export default function Overview() {
-  const creator = getCurrentCreator();
+  const creator = useCurrentCreator();
+  const { data: apps } = useMyApps();
+  const app = apps?.[0]; // primary app
   const currentQAU = creator.weeklyQAU[7];
   const lastWeekQAU = creator.weeklyQAU[6];
   const qauChange = percentChange(currentQAU, lastWeekQAU);

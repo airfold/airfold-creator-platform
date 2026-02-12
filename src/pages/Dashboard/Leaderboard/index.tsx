@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { creators, currentCreatorId } from '../../../data/creators';
+import { useAllCreators } from '../../../hooks/useCreatorData';
 import { formatNumber, formatCurrency } from '../../../utils/earnings';
 
 type Period = 'week' | 'month' | 'all';
@@ -14,6 +14,7 @@ function getQAU(weeklyQAU: number[], period: Period): number {
 }
 
 export default function Leaderboard() {
+  const { creators, currentCreatorId } = useAllCreators();
   const [period, setPeriod] = useState<Period>('week');
 
   const sorted = [...creators]

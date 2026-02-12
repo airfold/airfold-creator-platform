@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import ProgressBar from '../../../components/ProgressBar';
-import { getCurrentCreator } from '../../../data/creators';
+import { useCurrentCreator } from '../../../hooks/useCreatorData';
 import {
   calculateWeeklyEarnings,
   formatCurrency,
@@ -18,7 +18,7 @@ const tooltipStyle = {
 };
 
 export default function Earnings() {
-  const creator = getCurrentCreator();
+  const creator = useCurrentCreator();
 
   const weeklyData = creator.weeklyQAU.map((qau, i) => {
     const e = calculateWeeklyEarnings(qau);

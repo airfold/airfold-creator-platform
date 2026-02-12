@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
 import Badge from '../../../components/Badge';
 import ProgressBar from '../../../components/ProgressBar';
-import { getCurrentCreator } from '../../../data/creators';
+import { useCurrentCreator } from '../../../hooks/useCreatorData';
 
 export default function HealthScore() {
-  const creator = getCurrentCreator();
+  const creator = useCurrentCreator();
   const score = creator.healthScore;
 
   const scoreColor = score >= 80 ? '#22c55e' : score >= 50 ? '#f97316' : '#ef4444';

@@ -25,7 +25,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json();
 }
 
-// ─── App Types ───
+// ─── Types (matching backend schemas) ───
 
 export interface AppResponse {
   id: string;
@@ -46,12 +46,42 @@ export interface AppResponse {
   remix_source_app_id: string | null;
 }
 
-export interface AnalyticsResponse {
-  dau: { day: string; users: number }[];
+export interface DauPoint {
+  day: string;
+  users: number;
+}
+
+export interface GeoEntry {
+  country: string;
+  users: number;
+}
+
+export interface DeviceEntry {
+  device_type: string;
+  count: number;
+}
+
+export interface AppStats {
+  worker_name: string;
+  views: number;
+  unique_users: number;
+}
+
+export interface CreatorAnalyticsResponse {
+  dau: DauPoint[];
   total_views: number;
   unique_users: number;
-  geo: { country: string; users: number }[];
-  devices: { device_type: string; count: number }[];
+  geo: GeoEntry[];
+  devices: DeviceEntry[];
+  per_app: AppStats[];
+}
+
+export interface AppAnalyticsResponse {
+  dau: DauPoint[];
+  total_views: number;
+  unique_users: number;
+  geo: GeoEntry[];
+  devices: DeviceEntry[];
 }
 
 // ─── API Methods ───
@@ -61,10 +91,10 @@ export async function fetchMyApps(): Promise<AppResponse[]> {
   return data.apps;
 }
 
-export async function fetchAppAnalytics(appId: string, period: string = '30d'): Promise<AnalyticsResponse> {
-  return request<AnalyticsResponse>(`/v1/analytics/app/${appId}?period=${period}`);
+export async function fetchCreatorAnalytics(period: string = '30d'): Promise<CreatorAnalyticsResponse> {
+  return request<CreatorAnalyticsResponse>(`/v1/analytics/creator?period=${period}`);
 }
 
-export async function fetchCreatorAnalytics(period: string = '30d'): Promise<AnalyticsResponse> {
-  return request<AnalyticsResponse>(`/v1/analytics/creator?period=${period}`);
+export async function fetchAppAnalytics(appId: string, period: string = '30d'): Promise<AppAnalyticsResponse> {
+  return request<AppAnalyticsResponse>(`/v1/analytics/app/${appId}?period=${period}`);
 }

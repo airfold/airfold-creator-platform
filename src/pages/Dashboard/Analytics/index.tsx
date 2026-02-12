@@ -4,7 +4,7 @@ import {
   BarChart, Bar,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
 } from 'recharts';
-import { getCurrentCreator } from '../../../data/creators';
+import { useCurrentCreator, useCreatorAnalytics } from '../../../hooks/useCreatorData';
 
 const tooltipStyle = {
   background: '#FFFFFF',
@@ -15,33 +15,30 @@ const tooltipStyle = {
 };
 
 export default function Analytics() {
-  const creator = getCurrentCreator();
+  const creator = useCurrentCreator();
+  const { data: analytics, isLoading, error } = useCreatorAnalytics('30d');
+
+  // Fallback data while loading
+  const dauData = analytics?.dau ?? [];
+  const totalViews = analytics?.total_views ?? 0;
+  const uniqueUsers = analytics?.unique_users ?? 0;
+  const geoData = analytics?.geo ?? [];
+  const deviceData = analytics?.devices ?? [];
+
+  // QAU vs unique (still mock — no backend QAU endpoint)
   const currentQAU = creator.weeklyQAU[7];
-
-  const dauData = Array.from({ length: 30 }, (_, i) => ({
-    day: `${i + 1}`,
-    dau: Math.round(currentQAU * (0.3 + Math.random() * 0.4) * (1 + Math.sin(i / 5) * 0.2)),
-  }));
-
   const qauVsUnique = creator.weeklyQAU.map((qau, i) => ({
     week: `W${i + 1}`,
     qau,
     uniqueUsers: Math.round(qau * (1.4 + Math.random() * 0.3)),
   }));
 
+  // Retention data (mock — no backend endpoint)
   const retentionData = [
     { week: 'Week 1', retention: 100 },
     { week: 'Week 2', retention: 68 },
     { week: 'Week 3', retention: 52 },
     { week: 'Week 4', retention: 41 },
-  ];
-
-  const sessionData = [
-    { range: '0-1m', count: 120 },
-    { range: '1-3m', count: 280 },
-    { range: '3-5m', count: 340 },
-    { range: '5-10m', count: 190 },
-    { range: '10m+', count: 70 },
   ];
 
   return (
@@ -51,27 +48,47 @@ export default function Analytics() {
         <p className="text-sm text-af-medium-gray">{creator.appName} · Performance deep dive</p>
       </div>
 
+      {/* Summary stats */}
+      <div className="grid grid-cols-2 gap-3">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-3 text-center">
+          <div className="text-xs text-af-medium-gray mb-0.5">Total Views (30d)</div>
+          <div className="text-xl font-bold text-af-tint">{isLoading ? '—' : totalViews.toLocaleString()}</div>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="glass-card p-3 text-center">
+          <div className="text-xs text-af-medium-gray mb-0.5">Unique Users (30d)</div>
+          <div className="text-xl font-bold text-af-tint">{isLoading ? '—' : uniqueUsers.toLocaleString()}</div>
+        </motion.div>
+      </div>
+
+      {/* DAU from real API */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-4">
         <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">Daily Active Users (30d)</h3>
-        <p className="text-xs text-af-medium-gray mb-3">Unique users engaging with your app daily</p>
-        <ResponsiveContainer width="100%" height={180}>
-          <AreaChart data={dauData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
-            <XAxis dataKey="day" stroke="#8E8E93" fontSize={10} />
-            <YAxis stroke="#8E8E93" fontSize={10} width={35} />
-            <Tooltip contentStyle={tooltipStyle} />
-            <defs>
-              <linearGradient id="dauGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#BD295A" stopOpacity={0.15} />
-                <stop offset="100%" stopColor="#BD295A" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <Area type="monotone" dataKey="dau" stroke="#BD295A" strokeWidth={2} fill="url(#dauGrad)" />
-          </AreaChart>
-        </ResponsiveContainer>
+        <p className="text-xs text-af-medium-gray mb-3">
+          {isLoading ? 'Loading...' : error ? 'Using cached data' : 'Live from analytics'}
+        </p>
+        {isLoading ? (
+          <div className="h-[180px] flex items-center justify-center text-af-medium-gray text-sm">Loading...</div>
+        ) : (
+          <ResponsiveContainer width="100%" height={180}>
+            <AreaChart data={dauData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
+              <XAxis dataKey="day" stroke="#8E8E93" fontSize={10} tickFormatter={(v) => v.slice(5)} />
+              <YAxis stroke="#8E8E93" fontSize={10} width={35} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <defs>
+                <linearGradient id="dauGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#BD295A" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="#BD295A" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <Area type="monotone" dataKey="users" stroke="#BD295A" strokeWidth={2} fill="url(#dauGrad)" />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
       </motion.div>
 
       <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
+        {/* QAU vs Unique Users (mock) */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-4">
           <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">QAU vs Unique Users</h3>
           <p className="text-xs text-af-medium-gray mb-3">How many unique users qualify as QAU</p>
@@ -88,6 +105,7 @@ export default function Analytics() {
           </ResponsiveContainer>
         </motion.div>
 
+        {/* Retention (mock) */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="glass-card p-4">
           <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">Retention Curve</h3>
           <p className="text-xs text-af-medium-gray mb-3">User retention across weeks</p>
@@ -102,18 +120,34 @@ export default function Analytics() {
           </ResponsiveContainer>
         </motion.div>
 
+        {/* Device breakdown from real API */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-4 md:col-span-2">
-          <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">Session Duration</h3>
-          <p className="text-xs text-af-medium-gray mb-3">Sessions under 1 min don't count toward QAU</p>
-          <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={sessionData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
-              <XAxis dataKey="range" stroke="#8E8E93" fontSize={10} />
-              <YAxis stroke="#8E8E93" fontSize={10} width={35} />
-              <Tooltip contentStyle={tooltipStyle} />
-              <Bar dataKey="count" fill="#E8739F" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">Device & Geo Breakdown</h3>
+          <p className="text-xs text-af-medium-gray mb-3">{isLoading ? 'Loading...' : 'Live from analytics'}</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <h4 className="text-xs font-medium text-af-charcoal mb-2">Devices</h4>
+              <div className="space-y-1.5">
+                {(deviceData.length > 0 ? deviceData : [{ device_type: 'mobile', count: 0 }]).map(d => (
+                  <div key={d.device_type} className="flex justify-between text-xs">
+                    <span className="text-af-medium-gray capitalize">{d.device_type}</span>
+                    <span className="font-medium text-af-deep-charcoal">{d.count.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h4 className="text-xs font-medium text-af-charcoal mb-2">Top Countries</h4>
+              <div className="space-y-1.5">
+                {(geoData.length > 0 ? geoData.slice(0, 5) : [{ country: '—', users: 0 }]).map(g => (
+                  <div key={g.country} className="flex justify-between text-xs">
+                    <span className="text-af-medium-gray">{g.country}</span>
+                    <span className="font-medium text-af-deep-charcoal">{g.users.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </motion.div>
       </div>
     </div>

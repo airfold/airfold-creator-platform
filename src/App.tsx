@@ -1,7 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ClerkProvider, SignedIn, SignedOut } from '@clerk/clerk-react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import PublicLayout from './layouts/PublicLayout';
 import DashboardLayout from './layouts/DashboardLayout';
+
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
+});
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Overview from './pages/Dashboard/Overview';
@@ -55,9 +60,11 @@ function AppRoutes() {
 export default function App() {
   return (
     <ClerkProvider publishableKey={CLERK_KEY} afterSignOutUrl="/">
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </QueryClientProvider>
     </ClerkProvider>
   );
 }
