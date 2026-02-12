@@ -62,8 +62,8 @@ export default function Overview() {
             <span className="text-af-deep-charcoal font-medium">{formatNumber(currentQAU)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-af-medium-gray">Rate per active user</span>
-            <span className="text-af-deep-charcoal font-medium">$2 / week</span>
+            <span className="text-af-medium-gray">Rate per QAU</span>
+            <span className="text-af-deep-charcoal font-medium">$2</span>
           </div>
           <div className="flex justify-between">
             <span className="text-af-medium-gray">Gross earnings</span>
