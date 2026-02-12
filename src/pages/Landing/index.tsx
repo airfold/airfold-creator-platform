@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Logo from '../../components/Logo';
 import SparklineChart from '../../components/SparklineChart';
 import { creators, platformStats, getCreatorTotalQAU, getCreatorAvgHealthScore } from '../../data/creators';
 import { formatNumber, formatCurrency } from '../../utils/earnings';
-import { enableDevMode } from '../../context/AuthContext';
 
 const featuredCreators = creators
   .filter(c => getCreatorAvgHealthScore(c) > 80 && getCreatorTotalQAU(c)[7] > 20)
@@ -13,20 +11,13 @@ const featuredCreators = creators
   .slice(0, 4);
 
 const stats = [
-  { label: 'Active Creators', value: formatNumber(platformStats.totalCreators) },
-  { label: 'Apps Live', value: formatNumber(platformStats.totalAppsLive) },
-  { label: 'QAUs This Week', value: formatNumber(platformStats.totalQAUThisWeek) },
-  { label: 'Total Paid Out', value: formatCurrency(platformStats.totalPaidOut) },
-];
-
-const steps = [
-  { num: '01', title: 'Create an app', desc: 'Describe your idea and airfold AI builds it for you. No coding required.' },
-  { num: '02', title: 'Grow your users', desc: 'Promote your app on campus. Every qualified active user counts toward your earnings.' },
-  { num: '03', title: 'Get paid', desc: 'Earn up to $5,000/month. Weekly payouts based on how many users you keep coming back.' },
+  { label: 'Creators', value: formatNumber(platformStats.totalCreators) },
+  { label: 'Apps', value: formatNumber(platformStats.totalAppsLive) },
+  { label: 'QAU', value: formatNumber(platformStats.totalQAUThisWeek) },
+  { label: 'Paid Out', value: formatCurrency(platformStats.totalPaidOut) },
 ];
 
 export default function Landing() {
-  const navigate = useNavigate();
   const [showTop, setShowTop] = useState(false);
 
   useEffect(() => {
@@ -40,104 +31,99 @@ export default function Landing() {
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-af-tint-soft/50 via-white to-white" />
-        <div className="relative max-w-7xl mx-auto px-5 pt-20 pb-16 text-center">
+        <div className="relative max-w-7xl mx-auto px-5 pt-20 pb-14 text-center">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <div className="inline-flex items-center gap-2 bg-af-tint-soft rounded-full px-3 py-1.5 mb-6 border border-af-tint/10">
+            <div className="inline-flex items-center gap-2 bg-af-tint-soft rounded-full px-3 py-1.5 mb-5 border border-af-tint/10">
               <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              <span className="text-xs text-af-charcoal">34,000+ students on campus</span>
+              <span className="text-xs text-af-charcoal font-medium">{formatCurrency(platformStats.totalPaidOut)} paid to creators</span>
             </div>
-            <h1 className="text-4xl font-black mb-4 leading-tight text-af-deep-charcoal">
-              <span className="text-af-tint">Create.</span> Launch. <span className="text-af-tint">Earn.</span>
+            <h1 className="text-4xl font-black mb-3 leading-tight text-af-deep-charcoal">
+              Build Apps.<br /><span className="text-af-tint">Get Paid.</span>
             </h1>
-            <p className="text-base text-af-medium-gray max-w-sm mx-auto mb-8">
-              Create apps for your campus, grow real users, and earn based on engagement.
+            <p className="text-sm text-af-medium-gray max-w-xs mx-auto mb-7">
+              AI builds it. You grow it. We pay you.
             </p>
-            <div className="flex flex-col md:flex-row md:justify-center items-center gap-3">
-              <a href="https://apps.apple.com/app/airfold" className="btn-primary text-base px-8 py-3.5 w-full max-w-xs text-center">Open in airfold App</a>
-              <a href="#how-it-works" className="btn-secondary text-base px-8 py-3.5 w-full max-w-xs text-center">Learn More</a>
-            </div>
-            <p className="text-xs text-af-medium-gray mt-3">Creator Dashboard is accessible from the airfold iOS app.</p>
-            <button
-              onClick={() => { enableDevMode(); navigate('/dashboard'); }}
-              className="mt-4 text-[10px] font-mono text-af-medium-gray/40 border border-dashed border-af-light-gray/50 rounded px-2 py-1 active:text-af-tint active:border-af-tint transition-colors"
-            >
-              DEV MODE
-            </button>
+            <a href="https://apps.apple.com/app/airfold" className="btn-primary text-base px-8 py-3.5 inline-block">Start Creating</a>
           </motion.div>
         </div>
       </section>
 
-      {/* Stats bar */}
+      {/* Stats */}
       <section className="border-y border-af-light-gray bg-af-surface">
-        <div className="max-w-7xl mx-auto px-5 py-5 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="max-w-7xl mx-auto px-5 py-4 grid grid-cols-4 gap-3">
           {stats.map((s, i) => (
-            <motion.div key={s.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="text-center">
-              <div className="text-xl font-bold text-af-tint">{s.value}</div>
-              <div className="text-xs text-af-medium-gray mt-0.5">{s.label}</div>
+            <motion.div key={s.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="text-center">
+              <div className="text-lg font-black text-af-tint">{s.value}</div>
+              <div className="text-[10px] text-af-medium-gray">{s.label}</div>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* Featured Creator Apps */}
-      <section className="max-w-7xl mx-auto px-5 py-12">
-        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-af-deep-charcoal mb-2">Featured Creator Apps</h2>
-          <p className="text-af-medium-gray text-sm">Top performing apps built by student creators</p>
-        </motion.div>
+      {/* FOMO — Creators earning right now */}
+      <section className="max-w-7xl mx-auto px-5 py-10">
+        <motion.h2 initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-xl font-black text-af-deep-charcoal text-center mb-5">
+          Creators earning <span className="text-af-tint">right now</span>
+        </motion.h2>
         <div className="space-y-2 md:grid md:grid-cols-2 md:gap-3 md:space-y-0">
           {featuredCreators.map((creator, i) => {
             const totalQAU = getCreatorTotalQAU(creator);
+            const weeklyEarnings = totalQAU[7] * 2;
             const primaryApp = creator.apps[0];
             return (
-            <motion.div key={creator.id} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="glass-card-hover p-3 flex items-center gap-3">
-              <div className="w-16 shrink-0">
-                <SparklineChart data={totalQAU} height={32} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <h3 className="font-bold text-sm text-af-deep-charcoal truncate">{primaryApp?.appName ?? creator.name}</h3>
-                  <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-af-tint-soft text-af-tint border border-af-tint/10 shrink-0">
-                    {formatNumber(totalQAU[7])} QAU
-                  </span>
+              <motion.div key={creator.id} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="glass-card-hover p-3 flex items-center gap-3">
+                <div className="w-14 shrink-0">
+                  <SparklineChart data={totalQAU} height={28} />
                 </div>
-                <p className="text-[11px] text-af-medium-gray">by {creator.name}</p>
-              </div>
-              <div className="text-right shrink-0">
-                <div className="text-sm font-bold text-af-tint">{formatCurrency(totalQAU[7] * 2)}</div>
-                <div className="text-[10px] text-af-medium-gray">/week</div>
-              </div>
-            </motion.div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-sm text-af-deep-charcoal truncate">{primaryApp?.appName ?? creator.name}</h3>
+                  <p className="text-[11px] text-af-medium-gray">{creator.name}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-base font-black text-af-tint">{formatCurrency(weeklyEarnings)}</div>
+                  <div className="text-[10px] text-success font-semibold">/week</div>
+                </div>
+              </motion.div>
             );
           })}
         </div>
       </section>
 
-      {/* How it works */}
+      {/* How it works — minimal */}
       <section id="how-it-works" className="bg-af-surface">
-        <div className="max-w-7xl mx-auto px-5 py-12">
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-af-deep-charcoal mb-2">How It Works</h2>
-            <p className="text-af-medium-gray text-sm">Three steps to start earning as a creator</p>
-          </motion.div>
-          <div className="space-y-3 md:grid md:grid-cols-3 md:gap-4 md:space-y-0">
-            {steps.map((step, i) => (
-              <motion.div key={step.num} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="glass-card p-5 relative overflow-hidden">
-                <span className="absolute top-3 right-4 text-4xl font-black text-af-light-gray/50">{step.num}</span>
-                <div className="relative">
-                  <h3 className="text-base font-bold mb-1.5 text-af-tint">{step.title}</h3>
-                  <p className="text-sm text-af-charcoal leading-relaxed">{step.desc}</p>
-                </div>
-              </motion.div>
-            ))}
+        <div className="max-w-7xl mx-auto px-5 py-10">
+          <h2 className="text-xl font-black text-af-deep-charcoal text-center mb-5">3 Steps</h2>
+          <div className="space-y-2 md:grid md:grid-cols-3 md:gap-3 md:space-y-0">
+            <div className="glass-card p-4 relative overflow-hidden">
+              <span className="absolute top-2 right-3 text-3xl font-black text-af-light-gray/40">01</span>
+              <h3 className="text-sm font-bold text-af-tint mb-0.5">Create</h3>
+              <p className="text-xs text-af-charcoal">Describe your idea. AI builds it.</p>
+            </div>
+            <div className="glass-card p-4 relative overflow-hidden">
+              <span className="absolute top-2 right-3 text-3xl font-black text-af-light-gray/40">02</span>
+              <h3 className="text-sm font-bold text-af-tint mb-0.5">Grow</h3>
+              <p className="text-xs text-af-charcoal">Share on campus. Users = money.</p>
+            </div>
+            <div className="glass-card p-4 relative overflow-hidden">
+              <span className="absolute top-2 right-3 text-3xl font-black text-af-light-gray/40">03</span>
+              <h3 className="text-sm font-bold text-af-tint mb-0.5">Earn</h3>
+              <p className="text-xs text-af-charcoal">Up to $5K/mo. Paid weekly.</p>
+            </div>
           </div>
         </div>
       </section>
 
+      {/* CTA */}
+      <section className="text-center py-10 px-5">
+        <h2 className="text-xl font-black text-af-deep-charcoal mb-2">Ready?</h2>
+        <p className="text-sm text-af-medium-gray mb-5">Others are already earning. Don't miss out.</p>
+        <a href="https://apps.apple.com/app/airfold" className="btn-primary text-base px-8 py-3.5 inline-block">Get the App</a>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-af-light-gray">
-        <div className="px-5 py-8">
-          <div className="flex flex-col items-center gap-4 text-center">
+        <div className="px-5 py-6">
+          <div className="flex flex-col items-center gap-3 text-center">
             <Logo size="sm" />
             <div className="flex items-center gap-6 text-xs text-af-medium-gray">
               <a href="https://airfold.co" target="_blank" rel="noopener noreferrer" className="active:text-af-deep-charcoal">About</a>
@@ -145,7 +131,7 @@ export default function Landing() {
               <a href="https://airfold.co/pp" target="_blank" rel="noopener noreferrer" className="active:text-af-deep-charcoal">Privacy</a>
               <a href="mailto:apple@airfold.co" className="active:text-af-deep-charcoal">Support</a>
             </div>
-            <p className="text-xs text-af-medium-gray">&copy; 2026 <span className="font-brand">airfold</span>. All rights reserved.</p>
+            <p className="text-[10px] text-af-medium-gray">&copy; 2026 <span className="font-brand">airfold</span></p>
           </div>
         </div>
       </footer>

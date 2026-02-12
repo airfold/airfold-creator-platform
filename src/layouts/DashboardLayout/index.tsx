@@ -41,30 +41,27 @@ export default function DashboardLayout() {
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-white border-b border-af-light-gray safe-top">
           <div className="h-14 px-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="cursor-pointer" onClick={() => navigate('/dashboard')}>
-                <Logo size="sm" />
-              </div>
-              {!isDevMode() && (
-                <button
-                  onClick={() => { enableDevMode(); window.location.reload(); }}
-                  className="text-[9px] font-mono text-af-medium-gray/50 border border-dashed border-af-light-gray/50 rounded px-1.5 py-0.5 active:text-af-tint active:border-af-tint"
-                >
-                  DEV
-                </button>
-              )}
+            <div className="cursor-pointer" onClick={() => navigate('/dashboard')}>
+              <Logo size="sm" />
             </div>
-            <div className="flex items-center gap-3">
-              <div className="text-right mr-1">
+            <div className="flex items-center gap-2">
+              <div className="text-right">
                 <p className="text-xs font-semibold text-af-deep-charcoal leading-tight truncate max-w-[120px]">{user?.name}</p>
                 {selectedApp && <p className="text-[10px] text-af-medium-gray leading-tight truncate max-w-[120px]">{selectedApp.appName}</p>}
               </div>
-              {isDevMode() && (
+              {isDevMode() ? (
                 <button
                   onClick={() => { clearDevMode(); window.location.href = '/'; }}
-                  className="w-8 h-8 rounded-full bg-af-tint text-white text-xs font-bold flex items-center justify-center"
+                  className="text-[9px] font-mono font-bold text-af-tint border border-af-tint/30 rounded px-1.5 py-0.5 active:opacity-70"
                 >
-                  DC
+                  DEV
+                </button>
+              ) : (
+                <button
+                  onClick={() => { enableDevMode(); window.location.reload(); }}
+                  className="text-[9px] font-mono text-af-medium-gray/40 border border-dashed border-af-light-gray/50 rounded px-1.5 py-0.5 active:text-af-tint active:border-af-tint"
+                >
+                  DEV
                 </button>
               )}
             </div>
