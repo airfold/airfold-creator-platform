@@ -132,8 +132,8 @@ export default function Landing() {
             <Logo size="sm" />
             <div className="flex items-center gap-6 text-xs text-af-medium-gray">
               <a href="https://airfold.co" target="_blank" rel="noopener noreferrer" className="active:text-af-deep-charcoal">About</a>
-              <a href="https://airfold.co/terms" target="_blank" rel="noopener noreferrer" className="active:text-af-deep-charcoal">Terms</a>
-              <a href="https://airfold.co/privacy" target="_blank" rel="noopener noreferrer" className="active:text-af-deep-charcoal">Privacy</a>
+              <a href="https://airfold.co/tos" target="_blank" rel="noopener noreferrer" className="active:text-af-deep-charcoal">Terms</a>
+              <a href="https://airfold.co/pp" target="_blank" rel="noopener noreferrer" className="active:text-af-deep-charcoal">Privacy</a>
               <a href="mailto:apple@airfold.co" className="active:text-af-deep-charcoal">Support</a>
             </div>
             <p className="text-xs text-af-medium-gray">&copy; 2026 <span className="font-brand">airfold</span>. All rights reserved.</p>
