@@ -79,6 +79,16 @@ Score starts at 100, penalties are subtracted, then clamped to 0–100:
 - **50–79** → At risk (orange) — needs improvement
 - **0–49** → Under review (red) — payouts paused
 
+**Examples:**
+
+> **Healthy app (score 100):** 5% same-IP, 25% bounce rate, avg session 3m 20s. No penalties — all metrics are well within limits. Creator gets full payouts.
+
+> **Decent app (score 80):** 18% same-IP (−10), 35% bounce rate (ok), avg session 45s (−10). Loses 20 points but still eligible at 80. Close to the edge though.
+
+> **Struggling app (score 55):** 8% same-IP (ok), 65% bounce rate (−25, flagged), avg session 20s (−25, flagged). Two flags, score drops to 50–55. At risk — creator sees "Needs attention" with tips to fix.
+
+> **Flagged app (score 15):** 40% same-IP (−30, flagged), 70% bounce rate (−25, flagged), avg session 15s (−25, flagged). All three flags hit. Score crashes to 20 or below. Payouts paused until fixed.
+
 **What the creator sees:**
 
 - Big color-coded score (80 = green, 55 = orange, 30 = red)
