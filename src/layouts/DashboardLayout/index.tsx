@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { UserButton } from '@clerk/clerk-react';
-import { useAuth, isDevMode, clearDevMode } from '../../context/AuthContext';
+import { useAuth, isDevMode, isNativeMode, enableDevMode, clearDevMode } from '../../context/AuthContext';
 import { setTokenGetter } from '../../services/api';
 import Logo from '../../components/Logo';
 import { haptic } from '../../utils/haptic';
@@ -42,8 +42,18 @@ export default function DashboardLayout() {
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-af-light-gray safe-top">
           <div className="h-14 px-4 flex items-center justify-between">
-            <div className="cursor-pointer" onClick={() => navigate('/dashboard')}>
-              <Logo size="sm" />
+            <div className="flex items-center gap-2">
+              <div className="cursor-pointer" onClick={() => navigate('/dashboard')}>
+                <Logo size="sm" />
+              </div>
+              {!isDevMode() && (
+                <button
+                  onClick={() => { enableDevMode(); window.location.reload(); }}
+                  className="text-[9px] font-mono text-af-medium-gray/50 border border-dashed border-af-light-gray/50 rounded px-1.5 py-0.5 active:text-af-tint active:border-af-tint"
+                >
+                  DEV
+                </button>
+              )}
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right mr-1">
