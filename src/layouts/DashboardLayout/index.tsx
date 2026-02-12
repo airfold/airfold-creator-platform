@@ -6,13 +6,19 @@ import { setTokenGetter } from '../../services/api';
 import Logo from '../../components/Logo';
 import DesktopBlocker from '../../components/DesktopBlocker';
 
+const NavIcon = ({ d, active }: { d: string; active: boolean }) => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={active ? '#BD295A' : '#8E8E93'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d={d} />
+  </svg>
+);
+
 const navItems = [
-  { to: '/dashboard', label: 'Overview', icon: '📊' },
-  { to: '/dashboard/earnings', label: 'Earnings', icon: '💰' },
-  { to: '/dashboard/analytics', label: 'Analytics', icon: '📈' },
-  { to: '/dashboard/leaderboard', label: 'Board', icon: '🏆' },
-  { to: '/dashboard/calculator', label: 'Calc', icon: '🧮' },
-  { to: '/dashboard/health', label: 'Health', icon: '🛡️' },
+  { to: '/dashboard', label: 'Overview', iconPath: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M9 22V12h6v10' },
+  { to: '/dashboard/earnings', label: 'Earnings', iconPath: 'M12 1v22 M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' },
+  { to: '/dashboard/analytics', label: 'Analytics', iconPath: 'M18 20V10 M12 20V4 M6 20v-6' },
+  { to: '/dashboard/leaderboard', label: 'Board', iconPath: 'M6 9H4.5a2.5 2.5 0 0 1 0-5C7 4 7 7 7 7 M18 9h1.5a2.5 2.5 0 0 0 0-5C17 4 17 7 17 7 M4 22h16 M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22 M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22 M18 2H6v7a6 6 0 0 0 12 0V2Z' },
+  { to: '/dashboard/calculator', label: 'Calc', iconPath: 'M4 4h16v16H4z M8 8h8 M8 12h8 M8 16h3' },
+  { to: '/dashboard/health', label: 'Health', iconPath: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z' },
 ];
 
 export default function DashboardLayout() {
@@ -78,8 +84,12 @@ export default function DashboardLayout() {
                   }`
                 }
               >
-                <span className="text-lg leading-none">{item.icon}</span>
-                <span>{item.label}</span>
+                {({ isActive }) => (
+                  <>
+                    <NavIcon d={item.iconPath} active={isActive} />
+                    <span>{item.label}</span>
+                  </>
+                )}
               </NavLink>
             ))}
           </div>

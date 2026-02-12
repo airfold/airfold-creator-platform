@@ -26,6 +26,24 @@ export default function Overview() {
         <p className="text-sm text-af-medium-gray">Welcome back, {creator.name.split(' ')[0]}</p>
       </div>
 
+      {/* Your App */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-4 flex items-center gap-4">
+        <div className="w-12 h-12 rounded-xl bg-af-tint-soft flex items-center justify-center text-2xl shrink-0">
+          {creator.category === 'Social' ? '💕' : creator.category === 'Education' ? '📚' : creator.category === 'Food' ? '🍔' : creator.category === 'Fitness' ? '💪' : '📱'}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-bold text-base text-af-deep-charcoal">{creator.appName}</h3>
+          <p className="text-xs text-af-medium-gray">{creator.category} · Joined {creator.joinedWeeksAgo === 1 ? 'last week' : `${creator.joinedWeeksAgo} weeks ago`}</p>
+        </div>
+        <div className="text-right shrink-0">
+          <div className="flex items-center gap-1">
+            <span className="text-warning text-sm">★</span>
+            <span className="text-sm font-bold text-af-deep-charcoal">{creator.rating > 0 ? creator.rating : '—'}</span>
+          </div>
+          <p className="text-[10px] text-af-medium-gray">{creator.ratingCount} ratings</p>
+        </div>
+      </motion.div>
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard label="Earnings This Week" value={earnings.capped} prefix="$" icon={<span className="text-2xl">💰</span>} />
         <StatCard label="QAU This Week" value={currentQAU} change={qauChange} icon={<span className="text-2xl">👥</span>} />

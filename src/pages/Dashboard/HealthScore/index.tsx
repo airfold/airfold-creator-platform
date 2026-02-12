@@ -25,7 +25,7 @@ export default function HealthScore() {
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Health Score</h1>
-        <p className="text-sm text-af-medium-gray">Traffic quality and eligibility status</p>
+        <p className="text-sm text-af-medium-gray">{creator.appName} · Traffic quality and eligibility</p>
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-6 flex flex-col items-center">

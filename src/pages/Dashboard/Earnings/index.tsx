@@ -37,7 +37,7 @@ export default function Earnings() {
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Earnings</h1>
-        <p className="text-sm text-af-medium-gray">Track your weekly and monthly payouts</p>
+        <p className="text-sm text-af-medium-gray">{creator.appName} · Weekly and monthly payouts</p>
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-4">

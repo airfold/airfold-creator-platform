@@ -48,7 +48,7 @@ export default function Analytics() {
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Analytics</h1>
-        <p className="text-sm text-af-medium-gray">Deep dive into your app's performance</p>
+        <p className="text-sm text-af-medium-gray">{creator.appName} · Performance deep dive</p>
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-4">
