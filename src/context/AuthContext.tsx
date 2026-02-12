@@ -50,22 +50,23 @@ export function useAuth() {
       user: {
         id: 'dev_9',
         email: 'david@airfold.co',
-        name: 'David Chikly',
+        name: 'Mock User',
         avatar: undefined,
       },
       isAuthenticated: true,
       isLoaded: true,
-      logout: () => { clearDevMode(); window.location.href = '/'; },
+      logout: () => { clearDevMode(); window.location.reload(); },
       getToken: () => Promise.resolve('dev-token'),
     };
   }
 
   if (nativeToken) {
+    const nativeName = sessionStorage.getItem('native_user_name') || 'Creator';
     return {
       user: {
         id: 'native_user',
         email: '',
-        name: 'Creator',
+        name: nativeName,
         avatar: undefined,
       },
       isAuthenticated: true,
