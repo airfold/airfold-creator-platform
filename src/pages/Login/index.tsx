@@ -1,9 +1,21 @@
 import { SignIn, SignedIn } from '@clerk/clerk-react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Logo from '../../components/Logo';
+import { enableDevMode, isDevMode } from '../../context/AuthContext';
 
 export default function Login() {
+  const navigate = useNavigate();
+
+  if (isDevMode()) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  const handleDevSkip = () => {
+    enableDevMode();
+    navigate('/dashboard');
+  };
+
   return (
     <>
       <SignedIn>
@@ -35,6 +47,14 @@ export default function Login() {
               },
             }}
           />
+          <div className="mt-6 text-center">
+            <button
+              onClick={handleDevSkip}
+              className="px-4 py-2 text-xs font-mono text-af-medium-gray border border-dashed border-af-light-gray rounded-lg hover:text-af-tint hover:border-af-tint transition-colors cursor-pointer"
+            >
+              DEV SKIP
+            </button>
+          </div>
         </motion.div>
       </div>
     </>

@@ -125,10 +125,24 @@ export const creators: Creator[] = [
     flags: [],
     joinedWeeksAgo: 1,
   },
+  {
+    id: '9',
+    name: 'David Chikly',
+    email: 'david@airfold.co',
+    appName: 'SecretCrush',
+    category: 'Social',
+    avatar: null,
+    rating: 4.7,
+    ratingCount: 19,
+    weeklyQAU: generateWeeklyData([0, 0, 0, 0, 0, 0, 0.6, 1.0], 78),
+    healthScore: 94,
+    flags: [],
+    joinedWeeksAgo: 1,
+  },
 ];
 
 /** The current logged-in creator for demo purposes */
-export const currentCreatorId = '5';
+export let currentCreatorId = '9';
 
 export function getCreator(id: string): Creator | undefined {
   return creators.find(c => c.id === id);
@@ -140,8 +154,8 @@ export function getCurrentCreator(): Creator {
 
 /** Platform-wide stats — early stage, just launched */
 export const platformStats = {
-  totalCreators: 8,
-  totalAppsLive: 7,
-  totalQAUThisWeek: 412,
-  totalPaidOut: 1840,
+  totalCreators: 9,
+  totalAppsLive: 8,
+  totalQAUThisWeek: 490,
+  totalPaidOut: 2000,
 };

@@ -10,10 +10,14 @@ import Analytics from './pages/Dashboard/Analytics';
 import Leaderboard from './pages/Dashboard/Leaderboard';
 import Calculator from './pages/Dashboard/Calculator';
 import HealthScore from './pages/Dashboard/HealthScore';
+import { isDevMode } from './context/AuthContext';
 
 const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  if (isDevMode()) {
+    return <>{children}</>;
+  }
   return (
     <>
       <SignedIn>{children}</SignedIn>
