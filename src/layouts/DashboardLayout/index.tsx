@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth, isDevMode, enableDevMode, clearDevMode } from '../../context/AuthContext';
 import { setTokenGetter } from '../../services/api';
-import Logo from '../../components/Logo';
 import { haptic } from '../../utils/haptic';
 import DesktopBlocker from '../../components/DesktopBlocker';
 import { useSelectedApp } from '../../context/AppContext';
@@ -42,7 +41,7 @@ export default function DashboardLayout() {
         <header className="sticky top-0 z-30 bg-white border-b border-af-light-gray safe-top">
           <div className="h-14 px-4 flex items-center justify-between">
             <div className="cursor-pointer" onClick={() => navigate('/dashboard')}>
-              <Logo size="sm" />
+              <span className="font-brand text-lg text-af-tint tracking-tight">airfold</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="text-right">
