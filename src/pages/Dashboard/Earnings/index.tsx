@@ -43,12 +43,19 @@ function PayoutCard() {
     );
   }
 
+  const openStripeUrl = (url: string) => {
+    // In iOS WKWebView, window.location.href to external domains gets intercepted
+    // and opened in Safari. Reset busy state after a short delay.
+    window.location.href = url;
+    setTimeout(() => setBusy(false), 1500);
+  };
+
   const handleSetup = async () => {
     setBusy(true);
     setActionError(null);
     try {
       const res = await startConnectOnboarding();
-      window.location.href = res.url;
+      openStripeUrl(res.url);
     } catch (err) {
       console.error('Stripe onboarding failed:', err);
       setActionError(`Failed to start setup. ${err instanceof Error ? err.message : 'Try again.'}`);
@@ -61,7 +68,7 @@ function PayoutCard() {
     setActionError(null);
     try {
       const res = await refreshOnboardingLink();
-      window.location.href = res.url;
+      openStripeUrl(res.url);
     } catch (err) {
       console.error('Stripe refresh link failed:', err);
       setActionError(`Failed to load setup. ${err instanceof Error ? err.message : 'Try again.'}`);
