@@ -111,8 +111,6 @@ export interface CreatorHealthResponse {
   status: string;
   metrics: HealthMetrics;
   flags: string[];
-  rating: number;
-  rating_count: number;
 }
 
 export interface LeaderboardEntry {

@@ -23,9 +23,6 @@ export default function HealthScore() {
   const score = healthData?.score ?? 80;
   const flags = healthData?.flags ?? [];
   const metrics = healthData?.metrics;
-  const rating = healthData?.rating ?? 0;
-  const ratingCount = healthData?.rating_count ?? 0;
-
   const scoreColor = score >= 80 ? '#22c55e' : score >= 50 ? '#f97316' : '#ef4444';
   const scoreBg = score >= 80 ? 'bg-green-50' : score >= 50 ? 'bg-orange-50' : 'bg-red-50';
   const statusLabel = score >= 80 ? "You're good" : score >= 50 ? 'Needs work' : 'Fix this';
@@ -72,10 +69,10 @@ export default function HealthScore() {
           </div>
         </div>
         <div className="glass-card p-4 text-center">
-          <div className="text-2xl font-bold text-af-deep-charcoal">{rating > 0 ? rating.toFixed(1) : '—'}</div>
-          <div className="text-xs text-af-medium-gray mt-0.5">Rating ({ratingCount})</div>
-          <div className={`text-[10px] font-semibold mt-1 ${rating >= 3.0 && ratingCount >= 15 ? 'text-success' : 'text-warning'}`}>
-            {ratingCount < 15 ? `Need ${15 - ratingCount} more` : rating >= 3.0 ? 'Meets min' : 'Below 3.0'}
+          <div className="text-2xl font-bold text-af-deep-charcoal">{score}<span className="text-sm font-normal text-af-medium-gray">/100</span></div>
+          <div className="text-xs text-af-medium-gray mt-0.5">Overall</div>
+          <div className={`text-[10px] font-semibold mt-1 ${score >= 80 ? 'text-success' : score >= 50 ? 'text-warning' : 'text-danger'}`}>
+            {score >= 80 ? 'Eligible' : score >= 50 ? 'At risk' : 'Review'}
           </div>
         </div>
       </div>

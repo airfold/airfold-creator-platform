@@ -178,11 +178,6 @@ function mockHealthResponse(appId?: string | null): CreatorHealthResponse {
   const creator = getCurrentCreator();
   const selectedApp = appId ? creator.apps.find(a => a.id === appId) : null;
   const score = selectedApp ? selectedApp.healthScore : getCreatorAvgHealthScore(creator);
-  const rating = selectedApp
-    ? selectedApp.rating
-    : (creator.apps.reduce((s, a) => s + a.rating * a.weeklyQAU[7], 0) /
-       Math.max(1, creator.apps.reduce((s, a) => s + a.weeklyQAU[7], 0)));
-  const ratingCount = selectedApp ? selectedApp.ratingCount : creator.apps.reduce((s, a) => s + a.ratingCount, 0);
   const flags = selectedApp ? selectedApp.flags : [...new Set(creator.apps.flatMap(a => a.flags))];
 
   return {
@@ -194,8 +189,6 @@ function mockHealthResponse(appId?: string | null): CreatorHealthResponse {
       avg_session_seconds: flags.includes('low_session_time') ? 18 : 272,
     },
     flags,
-    rating: Math.round(rating * 10) / 10,
-    rating_count: ratingCount,
   };
 }
 
