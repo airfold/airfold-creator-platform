@@ -16,6 +16,7 @@ import Leaderboard from './pages/Dashboard/Leaderboard';
 import Calculator from './pages/Dashboard/Calculator';
 import HealthScore from './pages/Dashboard/HealthScore';
 import { isDevMode } from './context/AuthContext';
+import { AppProvider } from './context/AppContext';
 
 const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -42,7 +43,9 @@ function AppRoutes() {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <DashboardLayout />
+            <AppProvider>
+              <DashboardLayout />
+            </AppProvider>
           </ProtectedRoute>
         }
       >

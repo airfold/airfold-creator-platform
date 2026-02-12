@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAllCreators } from '../../../hooks/useCreatorData';
-import { formatNumber, formatCurrency } from '../../../utils/earnings';
+import { getCreatorTotalQAU } from '../../../data/creators';
+import { formatNumber, formatCurrency, calculateWeeklyEarnings } from '../../../utils/earnings';
 
 type Period = 'week' | 'month' | 'all';
 
-function getQAU(weeklyQAU: number[], period: Period): number {
+function getQAU(totalWeeklyQAU: number[], period: Period): number {
   switch (period) {
-    case 'week': return weeklyQAU[7];
-    case 'month': return weeklyQAU.slice(-4).reduce((s, v) => s + v, 0);
-    case 'all': return weeklyQAU.reduce((s, v) => s + v, 0);
+    case 'week': return totalWeeklyQAU[7];
+    case 'month': return totalWeeklyQAU.slice(-4).reduce((s, v) => s + v, 0);
+    case 'all': return totalWeeklyQAU.reduce((s, v) => s + v, 0);
   }
 }
 
@@ -18,7 +19,13 @@ export default function Leaderboard() {
   const [period, setPeriod] = useState<Period>('week');
 
   const sorted = [...creators]
-    .map(c => ({ ...c, qau: getQAU(c.weeklyQAU, period) }))
+    .map(c => {
+      const totalQAU = getCreatorTotalQAU(c);
+      const qau = getQAU(totalQAU, period);
+      const earnings = calculateWeeklyEarnings(qau);
+      const appLabel = c.apps.length > 1 ? `${c.apps.length} apps` : c.apps[0]?.appName ?? '';
+      return { ...c, qau, earningsDisplay: earnings.capped, appLabel };
+    })
     .sort((a, b) => b.qau - a.qau)
     .slice(0, 20);
 
@@ -48,7 +55,6 @@ export default function Leaderboard() {
         <div className="divide-y divide-af-light-gray">
           {sorted.map((c, i) => {
             const isCurrentUser = c.id === currentCreatorId;
-            const weekEarnings = Math.min(c.qau * 2, period === 'week' ? 2000 : period === 'month' ? 5000 : Infinity);
 
             return (
               <motion.div
@@ -76,10 +82,10 @@ export default function Leaderboard() {
                     <span className={`text-sm font-medium truncate ${isCurrentUser ? 'text-af-tint' : 'text-af-deep-charcoal'}`}>{c.name}</span>
                     {isCurrentUser && <span className="text-[10px] text-af-tint shrink-0">(You)</span>}
                   </div>
-                  <span className="text-xs text-af-medium-gray truncate block">{c.appName}</span>
+                  <span className="text-xs text-af-medium-gray truncate block">{c.appLabel}</span>
                 </div>
                 <div className="text-right shrink-0">
-                  <div className="text-sm font-bold text-af-tint">{formatCurrency(weekEarnings)}</div>
+                  <div className="text-sm font-bold text-af-tint">{formatCurrency(c.earningsDisplay)}</div>
                   <div className="text-[10px] text-af-medium-gray">{formatNumber(c.qau)} QAU</div>
                 </div>
               </motion.div>

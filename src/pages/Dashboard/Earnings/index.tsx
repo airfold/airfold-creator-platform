@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
-import ProgressBar from '../../../components/ProgressBar';
+import AppSelector from '../../../components/AppSelector';
 import { useCurrentCreator } from '../../../hooks/useCreatorData';
+import { useSelectedApp } from '../../../context/AppContext';
+import { getCreatorTotalQAU } from '../../../data/creators';
 import {
   calculateWeeklyEarnings,
+  calculateMonthlyEarnings,
   formatCurrency,
-  WEEKLY_CAP,
-  MONTHLY_CAP,
 } from '../../../utils/earnings';
 
 const tooltipStyle = {
@@ -19,8 +20,12 @@ const tooltipStyle = {
 
 export default function Earnings() {
   const creator = useCurrentCreator();
+  const { selectedAppId } = useSelectedApp();
 
-  const weeklyData = creator.weeklyQAU.map((qau, i) => {
+  const selectedApp = selectedAppId ? creator.apps.find(a => a.id === selectedAppId) : null;
+  const weeklyQAU = selectedApp ? selectedApp.weeklyQAU : getCreatorTotalQAU(creator);
+
+  const weeklyData = weeklyQAU.map((qau, i) => {
     const e = calculateWeeklyEarnings(qau);
     return {
       week: `W${i + 1}`,
@@ -30,15 +35,18 @@ export default function Earnings() {
     };
   });
 
-  const monthlyTotal = weeklyData.slice(-4).reduce((sum, w) => sum + w.payout, 0);
-  const cappedMonthly = Math.min(monthlyTotal, MONTHLY_CAP);
+  const monthlyResult = calculateMonthlyEarnings(weeklyData.slice(-4).map(w => w.payout));
+
+  const subtitle = selectedApp ? selectedApp.appName : creator.apps.length > 1 ? 'All Apps' : creator.apps[0]?.appName ?? '';
 
   return (
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Earnings</h1>
-        <p className="text-sm text-af-medium-gray">{creator.appName} · Weekly and monthly payouts</p>
+        <p className="text-sm text-af-medium-gray">{subtitle} · Weekly and monthly payouts</p>
       </div>
+
+      <AppSelector />
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-4">
         <h3 className="text-base font-semibold text-af-deep-charcoal mb-4">Weekly Earnings</h3>
@@ -81,16 +89,9 @@ export default function Earnings() {
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-4">
-          <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Weekly Cap</h3>
-          <ProgressBar value={weeklyData[7].payout} max={WEEKLY_CAP} label={`${formatCurrency(weeklyData[7].payout)} / ${formatCurrency(WEEKLY_CAP)}`} />
-        </motion.div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="glass-card p-4">
-          <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Monthly Running Total</h3>
-          <ProgressBar value={cappedMonthly} max={MONTHLY_CAP} label={`${formatCurrency(cappedMonthly)} / ${formatCurrency(MONTHLY_CAP)}`} />
-        </motion.div>
-      </div>
+      {monthlyResult.capApplied && (
+        <p className="text-xs text-af-medium-gray text-center">Weekly earnings limit reached this period.</p>
+      )}
     </div>
   );
 }

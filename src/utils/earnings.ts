@@ -16,10 +16,10 @@
 const RATE_PER_QAU = 2;
 
 /** Weekly earnings cap */
-export const WEEKLY_CAP = 2000;
+const WEEKLY_CAP = 2000;
 
 /** Monthly earnings cap */
-export const MONTHLY_CAP = 5000;
+const MONTHLY_CAP = 5000;
 
 /**
  * Calculates weekly earnings: QAU count x $2, capped at $2,000

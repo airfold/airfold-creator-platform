@@ -4,7 +4,10 @@ import {
   BarChart, Bar,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
 } from 'recharts';
-import { useCurrentCreator, useCreatorAnalytics } from '../../../hooks/useCreatorData';
+import AppSelector from '../../../components/AppSelector';
+import { useCurrentCreator, useCreatorAnalytics, useAppAnalytics } from '../../../hooks/useCreatorData';
+import { useSelectedApp } from '../../../context/AppContext';
+import { getCreatorTotalQAU } from '../../../data/creators';
 
 const tooltipStyle = {
   background: '#FFFFFF',
@@ -16,24 +19,30 @@ const tooltipStyle = {
 
 export default function Analytics() {
   const creator = useCurrentCreator();
-  const { data: analytics, isLoading, error } = useCreatorAnalytics('30d');
+  const { selectedAppId } = useSelectedApp();
 
-  // Fallback data while loading
+  const selectedApp = selectedAppId ? creator.apps.find(a => a.id === selectedAppId) : null;
+  const weeklyQAU = selectedApp ? selectedApp.weeklyQAU : getCreatorTotalQAU(creator);
+
+  const { data: creatorAnalytics, isLoading: creatorLoading, error: creatorError } = useCreatorAnalytics('30d');
+  const { data: appAnalytics, isLoading: appLoading } = useAppAnalytics(selectedAppId);
+
+  const analytics = selectedAppId ? appAnalytics : creatorAnalytics;
+  const isLoading = selectedAppId ? appLoading : creatorLoading;
+  const error = selectedAppId ? null : creatorError;
+
   const dauData = analytics?.dau ?? [];
   const totalViews = analytics?.total_views ?? 0;
   const uniqueUsers = analytics?.unique_users ?? 0;
   const geoData = analytics?.geo ?? [];
   const deviceData = analytics?.devices ?? [];
 
-  // QAU vs unique (still mock — no backend QAU endpoint)
-  const currentQAU = creator.weeklyQAU[7];
-  const qauVsUnique = creator.weeklyQAU.map((qau, i) => ({
+  const qauVsUnique = weeklyQAU.map((qau, i) => ({
     week: `W${i + 1}`,
     qau,
     uniqueUsers: Math.round(qau * (1.4 + Math.random() * 0.3)),
   }));
 
-  // Retention data (mock — no backend endpoint)
   const retentionData = [
     { week: 'Week 1', retention: 100 },
     { week: 'Week 2', retention: 68 },
@@ -41,12 +50,16 @@ export default function Analytics() {
     { week: 'Week 4', retention: 41 },
   ];
 
+  const subtitle = selectedApp ? selectedApp.appName : creator.apps.length > 1 ? 'All Apps' : creator.apps[0]?.appName ?? '';
+
   return (
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Analytics</h1>
-        <p className="text-sm text-af-medium-gray">{creator.appName} · Performance deep dive</p>
+        <p className="text-sm text-af-medium-gray">{subtitle} · Performance deep dive</p>
       </div>
+
+      <AppSelector />
 
       {/* Summary stats */}
       <div className="grid grid-cols-2 gap-3">

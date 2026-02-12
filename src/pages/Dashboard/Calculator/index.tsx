@@ -2,17 +2,15 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   calculateWeeklyEarnings,
+  calculateMonthlyEarnings,
   formatCurrency,
-  WEEKLY_CAP,
-  MONTHLY_CAP,
 } from '../../../utils/earnings';
-import ProgressBar from '../../../components/ProgressBar';
 
 export default function Calculator() {
   const [qau, setQAU] = useState(500);
 
   const earnings = calculateWeeklyEarnings(qau);
-  const monthlyProjection = Math.min(earnings.capped * 4.3, MONTHLY_CAP);
+  const monthlyProjection = calculateMonthlyEarnings([earnings.capped, earnings.capped, earnings.capped, earnings.capped]);
 
   return (
     <div className="space-y-5">
@@ -41,14 +39,6 @@ export default function Calculator() {
               <span className="text-af-medium-gray">Rate</span>
               <span className="text-af-deep-charcoal font-medium">$2 per QAU / week</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-af-medium-gray">Weekly cap</span>
-              <span className="text-af-deep-charcoal font-medium">{formatCurrency(WEEKLY_CAP)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-af-medium-gray">Monthly cap</span>
-              <span className="text-af-deep-charcoal font-medium">{formatCurrency(MONTHLY_CAP)}</span>
-            </div>
           </div>
         </div>
       </motion.div>
@@ -62,26 +52,17 @@ export default function Calculator() {
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="glass-card p-4">
           <h3 className="text-xs text-af-medium-gray mb-1">Monthly Projection</h3>
-          <span className="text-2xl font-bold text-af-tint">{formatCurrency(Math.round(monthlyProjection))}</span>
+          <span className="text-2xl font-bold text-af-tint">{formatCurrency(monthlyProjection.capped)}</span>
           <div className="text-[10px] text-af-medium-gray mt-1">per month</div>
         </motion.div>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-4 space-y-3">
-        <h3 className="text-xs text-af-medium-gray font-medium">Cap Usage</h3>
-        <ProgressBar value={earnings.capped} max={WEEKLY_CAP} label={`Weekly: ${formatCurrency(earnings.capped)} / ${formatCurrency(WEEKLY_CAP)}`} />
-        <ProgressBar value={monthlyProjection} max={MONTHLY_CAP} label={`Monthly: ${formatCurrency(Math.round(monthlyProjection))} / ${formatCurrency(MONTHLY_CAP)}`} />
-        {earnings.capApplied && (
-          <div className="bg-orange-50 border border-warning/20 rounded-xl p-3 text-xs text-warning">
-            {"Weekly cap reached! You're leaving"} {formatCurrency(earnings.earnings - WEEKLY_CAP)} on the table.
-          </div>
-        )}
-        {monthlyProjection >= MONTHLY_CAP && (
-          <div className="bg-orange-50 border border-warning/20 rounded-xl p-3 text-xs text-warning">
-            Monthly cap would be reached at this rate.
-          </div>
-        )}
-      </motion.div>
+      {(earnings.capApplied || monthlyProjection.capApplied) && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-xs text-af-medium-gray text-center">
+          {earnings.capApplied && <p>Weekly earnings limit reached at this QAU level.</p>}
+          {monthlyProjection.capApplied && <p>Monthly earnings limit would be reached at this rate.</p>}
+        </motion.div>
+      )}
     </div>
   );
 }

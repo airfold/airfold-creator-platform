@@ -1,32 +1,46 @@
 import { motion } from 'framer-motion';
 import Badge from '../../../components/Badge';
 import ProgressBar from '../../../components/ProgressBar';
+import AppSelector from '../../../components/AppSelector';
 import { useCurrentCreator } from '../../../hooks/useCreatorData';
+import { useSelectedApp } from '../../../context/AppContext';
+import { getCreatorAvgHealthScore } from '../../../data/creators';
 
 export default function HealthScore() {
   const creator = useCurrentCreator();
-  const score = creator.healthScore;
+  const { selectedAppId } = useSelectedApp();
+
+  const selectedApp = selectedAppId ? creator.apps.find(a => a.id === selectedAppId) : null;
+
+  const score = selectedApp ? selectedApp.healthScore : getCreatorAvgHealthScore(creator);
+  const rating = selectedApp ? selectedApp.rating : (creator.apps.reduce((s, a) => s + a.rating * a.weeklyQAU[7], 0) / Math.max(1, creator.apps.reduce((s, a) => s + a.weeklyQAU[7], 0)));
+  const ratingCount = selectedApp ? selectedApp.ratingCount : creator.apps.reduce((s, a) => s + a.ratingCount, 0);
+  const flags = selectedApp ? selectedApp.flags : [...new Set(creator.apps.flatMap(a => a.flags))];
 
   const scoreColor = score >= 80 ? '#22c55e' : score >= 50 ? '#f97316' : '#ef4444';
   const status = score >= 80 ? 'Eligible' : score >= 50 ? 'At Risk' : 'Under Review';
   const statusColor: 'green' | 'amber' | 'red' = score >= 80 ? 'green' : score >= 50 ? 'amber' : 'red';
 
   const metrics = {
-    sameIPPercent: creator.flags.includes('same_ip_cluster') ? 42 : 3,
-    bounceRate: creator.flags.includes('high_bounce_rate') ? 68 : 22,
-    avgSessionTime: creator.flags.includes('low_session_time') ? '0:18' : '4:32',
-    rating: creator.rating,
-    ratingCount: creator.ratingCount,
+    sameIPPercent: flags.includes('same_ip_cluster') ? 42 : 3,
+    bounceRate: flags.includes('high_bounce_rate') ? 68 : 22,
+    avgSessionTime: flags.includes('low_session_time') ? '0:18' : '4:32',
+    rating: Math.round(rating * 10) / 10,
+    ratingCount,
   };
 
   const ratingMeetsMinimum = metrics.rating >= 3.0 && metrics.ratingCount >= 15;
+
+  const subtitle = selectedApp ? selectedApp.appName : creator.apps.length > 1 ? 'All Apps' : creator.apps[0]?.appName ?? '';
 
   return (
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Health Score</h1>
-        <p className="text-sm text-af-medium-gray">{creator.appName} · Traffic quality and eligibility</p>
+        <p className="text-sm text-af-medium-gray">{subtitle} · Traffic quality and eligibility</p>
       </div>
+
+      <AppSelector />
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-6 flex flex-col items-center">
         <div className="relative w-32 h-32 mb-4">
@@ -144,11 +158,11 @@ export default function HealthScore() {
 
           <div className="mt-4 pt-3 border-t border-af-light-gray">
             <h4 className="text-xs font-medium text-af-medium-gray mb-2">Active Flags</h4>
-            {creator.flags.length === 0 ? (
+            {flags.length === 0 ? (
               <p className="text-sm text-success">No flags — you're in good standing.</p>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {creator.flags.map(flag => (
+                {flags.map(flag => (
                   <Badge key={flag} label={flag.replace(/_/g, ' ')} color="red" />
                 ))}
               </div>

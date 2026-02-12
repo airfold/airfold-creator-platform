@@ -5,6 +5,8 @@ import { useAuth, isDevMode, clearDevMode } from '../../context/AuthContext';
 import { setTokenGetter } from '../../services/api';
 import Logo from '../../components/Logo';
 import DesktopBlocker from '../../components/DesktopBlocker';
+import { useSelectedApp } from '../../context/AppContext';
+import { useCurrentCreator } from '../../hooks/useCreatorData';
 
 const NavIcon = ({ d, active }: { d: string; active: boolean }) => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={active ? '#BD295A' : '#8E8E93'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -24,6 +26,9 @@ const navItems = [
 export default function DashboardLayout() {
   const { user, getToken } = useAuth();
   const navigate = useNavigate();
+  const { selectedAppId } = useSelectedApp();
+  const creator = useCurrentCreator();
+  const selectedApp = selectedAppId ? creator.apps.find(a => a.id === selectedAppId) : null;
 
   useEffect(() => {
     setTokenGetter(getToken);
@@ -42,6 +47,7 @@ export default function DashboardLayout() {
             <div className="flex items-center gap-3">
               <div className="text-right mr-1">
                 <p className="text-xs font-semibold text-af-deep-charcoal leading-tight truncate max-w-[120px]">{user?.name}</p>
+                {selectedApp && <p className="text-[10px] text-af-medium-gray leading-tight truncate max-w-[120px]">{selectedApp.appName}</p>}
               </div>
               {isDevMode() ? (
                 <button
