@@ -67,26 +67,6 @@ export default function Analytics() {
       ? 'All Apps'
       : apps?.[0]?.name ?? '';
 
-  if (isLoading) {
-    return (
-      <div className="space-y-5">
-        <div>
-          <h1 className="text-2xl font-bold text-af-deep-charcoal mb-0.5">Analytics</h1>
-          <p className="text-sm text-af-medium-gray">All Apps</p>
-        </div>
-        <div className="h-10 rounded-xl animate-pulse bg-af-surface" />
-        <div className="grid grid-cols-2 gap-3">
-          <div className="glass-card p-3 h-16 animate-pulse" />
-          <div className="glass-card p-3 h-16 animate-pulse" />
-        </div>
-        <div className="glass-card p-4">
-          <div className="h-4 w-20 rounded animate-pulse bg-af-surface mb-3" />
-          <div className="h-[180px] rounded-xl animate-pulse bg-af-surface" />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-5">
       <div>
@@ -101,18 +81,28 @@ export default function Analytics() {
       <div className="grid grid-cols-2 gap-3">
         <div className="glass-card p-3 text-center">
           <div className="text-xs text-af-medium-gray mb-0.5">Views (30d)</div>
-          <div className="text-xl font-bold text-af-tint">{isLoading ? '—' : totalViews.toLocaleString()}</div>
+          {isLoading ? (
+            <div className="h-6 w-16 rounded animate-pulse bg-af-surface mx-auto" />
+          ) : (
+            <div className="text-xl font-bold text-af-tint">{totalViews.toLocaleString()}</div>
+          )}
         </div>
         <div className="glass-card p-3 text-center">
           <div className="text-xs text-af-medium-gray mb-0.5">Unique (30d)</div>
-          <div className="text-xl font-bold text-af-tint">{isLoading ? '—' : uniqueUsers.toLocaleString()}</div>
+          {isLoading ? (
+            <div className="h-6 w-16 rounded animate-pulse bg-af-surface mx-auto" />
+          ) : (
+            <div className="text-xl font-bold text-af-tint">{uniqueUsers.toLocaleString()}</div>
+          )}
         </div>
       </div>
 
       {/* DAU from real API */}
       <div className="glass-card p-4">
         <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">DAU (30d)</h3>
-        {error ? (
+        {isLoading ? (
+          <div className="h-[180px] rounded-xl animate-pulse bg-af-surface" />
+        ) : error ? (
           <div className="h-[180px] flex items-center justify-center text-af-medium-gray text-sm">No data available</div>
         ) : (
           <ResponsiveContainer width="100%" height={180}>
@@ -137,31 +127,39 @@ export default function Analytics() {
         {/* QAU vs Unique Users */}
         <div className="glass-card p-4">
           <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">QAU vs Unique</h3>
-          <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={qauVsUnique}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
-              <XAxis dataKey="week" stroke="#8E8E93" fontSize={10} />
-              <YAxis stroke="#8E8E93" fontSize={10} width={35} />
-              <Tooltip contentStyle={tooltipStyle} />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Bar dataKey="uniqueUsers" name="Unique" fill="#E5E5EA" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="qau" name="QAU" fill="#BD295A" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          {isLoading ? (
+            <div className="h-[180px] rounded-xl animate-pulse bg-af-surface" />
+          ) : (
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart data={qauVsUnique}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
+                <XAxis dataKey="week" stroke="#8E8E93" fontSize={10} />
+                <YAxis stroke="#8E8E93" fontSize={10} width={35} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <Bar dataKey="uniqueUsers" name="Unique" fill="#E5E5EA" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="qau" name="QAU" fill="#BD295A" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         {/* Retention */}
         <div className="glass-card p-4">
           <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Retention</h3>
-          <ResponsiveContainer width="100%" height={180}>
-            <LineChart data={retentionData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
-              <XAxis dataKey="week" stroke="#8E8E93" fontSize={10} />
-              <YAxis stroke="#8E8E93" fontSize={10} unit="%" width={35} />
-              <Tooltip contentStyle={tooltipStyle} />
-              <Line type="monotone" dataKey="retention" stroke="#22c55e" strokeWidth={3} dot={{ r: 4, fill: '#22c55e' }} />
-            </LineChart>
-          </ResponsiveContainer>
+          {isLoading ? (
+            <div className="h-[180px] rounded-xl animate-pulse bg-af-surface" />
+          ) : (
+            <ResponsiveContainer width="100%" height={180}>
+              <LineChart data={retentionData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
+                <XAxis dataKey="week" stroke="#8E8E93" fontSize={10} />
+                <YAxis stroke="#8E8E93" fontSize={10} unit="%" width={35} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Line type="monotone" dataKey="retention" stroke="#22c55e" strokeWidth={3} dot={{ r: 4, fill: '#22c55e' }} />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
       </div>

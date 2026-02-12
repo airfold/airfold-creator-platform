@@ -96,94 +96,96 @@ export default function HealthScore() {
 
       <AppSelector />
 
-      {isLoading ? (
-        <div className="space-y-4">
-          <div className="h-40 rounded-2xl animate-pulse bg-af-surface" />
-          <div className="space-y-2.5">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="glass-card p-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl animate-pulse bg-af-surface" />
-                <div className="flex-1 space-y-1.5">
-                  <div className="h-3.5 w-24 rounded animate-pulse bg-af-surface" />
-                  <div className="h-3 w-36 rounded animate-pulse bg-af-surface" />
-                </div>
-                <div className="space-y-1.5 text-right">
-                  <div className="h-5 w-12 rounded animate-pulse bg-af-surface ml-auto" />
-                  <div className="h-3 w-14 rounded animate-pulse bg-af-surface ml-auto" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : (
       <div className="space-y-4">
         {/* Score card */}
-        <div className={`${scoreBg} rounded-2xl p-6 text-center`}>
-          <div className="text-6xl font-black mb-1" style={{ color: scoreColor }}>{score}</div>
-          <div className="text-sm font-semibold text-af-deep-charcoal">
-            {score >= 80 ? 'Looking great' : score >= 50 ? 'Needs attention' : 'Action required'}
-          </div>
-          <div className="text-xs text-af-medium-gray mt-0.5">
-            {score >= 80 ? 'Your app qualifies for payouts' : score >= 50 ? 'Improve the flagged areas to stay eligible' : 'Fix the issues below to keep earning'}
-          </div>
+        <div className={`${isLoading ? 'bg-af-surface' : scoreBg} rounded-2xl p-6 text-center`}>
+          {isLoading ? (
+            <>
+              <div className="h-14 w-20 rounded mx-auto mb-1 animate-pulse bg-af-light-gray" />
+              <div className="h-4 w-24 rounded mx-auto mb-1 animate-pulse bg-af-light-gray" />
+              <div className="h-3 w-40 rounded mx-auto animate-pulse bg-af-light-gray" />
+            </>
+          ) : (
+            <>
+              <div className="text-6xl font-black mb-1" style={{ color: scoreColor }}>{score}</div>
+              <div className="text-sm font-semibold text-af-deep-charcoal">
+                {score >= 80 ? 'Looking great' : score >= 50 ? 'Needs attention' : 'Action required'}
+              </div>
+              <div className="text-xs text-af-medium-gray mt-0.5">
+                {score >= 80 ? 'Your app qualifies for payouts' : score >= 50 ? 'Improve the flagged areas to stay eligible' : 'Fix the issues below to keep earning'}
+              </div>
+            </>
+          )}
         </div>
 
-        {/* Metrics — human-readable */}
+        {/* Metrics */}
         <div className="space-y-2.5">
           {/* Session time */}
           <div className="glass-card p-4 flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${session >= 60 ? 'bg-green-50' : 'bg-red-50'}`}>
-              <svg className={`w-5 h-5 ${session >= 60 ? 'text-green-500' : 'text-red-500'}`} viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="1.5"/><path d="M10 6v4.5l3 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLoading ? 'bg-af-surface' : session >= 60 ? 'bg-green-50' : 'bg-red-50'}`}>
+              <svg className={`w-5 h-5 ${isLoading ? 'text-af-medium-gray' : session >= 60 ? 'text-green-500' : 'text-red-500'}`} viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="1.5"/><path d="M10 6v4.5l3 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-semibold text-af-deep-charcoal">Avg time in app</div>
-              <div className="text-xs text-af-medium-gray">{session >= 60 ? 'Users are sticking around' : 'Users leave too quickly'}</div>
+              {isLoading ? <div className="h-3 w-32 rounded animate-pulse bg-af-surface mt-1" /> : (
+                <div className="text-xs text-af-medium-gray">{session >= 60 ? 'Users are sticking around' : 'Users leave too quickly'}</div>
+              )}
             </div>
             <div className="text-right shrink-0">
-              <div className="text-lg font-bold text-af-deep-charcoal">{formatSessionTime(session)}</div>
-              <div className={`text-[10px] font-semibold ${session >= 60 ? 'text-green-500' : 'text-red-500'}`}>
-                {session >= 60 ? 'Good' : 'Under 1 min'}
-              </div>
+              {isLoading ? <div className="h-5 w-10 rounded animate-pulse bg-af-surface ml-auto" /> : (
+                <>
+                  <div className="text-lg font-bold text-af-deep-charcoal">{formatSessionTime(session)}</div>
+                  <div className={`text-[10px] font-semibold ${session >= 60 ? 'text-green-500' : 'text-red-500'}`}>{session >= 60 ? 'Good' : 'Under 1 min'}</div>
+                </>
+              )}
             </div>
           </div>
 
-          {/* Repeat visitors (bounce = opposite) */}
+          {/* One-time visitors */}
           <div className="glass-card p-4 flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${bounce <= 50 ? 'bg-green-50' : 'bg-red-50'}`}>
-              <svg className={`w-5 h-5 ${bounce <= 50 ? 'text-green-500' : 'text-red-500'}`} viewBox="0 0 20 20" fill="none"><path d="M10 3v4m0 0l-2-2m2 2l2-2M10 17v-4m0 0l-2 2m2-2l2 2M3 10h4m0 0L5 8m2 2L5 12M17 10h-4m0 0l2-2m-2 2l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLoading ? 'bg-af-surface' : bounce <= 50 ? 'bg-green-50' : 'bg-red-50'}`}>
+              <svg className={`w-5 h-5 ${isLoading ? 'text-af-medium-gray' : bounce <= 50 ? 'text-green-500' : 'text-red-500'}`} viewBox="0 0 20 20" fill="none"><path d="M10 3v4m0 0l-2-2m2 2l2-2M10 17v-4m0 0l-2 2m2-2l2 2M3 10h4m0 0L5 8m2 2L5 12M17 10h-4m0 0l2-2m-2 2l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-semibold text-af-deep-charcoal">One-time visitors</div>
-              <div className="text-xs text-af-medium-gray">{bounce <= 50 ? 'Most users come back' : 'Too many leave after 1 visit'}</div>
+              {isLoading ? <div className="h-3 w-36 rounded animate-pulse bg-af-surface mt-1" /> : (
+                <div className="text-xs text-af-medium-gray">{bounce <= 50 ? 'Most users come back' : 'Too many leave after 1 visit'}</div>
+              )}
             </div>
             <div className="text-right shrink-0">
-              <div className="text-lg font-bold text-af-deep-charcoal">{bounce}%</div>
-              <div className={`text-[10px] font-semibold ${bounce <= 50 ? 'text-green-500' : 'text-red-500'}`}>
-                {bounce <= 50 ? 'Good' : 'Too high'}
-              </div>
+              {isLoading ? <div className="h-5 w-10 rounded animate-pulse bg-af-surface ml-auto" /> : (
+                <>
+                  <div className="text-lg font-bold text-af-deep-charcoal">{bounce}%</div>
+                  <div className={`text-[10px] font-semibold ${bounce <= 50 ? 'text-green-500' : 'text-red-500'}`}>{bounce <= 50 ? 'Good' : 'Too high'}</div>
+                </>
+              )}
             </div>
           </div>
 
-          {/* Unique users (same IP = suspicious) */}
+          {/* User authenticity */}
           <div className="glass-card p-4 flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${sameIp <= 20 ? 'bg-green-50' : 'bg-red-50'}`}>
-              <svg className={`w-5 h-5 ${sameIp <= 20 ? 'text-green-500' : 'text-red-500'}`} viewBox="0 0 20 20" fill="none"><path d="M13.5 6.5a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0zM4 16c0-2.5 2.5-4.5 6-4.5s6 2 6 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLoading ? 'bg-af-surface' : sameIp <= 20 ? 'bg-green-50' : 'bg-red-50'}`}>
+              <svg className={`w-5 h-5 ${isLoading ? 'text-af-medium-gray' : sameIp <= 20 ? 'text-green-500' : 'text-red-500'}`} viewBox="0 0 20 20" fill="none"><path d="M13.5 6.5a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0zM4 16c0-2.5 2.5-4.5 6-4.5s6 2 6 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-semibold text-af-deep-charcoal">User authenticity</div>
-              <div className="text-xs text-af-medium-gray">{sameIp <= 20 ? 'Traffic looks organic' : 'Some traffic looks suspicious'}</div>
+              {isLoading ? <div className="h-3 w-28 rounded animate-pulse bg-af-surface mt-1" /> : (
+                <div className="text-xs text-af-medium-gray">{sameIp <= 20 ? 'Traffic looks organic' : 'Some traffic looks suspicious'}</div>
+              )}
             </div>
             <div className="text-right shrink-0">
-              <div className="text-lg font-bold text-af-deep-charcoal">{100 - sameIp}%</div>
-              <div className={`text-[10px] font-semibold ${sameIp <= 20 ? 'text-green-500' : 'text-red-500'}`}>
-                {sameIp <= 20 ? 'Organic' : 'Flagged'}
-              </div>
+              {isLoading ? <div className="h-5 w-10 rounded animate-pulse bg-af-surface ml-auto" /> : (
+                <>
+                  <div className="text-lg font-bold text-af-deep-charcoal">{100 - sameIp}%</div>
+                  <div className={`text-[10px] font-semibold ${sameIp <= 20 ? 'text-green-500' : 'text-red-500'}`}>{sameIp <= 20 ? 'Organic' : 'Flagged'}</div>
+                </>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Flags — friendly wording */}
-        {flags.length > 0 && (
+        {/* Flags */}
+        {!isLoading && flags.length > 0 && (
           <div className="bg-red-50 rounded-xl p-4">
             <h3 className="text-sm font-semibold text-red-600 mb-2">Things to fix</h3>
             <div className="space-y-1.5">
@@ -199,7 +201,6 @@ export default function HealthScore() {
           </div>
         )}
       </div>
-      )}
 
       {showRules && <QAURulesSheet onClose={() => setShowRules(false)} />}
     </div>
