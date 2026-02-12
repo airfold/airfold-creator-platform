@@ -60,7 +60,7 @@ export default function HealthScore() {
         </p>
       </motion.div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-4">
           <h3 className="text-base font-semibold text-af-deep-charcoal mb-3">Traffic Quality Flags</h3>
           <div className="space-y-5">

@@ -53,7 +53,7 @@ export default function Calculator() {
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-2 gap-3">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-4">
           <h3 className="text-xs text-af-medium-gray mb-1">Weekly Payout</h3>
           <span className="text-2xl font-bold text-af-tint">{formatCurrency(earnings.capped)}</span>

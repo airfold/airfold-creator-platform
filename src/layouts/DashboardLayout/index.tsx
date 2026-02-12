@@ -26,7 +26,7 @@ export default function DashboardLayout() {
   return (
     <>
       <DesktopBlocker />
-      <div className="min-h-screen bg-af-surface md:hidden">
+      <div className="min-h-screen bg-af-surface lg:hidden">
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-af-light-gray safe-top">
           <div className="h-14 px-4 flex items-center justify-between">
@@ -49,7 +49,7 @@ export default function DashboardLayout() {
         </header>
 
         {/* Main content */}
-        <main className="px-4 pt-4 pb-24">
+        <main className="px-4 md:px-8 pt-4 pb-24 md:max-w-2xl md:mx-auto">
           <Outlet />
         </main>
 

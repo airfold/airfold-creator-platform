@@ -2,7 +2,7 @@ import Logo from './Logo';
 
 export default function DesktopBlocker() {
   return (
-    <div className="hidden md:flex fixed inset-0 z-[100] bg-gradient-to-b from-af-tint-soft/50 via-white to-white items-center justify-center">
+    <div className="hidden lg:flex fixed inset-0 z-[100] bg-gradient-to-b from-af-tint-soft/50 via-white to-white items-center justify-center">
       <div className="text-center px-8 max-w-lg">
         <Logo size="lg" className="mb-10 inline-block" />
 

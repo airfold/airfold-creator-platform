@@ -26,7 +26,7 @@ export default function Overview() {
         <p className="text-sm text-af-medium-gray">Welcome back, {creator.name.split(' ')[0]}</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard label="Earnings This Week" value={earnings.capped} prefix="$" icon={<span className="text-2xl">💰</span>} />
         <StatCard label="QAU This Week" value={currentQAU} change={qauChange} icon={<span className="text-2xl">👥</span>} />
         <StatCard label="QAU Last Week" value={lastWeekQAU} icon={<span className="text-2xl">📊</span>} />
@@ -37,7 +37,7 @@ export default function Overview() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-4">
         <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">QAU Trend (8 Weeks)</h3>
         <p className="text-xs text-af-medium-gray mb-3">Qualified Active Users over time</p>
-        <SparklineChart data={creator.weeklyQAU} height={100} />
+        <SparklineChart data={creator.weeklyQAU} height={140} />
         <div className="flex justify-between mt-3 text-[10px] text-af-medium-gray">
           <span>8 weeks ago</span>
           <span>This week</span>

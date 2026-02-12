@@ -50,7 +50,7 @@ export default function Landing() {
             <p className="text-base text-af-medium-gray max-w-sm mx-auto mb-8">
               Create mini-apps for your campus, grow real users, and earn based on engagement.
             </p>
-            <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-col md:flex-row md:justify-center items-center gap-3">
               <Link to="/login" className="btn-primary text-base px-8 py-3.5 w-full max-w-xs">Start Creating</Link>
               <a href="#how-it-works" className="btn-secondary text-base px-8 py-3.5 w-full max-w-xs text-center">Learn More</a>
             </div>
@@ -60,7 +60,7 @@ export default function Landing() {
 
       {/* Stats bar */}
       <section className="border-y border-af-light-gray bg-af-surface">
-        <div className="max-w-7xl mx-auto px-5 py-5 grid grid-cols-2 gap-4">
+        <div className="max-w-7xl mx-auto px-5 py-5 grid grid-cols-2 md:grid-cols-4 gap-4">
           {stats.map((s, i) => (
             <motion.div key={s.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="text-center">
               <div className="text-xl font-bold text-af-tint">{s.value}</div>
@@ -76,7 +76,7 @@ export default function Landing() {
           <h2 className="text-2xl font-bold text-af-deep-charcoal mb-2">Featured Creator Apps</h2>
           <p className="text-af-medium-gray text-sm">Top performing apps built by student creators</p>
         </motion.div>
-        <div className="space-y-3">
+        <div className="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
           {featuredCreators.map((creator, i) => (
             <motion.div key={creator.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="glass-card-hover p-4">
               <div className="flex items-start justify-between mb-3">
@@ -111,7 +111,7 @@ export default function Landing() {
             <h2 className="text-2xl font-bold text-af-deep-charcoal mb-2">How It Works</h2>
             <p className="text-af-medium-gray text-sm">Three steps to start earning as a creator</p>
           </motion.div>
-          <div className="space-y-3">
+          <div className="space-y-3 md:grid md:grid-cols-3 md:gap-4 md:space-y-0">
             {steps.map((step, i) => (
               <motion.div key={step.num} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="glass-card p-5 relative overflow-hidden">
                 <span className="absolute top-3 right-4 text-4xl font-black text-af-light-gray/50">{step.num}</span>

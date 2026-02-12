@@ -71,7 +71,7 @@ export default function Analytics() {
         </ResponsiveContainer>
       </motion.div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card p-4">
           <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">QAU vs Unique Users</h3>
           <p className="text-xs text-af-medium-gray mb-3">How many unique users qualify as QAU</p>
@@ -102,7 +102,7 @@ export default function Analytics() {
           </ResponsiveContainer>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-4 md:col-span-2">
           <h3 className="text-base font-semibold text-af-deep-charcoal mb-0.5">Session Duration</h3>
           <p className="text-xs text-af-medium-gray mb-3">Sessions under 1 min don't count toward QAU</p>
           <ResponsiveContainer width="100%" height={180}>

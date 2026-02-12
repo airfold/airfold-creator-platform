@@ -42,7 +42,7 @@ export default function Earnings() {
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-4">
         <h3 className="text-base font-semibold text-af-deep-charcoal mb-4">Weekly Earnings</h3>
-        <ResponsiveContainer width="100%" height={200}>
+        <ResponsiveContainer width="100%" height={240}>
           <BarChart data={weeklyData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
             <XAxis dataKey="week" stroke="#8E8E93" fontSize={10} />
@@ -81,7 +81,7 @@ export default function Earnings() {
         </div>
       </motion.div>
 
-      <div className="grid grid-cols-1 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-card p-4">
           <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Weekly Cap</h3>
           <ProgressBar value={weeklyData[7].payout} max={WEEKLY_CAP} label={`${formatCurrency(weeklyData[7].payout)} / ${formatCurrency(WEEKLY_CAP)}`} />
