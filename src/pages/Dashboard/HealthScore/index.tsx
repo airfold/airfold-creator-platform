@@ -8,17 +8,6 @@ function formatSessionTime(seconds: number): string {
   return `${seconds}s`;
 }
 
-function getHealthPenalties(metrics: { same_ip_percent: number; bounce_rate: number; avg_session_seconds: number }) {
-  const session = metrics.avg_session_seconds;
-  const bounce = metrics.bounce_rate;
-  const sameIp = metrics.same_ip_percent;
-
-  const sessionPenalty = session < 30 ? -25 : session < 60 ? -10 : 0;
-  const bouncePenalty = bounce > 60 ? -25 : bounce > 40 ? -10 : 0;
-  const sameIpPenalty = sameIp > 30 ? -30 : sameIp > 15 ? -10 : 0;
-
-  return { sessionPenalty, bouncePenalty, sameIpPenalty };
-}
 
 function QAURulesSheet({ onClose }: { onClose: () => void }) {
   return (
@@ -89,7 +78,16 @@ export default function HealthScore() {
   const bounce = metrics?.bounce_rate ?? 0;
   const session = metrics?.avg_session_seconds ?? 0;
 
-  const penalties = metrics ? getHealthPenalties(metrics) : null;
+  // green / orange / red status per metric
+  const sessionStatus: 'green' | 'orange' | 'red' = session >= 60 ? 'green' : session >= 30 ? 'orange' : 'red';
+  const bounceStatus: 'green' | 'orange' | 'red' = bounce <= 40 ? 'green' : bounce <= 60 ? 'orange' : 'red';
+  const trafficStatus: 'green' | 'orange' | 'red' = sameIp <= 15 ? 'green' : sameIp <= 30 ? 'orange' : 'red';
+
+  const statusColors = {
+    green: { bg: 'bg-green-50', text: 'text-green-500', dot: 'bg-green-500' },
+    orange: { bg: 'bg-orange-50', text: 'text-orange-500', dot: 'bg-orange-500' },
+    red: { bg: 'bg-red-50', text: 'text-red-500', dot: 'bg-red-500' },
+  };
 
   return (
     <div className="space-y-4">
@@ -133,93 +131,78 @@ export default function HealthScore() {
 
         {/* Score breakdown — unified card */}
         <div className="glass-card overflow-hidden">
-          <div className="px-4 pt-4 pb-2 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-af-deep-charcoal">How your score works</h3>
-            {!isLoading && (
-              <span className="text-xs text-af-medium-gray">Starts at 100</span>
-            )}
+          <div className="px-4 pt-4 pb-2">
+            <h3 className="text-sm font-semibold text-af-deep-charcoal">Score breakdown</h3>
           </div>
 
           {/* Session time */}
           <div className="px-4 py-3 border-t border-af-light-gray flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLoading ? 'bg-af-surface' : penalties?.sessionPenalty === 0 ? 'bg-green-50' : 'bg-red-50'}`}>
-              <svg className={`w-5 h-5 ${isLoading ? 'text-af-medium-gray' : penalties?.sessionPenalty === 0 ? 'text-green-500' : 'text-red-500'}`} viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="1.5"/><path d="M10 6v4.5l3 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLoading ? 'bg-af-surface' : statusColors[sessionStatus].bg}`}>
+              <svg className={`w-5 h-5 ${isLoading ? 'text-af-medium-gray' : statusColors[sessionStatus].text}`} viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="1.5"/><path d="M10 6v4.5l3 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-semibold text-af-deep-charcoal">Time in app</div>
               {isLoading ? <div className="h-3 w-36 rounded animate-pulse bg-af-surface mt-1" /> : (
                 <div className="text-xs text-af-medium-gray">
-                  {penalties?.sessionPenalty === 0
-                    ? `${formatSessionTime(session)} avg — users stick around`
-                    : session < 30
-                      ? `${formatSessionTime(session)} avg — add more content to keep users in`
-                      : `${formatSessionTime(session)} avg — sessions are a bit short`}
+                  {sessionStatus === 'green' && `${formatSessionTime(session)} avg — users stick around`}
+                  {sessionStatus === 'orange' && `${formatSessionTime(session)} avg — sessions are a bit short`}
+                  {sessionStatus === 'red' && `${formatSessionTime(session)} avg — add more content to keep users in`}
                 </div>
               )}
             </div>
             <div className="shrink-0">
-              {isLoading ? <div className="h-6 w-10 rounded animate-pulse bg-af-surface" /> : (
-                penalties?.sessionPenalty === 0 ? (
-                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-green-50 text-green-500 text-sm font-bold">✓</span>
-                ) : (
-                  <span className="inline-flex items-center justify-center px-2 h-7 rounded-full bg-red-50 text-red-500 text-sm font-bold">{penalties?.sessionPenalty}</span>
-                )
+              {isLoading ? <div className="h-7 w-7 rounded-full animate-pulse bg-af-surface" /> : (
+                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-bold ${statusColors[sessionStatus].bg} ${statusColors[sessionStatus].text}`}>
+                  {sessionStatus === 'green' ? '✓' : '✗'}
+                </span>
               )}
             </div>
           </div>
 
           {/* Returning users */}
           <div className="px-4 py-3 border-t border-af-light-gray flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLoading ? 'bg-af-surface' : penalties?.bouncePenalty === 0 ? 'bg-green-50' : 'bg-red-50'}`}>
-              <svg className={`w-5 h-5 ${isLoading ? 'text-af-medium-gray' : penalties?.bouncePenalty === 0 ? 'text-green-500' : 'text-red-500'}`} viewBox="0 0 20 20" fill="none"><path d="M10 3v4m0 0l-2-2m2 2l2-2M10 17v-4m0 0l-2 2m2-2l2 2M3 10h4m0 0L5 8m2 2L5 12M17 10h-4m0 0l2-2m-2 2l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLoading ? 'bg-af-surface' : statusColors[bounceStatus].bg}`}>
+              <svg className={`w-5 h-5 ${isLoading ? 'text-af-medium-gray' : statusColors[bounceStatus].text}`} viewBox="0 0 20 20" fill="none"><path d="M10 3v4m0 0l-2-2m2 2l2-2M10 17v-4m0 0l-2 2m2-2l2 2M3 10h4m0 0L5 8m2 2L5 12M17 10h-4m0 0l2-2m-2 2l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-semibold text-af-deep-charcoal">Returning users</div>
               {isLoading ? <div className="h-3 w-40 rounded animate-pulse bg-af-surface mt-1" /> : (
                 <div className="text-xs text-af-medium-gray">
-                  {penalties?.bouncePenalty === 0
-                    ? `${100 - bounce}% come back — great retention`
-                    : bounce > 60
-                      ? `Only ${100 - bounce}% come back — make your app more engaging`
-                      : `${100 - bounce}% come back — could be better`}
+                  {bounceStatus === 'green' && `${100 - bounce}% come back — great retention`}
+                  {bounceStatus === 'orange' && `${100 - bounce}% come back — could be better`}
+                  {bounceStatus === 'red' && `Only ${100 - bounce}% come back — make your app more engaging`}
                 </div>
               )}
             </div>
             <div className="shrink-0">
-              {isLoading ? <div className="h-6 w-10 rounded animate-pulse bg-af-surface" /> : (
-                penalties?.bouncePenalty === 0 ? (
-                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-green-50 text-green-500 text-sm font-bold">✓</span>
-                ) : (
-                  <span className="inline-flex items-center justify-center px-2 h-7 rounded-full bg-red-50 text-red-500 text-sm font-bold">{penalties?.bouncePenalty}</span>
-                )
+              {isLoading ? <div className="h-7 w-7 rounded-full animate-pulse bg-af-surface" /> : (
+                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-bold ${statusColors[bounceStatus].bg} ${statusColors[bounceStatus].text}`}>
+                  {bounceStatus === 'green' ? '✓' : '✗'}
+                </span>
               )}
             </div>
           </div>
 
           {/* Real traffic */}
           <div className="px-4 py-3 border-t border-af-light-gray flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLoading ? 'bg-af-surface' : penalties?.sameIpPenalty === 0 ? 'bg-green-50' : 'bg-red-50'}`}>
-              <svg className={`w-5 h-5 ${isLoading ? 'text-af-medium-gray' : penalties?.sameIpPenalty === 0 ? 'text-green-500' : 'text-red-500'}`} viewBox="0 0 20 20" fill="none"><path d="M13.5 6.5a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0zM4 16c0-2.5 2.5-4.5 6-4.5s6 2 6 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLoading ? 'bg-af-surface' : statusColors[trafficStatus].bg}`}>
+              <svg className={`w-5 h-5 ${isLoading ? 'text-af-medium-gray' : statusColors[trafficStatus].text}`} viewBox="0 0 20 20" fill="none"><path d="M13.5 6.5a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0zM4 16c0-2.5 2.5-4.5 6-4.5s6 2 6 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-semibold text-af-deep-charcoal">Real traffic</div>
               {isLoading ? <div className="h-3 w-32 rounded animate-pulse bg-af-surface mt-1" /> : (
                 <div className="text-xs text-af-medium-gray">
-                  {penalties?.sameIpPenalty === 0
-                    ? `${100 - sameIp}% organic — traffic looks legit`
-                    : sameIp > 30
-                      ? `${sameIp}% from same source — share your app more widely`
-                      : `${100 - sameIp}% organic — some traffic looks suspicious`}
+                  {trafficStatus === 'green' && `${100 - sameIp}% organic — traffic looks legit`}
+                  {trafficStatus === 'orange' && `${100 - sameIp}% organic — some traffic looks suspicious`}
+                  {trafficStatus === 'red' && `${sameIp}% from same source — share your app more widely`}
                 </div>
               )}
             </div>
             <div className="shrink-0">
-              {isLoading ? <div className="h-6 w-10 rounded animate-pulse bg-af-surface" /> : (
-                penalties?.sameIpPenalty === 0 ? (
-                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-green-50 text-green-500 text-sm font-bold">✓</span>
-                ) : (
-                  <span className="inline-flex items-center justify-center px-2 h-7 rounded-full bg-red-50 text-red-500 text-sm font-bold">{penalties?.sameIpPenalty}</span>
-                )
+              {isLoading ? <div className="h-7 w-7 rounded-full animate-pulse bg-af-surface" /> : (
+                <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-bold ${statusColors[trafficStatus].bg} ${statusColors[trafficStatus].text}`}>
+                  {trafficStatus === 'green' ? '✓' : '✗'}
+                </span>
               )}
             </div>
           </div>
