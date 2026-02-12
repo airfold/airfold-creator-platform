@@ -75,6 +75,15 @@
   }
 }
 
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
 @utility btn-secondary {
   @apply bg-white px-6 py-3 rounded-xl font-semibold text-af-deep-charcoal transition-all duration-200 cursor-pointer;
   border: 1px solid rgba(0, 0, 0, 0.06);
