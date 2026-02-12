@@ -160,7 +160,7 @@ export async function fetchCreatorHealth(): Promise<CreatorHealthResponse> {
 }
 
 export async function fetchAppHealth(appId: string): Promise<CreatorHealthResponse> {
-  return request<CreatorHealthResponse>(`/v1/app/${appId}/health`);
+  return request<CreatorHealthResponse>(`/v1/creator/health/app/${appId}`);
 }
 
 export async function fetchLeaderboard(period: string = 'week', limit?: number): Promise<LeaderboardResponse> {

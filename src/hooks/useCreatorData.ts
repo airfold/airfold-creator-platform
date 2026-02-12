@@ -10,10 +10,9 @@ import {
   fetchAppHealth,
   fetchLeaderboard,
 } from '../services/api';
-import { getCurrentCreator, getCreatorTotalQAU, getCreatorAvgHealthScore, creators, platformStats } from '../data/creators';
+import { getCurrentCreator, getCreatorTotalQAU, getCreatorAvgHealthScore, creators } from '../data/creators';
 import { calculateWeeklyEarnings } from '../utils/earnings';
 import type { AppResponse, CreatorAnalyticsResponse, AppAnalyticsResponse, CreatorEarningsResponse, CreatorHealthResponse, LeaderboardResponse } from '../services/api';
-import type { Creator } from '../types';
 
 // ─── Mock data generators (dev mode) ───
 
@@ -127,27 +126,6 @@ export function useAppAnalytics(appId: string | null, period: string = '30d') {
     enabled: !!appId,
     staleTime: 5 * 60 * 1000,
   });
-}
-
-/**
- * Get the current creator profile.
- * In dev mode: returns mock creator from creators.ts
- * In prod mode: returns mock creator (earnings/health/leaderboard have no backend yet)
- *
- * TODO: Replace with real /v1/creator endpoint when backend adds it
- */
-export function useCurrentCreator(): Creator {
-  return getCurrentCreator();
-}
-
-/** All creators for leaderboard — mock only (no backend endpoint) */
-export function useAllCreators() {
-  return { creators, currentCreatorId: getCurrentCreator().id };
-}
-
-/** Platform stats — mock only (no backend endpoint) */
-export function usePlatformStats() {
-  return platformStats;
 }
 
 // ─── Creator Dashboard Hooks (real API in prod, mock in dev) ───

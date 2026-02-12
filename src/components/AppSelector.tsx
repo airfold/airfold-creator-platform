@@ -1,12 +1,12 @@
-import { useCurrentCreator } from '../hooks/useCreatorData';
+import { useMyApps } from '../hooks/useCreatorData';
 import { useSelectedApp } from '../context/AppContext';
 import { haptic } from '../utils/haptic';
 
 export default function AppSelector() {
-  const creator = useCurrentCreator();
+  const { data: apps } = useMyApps();
   const { selectedAppId, setSelectedAppId } = useSelectedApp();
 
-  if (creator.apps.length <= 1) return null;
+  if (!apps || apps.length <= 1) return null;
 
   return (
     <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
@@ -20,7 +20,7 @@ export default function AppSelector() {
       >
         All Apps
       </button>
-      {creator.apps.map(app => (
+      {apps.map(app => (
         <button
           key={app.id}
           onClick={() => { haptic(); setSelectedAppId(app.id); }}
@@ -30,7 +30,7 @@ export default function AppSelector() {
               : 'bg-white text-af-medium-gray border-af-light-gray active:text-af-deep-charcoal'
           }`}
         >
-          {app.appName}
+          {app.name}
         </button>
       ))}
     </div>

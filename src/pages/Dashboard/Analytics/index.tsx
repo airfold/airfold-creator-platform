@@ -1,12 +1,12 @@
 import {
-  LineChart, Line, AreaChart, Area,
+  AreaChart, Area,
   BarChart, Bar,
+  LineChart, Line,
   XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
 } from 'recharts';
 import AppSelector from '../../../components/AppSelector';
-import { useCurrentCreator, useCreatorAnalytics, useAppAnalytics } from '../../../hooks/useCreatorData';
+import { useMyApps, useCreatorAnalytics, useAppAnalytics, useCreatorEarnings } from '../../../hooks/useCreatorData';
 import { useSelectedApp } from '../../../context/AppContext';
-import { getCreatorTotalQAU } from '../../../data/creators';
 
 const tooltipStyle = {
   background: '#FFFFFF',
@@ -17,11 +17,11 @@ const tooltipStyle = {
 };
 
 export default function Analytics() {
-  const creator = useCurrentCreator();
+  const { data: apps } = useMyApps();
   const { selectedAppId } = useSelectedApp();
+  const { data: earnings } = useCreatorEarnings(selectedAppId);
 
-  const selectedApp = selectedAppId ? creator.apps.find(a => a.id === selectedAppId) : null;
-  const weeklyQAU = selectedApp ? selectedApp.weeklyQAU : getCreatorTotalQAU(creator);
+  const selectedApp = selectedAppId && apps ? apps.find(a => a.id === selectedAppId) : null;
 
   const { data: creatorAnalytics, isLoading: creatorLoading, error: creatorError } = useCreatorAnalytics('30d');
   const { data: appAnalytics, isLoading: appLoading } = useAppAnalytics(selectedAppId);
@@ -34,11 +34,25 @@ export default function Analytics() {
   const totalViews = analytics?.total_views ?? 0;
   const uniqueUsers = analytics?.unique_users ?? 0;
 
-  const qauVsUnique = weeklyQAU.map((qau, i) => ({
-    week: `W${i + 1}`,
-    qau,
-    uniqueUsers: Math.round(qau * (1.4 + Math.random() * 0.3)),
-  }));
+  // QAU vs Unique from earnings data if available, otherwise from app user_counts
+  const qauVsUnique = (() => {
+    if (earnings?.weekly?.length) {
+      const weekMap = new Map<string, number>();
+      earnings.weekly.forEach(w => {
+        weekMap.set(w.week_start, (weekMap.get(w.week_start) ?? 0) + w.qau);
+      });
+      return [...weekMap.entries()]
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([week, qau], i) => ({
+          week: `W${i + 1}`,
+          qau,
+          uniqueUsers: Math.round(qau * 1.5),
+        }));
+    }
+    // Fallback: single bar from current user_counts
+    const totalQAU = apps?.reduce((sum, a) => sum + (a.user_count ?? 0), 0) ?? 0;
+    return [{ week: 'Now', qau: totalQAU, uniqueUsers: Math.round(totalQAU * 1.5) }];
+  })();
 
   const retentionData = [
     { week: 'Week 1', retention: 100 },
@@ -47,7 +61,11 @@ export default function Analytics() {
     { week: 'Week 4', retention: 41 },
   ];
 
-  const subtitle = selectedApp ? selectedApp.appName : creator.apps.length > 1 ? 'All Apps' : creator.apps[0]?.appName ?? '';
+  const subtitle = selectedApp
+    ? selectedApp.name
+    : apps && apps.length > 1
+      ? 'All Apps'
+      : apps?.[0]?.name ?? '';
 
   return (
     <div className="space-y-5">
@@ -75,6 +93,8 @@ export default function Analytics() {
         <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">DAU (30d)</h3>
         {isLoading ? (
           <div className="h-[180px] flex items-center justify-center text-af-medium-gray text-sm">Loading...</div>
+        ) : error ? (
+          <div className="h-[180px] flex items-center justify-center text-af-medium-gray text-sm">No data available</div>
         ) : (
           <ResponsiveContainer width="100%" height={180}>
             <AreaChart data={dauData}>

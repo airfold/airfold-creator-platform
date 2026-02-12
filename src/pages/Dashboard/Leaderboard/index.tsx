@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLeaderboard } from '../../../hooks/useCreatorData';
-import { formatNumber, formatCurrency } from '../../../utils/earnings';
+
 import { haptic } from '../../../utils/haptic';
 
 type Period = 'week' | 'month' | 'all';
@@ -65,13 +65,10 @@ export default function Leaderboard() {
                       <span className={`text-sm font-medium truncate ${isCurrentUser ? 'text-af-tint' : 'text-af-deep-charcoal'}`}>{entry.name}</span>
                       {isCurrentUser && <span className="text-[10px] text-af-tint shrink-0">(You)</span>}
                     </div>
-                    <span className="text-xs text-af-medium-gray truncate block">
-                      {entry.app_count > 1 ? `${entry.app_count} apps` : '1 app'}
-                    </span>
+                    <span className="text-xs text-af-medium-gray truncate block">{entry.app_count} app{entry.app_count !== 1 ? 's' : ''}</span>
                   </div>
                   <div className="text-right shrink-0">
-                    <div className="text-sm font-bold text-af-tint">{formatCurrency(entry.earnings)}</div>
-                    <div className="text-[10px] text-af-medium-gray">{formatNumber(entry.qau)} QAU</div>
+                    <div className="text-xs text-af-medium-gray">{entry.app_count > 1 ? `${entry.app_count} apps` : '1 app'}</div>
                   </div>
                 </div>
               );
