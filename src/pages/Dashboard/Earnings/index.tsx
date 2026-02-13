@@ -75,8 +75,8 @@ function PayoutCard() {
     }
   };
 
-  // State 3: Connected & enabled
-  if (status.onboarding_complete && status.payouts_enabled) {
+  // State 1: Fully active — payouts enabled
+  if (status.payouts_enabled) {
     return (
       <div className="glass-card p-4 flex items-center gap-3">
         <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
@@ -92,8 +92,9 @@ function PayoutCard() {
     );
   }
 
-  // State 4: Onboarding complete but payouts not yet enabled (Stripe reviewing)
-  if (status.has_account && status.onboarding_complete && !status.payouts_enabled) {
+  // State 2: Details submitted, waiting on Stripe verification
+  // Once details_submitted=true, the user has done everything — Stripe is reviewing
+  if (status.has_account && status.details_submitted) {
     return (
       <div className="glass-card p-4 flex items-center gap-3">
         <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
@@ -103,15 +104,15 @@ function PayoutCard() {
           </svg>
         </div>
         <div>
-          <p className="text-sm font-semibold text-af-deep-charcoal">Account under review</p>
-          <p className="text-xs text-af-medium-gray">Stripe is verifying your account. Payouts will activate once approved.</p>
+          <p className="text-sm font-semibold text-af-deep-charcoal">Pending verification</p>
+          <p className="text-xs text-af-medium-gray">Stripe is reviewing your account. This usually takes 1–2 business days.</p>
         </div>
       </div>
     );
   }
 
-  // State 2: Onboarding incomplete
-  if (status.has_account && !status.onboarding_complete) {
+  // State 3: Account created but details not yet submitted
+  if (status.has_account) {
     return (
       <div className="glass-card p-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -136,7 +137,7 @@ function PayoutCard() {
     );
   }
 
-  // State 1: Not connected
+  // State 4: No account — not started
   return (
     <div className="space-y-2">
       <div className="glass-card p-4 flex items-center justify-between gap-3">
