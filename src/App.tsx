@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Component, useState, useEffect } from 'react';
 import type { ReactNode, ErrorInfo } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -45,10 +45,26 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
 initNativeToken();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  if (import.meta.env.DEV || isNativeMode()) {
-    return <>{children}</>;
-  }
-  // Not authenticated — redirect to landing (no standalone login)
+  const [checked, setChecked] = useState(false);
+  const [allowed, setAllowed] = useState(false);
+
+  useEffect(() => {
+    // WKWebView injects token at document start, but there can be a tiny race
+    // with React hydration. Re-check after a tick to catch late injection.
+    if (import.meta.env.DEV || isNativeMode()) {
+      setAllowed(true);
+      setChecked(true);
+      return;
+    }
+    const timer = setTimeout(() => {
+      setAllowed(isNativeMode());
+      setChecked(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!checked) return null; // brief blank while waiting
+  if (allowed) return <>{children}</>;
   return <Navigate to="/" replace />;
 }
 
