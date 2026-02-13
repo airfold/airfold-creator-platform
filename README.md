@@ -46,10 +46,6 @@ No web login. The iOS app injects a JWT + username into `sessionStorage` via `WK
 
 Token is read in `authHeaders()` from `sessionStorage` and sent as `Authorization: Bearer <jwt>` on every API call.
 
-### Dev Mode
-
-A small "DEV" toggle next to the logo in the dashboard header enables dev mode (`localStorage.dev_skip = '1'`), which bypasses auth and uses mock data from `src/data/creators.ts` for all API calls. This lets you run the dashboard without a backend or the iOS app. Toggling dev mode reloads the page.
-
 ---
 
 ## Tech Stack
@@ -79,7 +75,7 @@ A small "DEV" toggle next to the logo in the dashboard header enables dev mode (
 
 ### Data Hooks (`src/hooks/useCreatorData.ts`)
 
-All hooks check `isDevMode()` first — if true, return mock data. Otherwise hit the API.
+All hooks call the real API. In Vite dev mode (`npm run dev`), `AuthContext` provides a mock user so you can test without the iOS app, but data always comes from the backend.
 
 | Hook | Query Key | Endpoint | staleTime |
 |------|-----------|----------|-----------|
@@ -207,10 +203,11 @@ Creators receive payouts via **Stripe Connect Express**. Stripe handles KYC, ide
 5. Callback invalidates `payoutStatus` cache, then redirects to Earnings
 6. Card now shows **"Payouts active"** with a green checkmark
 
-Three card states:
-- **Not connected** — "Set up payouts" button
-- **Onboarding incomplete** — "Complete setup" button (warns them to finish)
-- **Connected & enabled** — "Payouts active" (green checkmark)
+Four card states (ordered by priority):
+1. **Payouts active** — `payouts_enabled=true` → green checkmark, ready to receive transfers
+2. **Pending verification** — `details_submitted=true` but payouts not yet enabled → blue info, "Stripe is reviewing, 1–2 business days"
+3. **Setup incomplete** — `has_account=true` but details not submitted → amber warning + "Complete setup" button
+4. **Not connected** — no Stripe account → "Set up payouts" button
 
 URL validation: `res.url.startsWith('https://connect.stripe.com/')` before any redirect.
 
@@ -263,10 +260,10 @@ src/
     SparklineChart.tsx      # SVG sparkline with useId() gradient IDs
     Logo.tsx                # Brand logo
   context/
-    AuthContext.tsx          # isNativeMode(), isDevMode(), initNativeToken()
+    AuthContext.tsx          # isNativeMode(), initNativeToken(), Vite DEV mock user
     AppContext.tsx           # selectedAppId state (shared across dashboard)
   hooks/
-    useCreatorData.ts       # All data hooks (dev mode → mock, prod → API)
+    useCreatorData.ts       # All React Query data hooks (always hit real API)
   services/
     api.ts                  # Authenticated fetch wrapper, Stripe onboarding calls
   utils/
@@ -305,7 +302,7 @@ npm run dev          # localhost:5173, uses .env.development
 npm run build        # production build
 ```
 
-Dev mode toggle in dashboard header bypasses auth + uses mock data — no backend or iOS app needed.
+In Vite dev mode (`npm run dev`), auth is bypassed with a mock user — but you still need the API running on `localhost:8000` for data.
 
 ## Deployment
 
