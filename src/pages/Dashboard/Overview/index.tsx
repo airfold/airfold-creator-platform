@@ -112,7 +112,7 @@ export default function Overview() {
 
   return (
     <div className="space-y-4">
-      {(earningsError || healthError) && (
+      {(earningsError || healthError) && !earnings && !health && (
         <div className="bg-red-50 rounded-xl p-3 text-xs text-red-600">
           Some data failed to load. Pull to refresh or try again later.
         </div>

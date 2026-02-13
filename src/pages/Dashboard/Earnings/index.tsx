@@ -184,7 +184,7 @@ export default function Earnings() {
 
       <PayoutCard />
 
-      {earningsError && (
+      {earningsError && !earningsData && (
         <div className="bg-red-50 rounded-xl p-3 text-xs text-red-600">
           Failed to load earnings data. Pull to refresh or try again later.
         </div>

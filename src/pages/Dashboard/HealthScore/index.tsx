@@ -106,7 +106,7 @@ export default function HealthScore() {
 
       <AppSelector />
 
-      {healthError && (
+      {healthError && !healthData && (
         <div className="bg-red-50 rounded-xl p-3 text-xs text-red-600">
           Failed to load health data. Pull to refresh or try again later.
         </div>
