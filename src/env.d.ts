@@ -7,3 +7,12 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+// WKWebView message handlers (iOS native bridge)
+interface Window {
+  webkit?: {
+    messageHandlers?: {
+      support?: { postMessage: (msg: string) => void };
+    };
+  };
+}

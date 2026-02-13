@@ -77,8 +77,16 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-4">
         <svg className="w-6 h-6 text-red-500" viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
       </div>
-      <h2 className="text-lg font-bold text-af-deep-charcoal mb-1">Session expired</h2>
-      <p className="text-sm text-af-medium-gray mb-4">Please open the dashboard from the Airfold app to sign in.</p>
+      <h2 className="text-lg font-bold text-af-deep-charcoal mb-1">Something went wrong</h2>
+      <p className="text-sm text-af-medium-gray mb-4">We couldn't load your session. Please try again or contact support.</p>
+      <button
+        onClick={() => {
+          try { window.webkit?.messageHandlers?.support?.postMessage('open'); } catch {}
+        }}
+        className="px-5 py-2.5 rounded-xl bg-af-tint text-white text-sm font-semibold cursor-pointer active:opacity-80"
+      >
+        Contact Support
+      </button>
     </div>
   );
 }
