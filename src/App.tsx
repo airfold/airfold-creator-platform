@@ -49,18 +49,28 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [allowed, setAllowed] = useState(false);
 
   useEffect(() => {
-    // WKWebView injects token at document start, but there can be a tiny race
-    // with React hydration. Re-check after a tick to catch late injection.
     if (import.meta.env.DEV || isNativeMode()) {
       setAllowed(true);
       setChecked(true);
       return;
     }
-    const timer = setTimeout(() => {
-      setAllowed(isNativeMode());
-      setChecked(true);
+    // WKWebView injects token into sessionStorage at document start, but
+    // there's a race with React hydration. Poll a few times before giving up.
+    let attempt = 0;
+    const maxAttempts = 10;
+    const interval = setInterval(() => {
+      attempt++;
+      if (isNativeMode()) {
+        clearInterval(interval);
+        setAllowed(true);
+        setChecked(true);
+      } else if (attempt >= maxAttempts) {
+        clearInterval(interval);
+        setAllowed(false);
+        setChecked(true);
+      }
     }, 50);
-    return () => clearTimeout(timer);
+    return () => clearInterval(interval);
   }, []);
 
   if (!checked) return null; // brief blank while waiting
