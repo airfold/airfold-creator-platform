@@ -44,6 +44,15 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
 // Pick up native token from iOS WKWebView sessionStorage injection
 initNativeToken();
 
+function LoadingScreen() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white">
+      <div className="w-10 h-10 rounded-full border-[3px] border-af-light-gray border-t-af-tint animate-spin mb-4" />
+      <p className="text-sm text-af-medium-gray font-medium">Loading dashboard...</p>
+    </div>
+  );
+}
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [checked, setChecked] = useState(false);
   const [allowed, setAllowed] = useState(false);
@@ -54,26 +63,16 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       setChecked(true);
       return;
     }
-    // WKWebView injects token into sessionStorage at document start, but
-    // there's a race with React hydration. Poll a few times before giving up.
-    let attempt = 0;
-    const maxAttempts = 10;
-    const interval = setInterval(() => {
-      attempt++;
-      if (isNativeMode()) {
-        clearInterval(interval);
-        setAllowed(true);
-        setChecked(true);
-      } else if (attempt >= maxAttempts) {
-        clearInterval(interval);
-        setAllowed(false);
-        setChecked(true);
-      }
-    }, 50);
-    return () => clearInterval(interval);
+    // Show loader for 1.5s to let WKWebView inject the token into sessionStorage.
+    // The iOS userScript fires at document start but can race with React hydration.
+    const timer = setTimeout(() => {
+      setAllowed(isNativeMode());
+      setChecked(true);
+    }, 1500);
+    return () => clearTimeout(timer);
   }, []);
 
-  if (!checked) return null; // brief blank while waiting
+  if (!checked) return <LoadingScreen />;
   if (allowed) return <>{children}</>;
   return <Navigate to="/" replace />;
 }
