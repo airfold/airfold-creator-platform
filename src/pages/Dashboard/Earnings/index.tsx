@@ -92,6 +92,24 @@ function PayoutCard() {
     );
   }
 
+  // State 4: Onboarding complete but payouts not yet enabled (Stripe reviewing)
+  if (status.has_account && status.onboarding_complete && !status.payouts_enabled) {
+    return (
+      <div className="glass-card p-4 flex items-center gap-3">
+        <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+          <svg className="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
+            <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-af-deep-charcoal">Account under review</p>
+          <p className="text-xs text-af-medium-gray">Stripe is verifying your account. Payouts will activate once approved.</p>
+        </div>
+      </div>
+    );
+  }
+
   // State 2: Onboarding incomplete
   if (status.has_account && !status.onboarding_complete) {
     return (
