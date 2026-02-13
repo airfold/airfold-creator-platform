@@ -42,7 +42,7 @@ export function useAuth() {
       isAuthenticated: true,
       isLoaded: true,
       logout: () => { sessionStorage.removeItem('native_token'); window.location.href = '/'; },
-      getToken: () => Promise.resolve(nativeToken),
+      getToken: () => Promise.resolve(sessionStorage.getItem('native_token')),
     };
   }
 
