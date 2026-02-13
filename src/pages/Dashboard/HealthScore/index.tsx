@@ -66,12 +66,12 @@ function QAURulesSheet({ onClose }: { onClose: () => void }) {
 
 export default function HealthScore() {
   const { selectedAppId } = useSelectedApp();
-  const { data: healthData, isLoading } = useCreatorHealth(selectedAppId);
+  const { data: healthData, isLoading, error: healthError } = useCreatorHealth(selectedAppId);
   const [showRules, setShowRules] = useState(false);
 
-  const score = healthData?.score ?? 80;
+  const score = healthData?.score ?? null;
   const metrics = healthData?.metrics;
-  const scoreBg = score >= 80 ? 'bg-green-50' : score >= 50 ? 'bg-orange-50' : 'bg-red-50';
+  const scoreBg = score === null ? 'bg-af-surface' : score >= 80 ? 'bg-green-50' : score >= 50 ? 'bg-orange-50' : 'bg-red-50';
 
   const sameIp = metrics?.same_ip_percent ?? 0;
   const bounce = metrics?.bounce_rate ?? 0;
@@ -106,6 +106,12 @@ export default function HealthScore() {
 
       <AppSelector />
 
+      {healthError && (
+        <div className="bg-red-50 rounded-xl p-3 text-xs text-red-600">
+          Failed to load health data. Pull to refresh or try again later.
+        </div>
+      )}
+
       <div className="space-y-4">
         {/* Status card */}
         <div className={`${isLoading ? 'bg-af-surface' : scoreBg} rounded-2xl p-5 flex items-center gap-4`}>
@@ -115,6 +121,18 @@ export default function HealthScore() {
               <div className="flex-1 space-y-1.5">
                 <div className="h-4 w-28 rounded animate-pulse bg-af-light-gray" />
                 <div className="h-3 w-44 rounded animate-pulse bg-af-light-gray" />
+              </div>
+            </>
+          ) : score === null ? (
+            <>
+              <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-af-light-gray">
+                <svg className="w-6 h-6 text-af-medium-gray" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/><path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <div>
+                <div className="text-lg font-bold text-af-deep-charcoal">No data yet</div>
+                <div className="text-xs text-af-medium-gray">Health score will appear once we have enough data</div>
               </div>
             </>
           ) : (

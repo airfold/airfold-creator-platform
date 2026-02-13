@@ -12,8 +12,14 @@ export function setTokenGetter(fn: GetToken) {
 }
 
 async function authHeaders(): Promise<HeadersInit> {
-  if (!_getToken) return {};
-  const token = await _getToken();
+  // 4C: Try custom getter first, fall back to sessionStorage (native WKWebView token)
+  let token: string | null = null;
+  if (_getToken) {
+    token = await _getToken();
+  }
+  if (!token) {
+    token = sessionStorage.getItem('native_token');
+  }
   if (!token) return {};
   return { Authorization: `Bearer ${token}` };
 }
@@ -24,7 +30,15 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     ...options,
     headers: { 'Content-Type': 'application/json', ...headers, ...options?.headers },
   });
-  if (!res.ok) throw new Error(`API ${res.status}: ${res.statusText}`);
+  if (!res.ok) {
+    // 4B: Parse error body for detail message
+    let detail = res.statusText;
+    try {
+      const body = await res.json();
+      if (body.detail) detail = body.detail;
+    } catch { /* ignore parse errors */ }
+    throw new Error(`API ${res.status}: ${detail}`);
+  }
   return res.json();
 }
 
@@ -151,11 +165,13 @@ export async function fetchMyApps(): Promise<AppResponse[]> {
 }
 
 export async function fetchCreatorAnalytics(period: string = '30d'): Promise<CreatorAnalyticsResponse> {
-  return request<CreatorAnalyticsResponse>(`/v1/analytics/creator?period=${period}`);
+  const params = new URLSearchParams({ period });
+  return request<CreatorAnalyticsResponse>(`/v1/analytics/creator?${params}`);
 }
 
 export async function fetchAppAnalytics(appId: string, period: string = '30d'): Promise<AppAnalyticsResponse> {
-  return request<AppAnalyticsResponse>(`/v1/analytics/app/${appId}?period=${period}`);
+  const params = new URLSearchParams({ period });
+  return request<AppAnalyticsResponse>(`/v1/analytics/app/${encodeURIComponent(appId)}?${params}`);
 }
 
 export async function fetchCreatorEarnings(period?: string): Promise<CreatorEarningsResponse> {
@@ -164,8 +180,8 @@ export async function fetchCreatorEarnings(period?: string): Promise<CreatorEarn
 }
 
 export async function fetchAppEarnings(appId: string, period?: string): Promise<CreatorEarningsResponse> {
-  const params = period ? `?period=${period}` : '';
-  return request<CreatorEarningsResponse>(`/v1/creator/earnings/app/${appId}${params}`);
+  const params = period ? `?${new URLSearchParams({ period })}` : '';
+  return request<CreatorEarningsResponse>(`/v1/creator/earnings/app/${encodeURIComponent(appId)}${params}`);
 }
 
 export async function fetchCreatorHealth(): Promise<CreatorHealthResponse> {
@@ -173,7 +189,7 @@ export async function fetchCreatorHealth(): Promise<CreatorHealthResponse> {
 }
 
 export async function fetchAppHealth(appId: string): Promise<CreatorHealthResponse> {
-  return request<CreatorHealthResponse>(`/v1/creator/health/app/${appId}`);
+  return request<CreatorHealthResponse>(`/v1/creator/health/app/${encodeURIComponent(appId)}`);
 }
 
 export async function fetchLeaderboard(period: string = 'week', limit?: number): Promise<LeaderboardResponse> {

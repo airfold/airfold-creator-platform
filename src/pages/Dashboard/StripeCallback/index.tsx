@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { fetchConnectStatus } from '../../../services/api';
 
 export default function StripeCallback() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [status, setStatus] = useState<'verifying' | 'success' | 'timeout'>('verifying');
   const cancelledRef = useRef(false);
 
   useEffect(() => {
-
     let attempts = 0;
     const maxAttempts = 10;
     let timeoutId: ReturnType<typeof setTimeout>;
@@ -21,6 +22,8 @@ export default function StripeCallback() {
         if (cancelledRef.current) return;
         if (result.onboarding_complete || result.details_submitted) {
           setStatus('success');
+          // Invalidate cache so Earnings page picks up new status immediately
+          queryClient.invalidateQueries({ queryKey: ['payoutStatus'] });
           timeoutId = setTimeout(() => navigate('/dashboard/earnings', { replace: true }), 1500);
           return;
         }
@@ -31,6 +34,7 @@ export default function StripeCallback() {
       attempts++;
       if (attempts >= maxAttempts) {
         setStatus('timeout');
+        queryClient.invalidateQueries({ queryKey: ['payoutStatus'] });
         timeoutId = setTimeout(() => navigate('/dashboard/earnings', { replace: true }), 2000);
         return;
       }
@@ -44,7 +48,7 @@ export default function StripeCallback() {
       cancelledRef.current = true;
       clearTimeout(timeoutId);
     };
-  }, [navigate]);
+  }, [navigate, queryClient]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">

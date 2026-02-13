@@ -1,7 +1,7 @@
 import {
   AreaChart, Area,
   BarChart, Bar,
-  XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
+  XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
 import AppSelector from '../../../components/AppSelector';
 import { useMyApps, useCreatorAnalytics, useAppAnalytics, useCreatorEarnings } from '../../../hooks/useCreatorData';
@@ -33,8 +33,8 @@ export default function Analytics() {
   const totalViews = analytics?.total_views ?? 0;
   const uniqueUsers = analytics?.unique_users ?? 0;
 
-  // QAU vs Unique from earnings data if available, otherwise from app user_counts
-  const qauVsUnique = (() => {
+  // QAU trend from earnings data
+  const qauTrend = (() => {
     if (earnings?.weekly?.length) {
       const weekMap = new Map<string, number>();
       earnings.weekly.forEach(w => {
@@ -42,15 +42,14 @@ export default function Analytics() {
       });
       return [...weekMap.entries()]
         .sort(([a], [b]) => a.localeCompare(b))
-        .map(([week, qau], i) => ({
+        .map(([, qau], i) => ({
           week: `W${i + 1}`,
           qau,
-          uniqueUsers: Math.round(qau * 1.5),
         }));
     }
     // Fallback: single bar from current user_counts
     const totalQAU = apps?.reduce((sum, a) => sum + (a.user_count ?? 0), 0) ?? 0;
-    return [{ week: 'Now', qau: totalQAU, uniqueUsers: Math.round(totalQAU * 1.5) }];
+    return [{ week: 'Now', qau: totalQAU }];
   })();
 
   const subtitle = selectedApp
@@ -115,20 +114,18 @@ export default function Analytics() {
         )}
       </div>
 
-      {/* QAU vs Unique Users */}
+      {/* Weekly QAU */}
       <div className="glass-card p-4">
-        <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">QAU vs Unique</h3>
+        <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Weekly QAU</h3>
         {isLoading ? (
           <div className="h-[180px] rounded-xl animate-pulse bg-af-surface" />
         ) : (
           <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={qauVsUnique}>
+            <BarChart data={qauTrend}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
               <XAxis dataKey="week" stroke="#8E8E93" fontSize={10} />
               <YAxis stroke="#8E8E93" fontSize={10} width={35} />
               <Tooltip contentStyle={tooltipStyle} />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Bar dataKey="uniqueUsers" name="Unique" fill="#E5E5EA" radius={[4, 4, 0, 0]} />
               <Bar dataKey="qau" name="QAU" fill="#BD295A" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

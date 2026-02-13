@@ -42,7 +42,7 @@ export function useAppAnalytics(appId: string | null, period: string = '30d') {
 /** Fetch creator earnings */
 export function useCreatorEarnings(appId?: string | null) {
   return useQuery({
-    queryKey: ['creatorEarnings', appId],
+    queryKey: ['creatorEarnings', appId ?? null],
     queryFn: () => {
       if (appId) return fetchAppEarnings(appId);
       return fetchCreatorEarnings();
@@ -54,7 +54,7 @@ export function useCreatorEarnings(appId?: string | null) {
 /** Fetch creator health */
 export function useCreatorHealth(appId?: string | null) {
   return useQuery({
-    queryKey: ['creatorHealth', appId],
+    queryKey: ['creatorHealth', appId ?? null],
     queryFn: () => {
       if (appId) return fetchAppHealth(appId);
       return fetchCreatorHealth();
@@ -68,7 +68,8 @@ export function usePayoutStatus() {
   return useQuery({
     queryKey: ['payoutStatus'],
     queryFn: fetchConnectStatus,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: true,
   });
 }
 

@@ -48,6 +48,9 @@ function PayoutCard() {
     setActionError(null);
     try {
       const res = await startConnectOnboarding();
+      if (!res.url.startsWith('https://connect.stripe.com/')) {
+        throw new Error('Unexpected redirect URL');
+      }
       window.location.href = res.url;
     } catch (err) {
       console.error('Stripe onboarding failed:', err);
@@ -61,6 +64,9 @@ function PayoutCard() {
     setActionError(null);
     try {
       const res = await refreshOnboardingLink();
+      if (!res.url.startsWith('https://connect.stripe.com/')) {
+        throw new Error('Unexpected redirect URL');
+      }
       window.location.href = res.url;
     } catch (err) {
       console.error('Stripe refresh link failed:', err);
@@ -142,7 +148,7 @@ function PayoutCard() {
 
 export default function Earnings() {
   const { selectedAppId } = useSelectedApp();
-  const { data: earningsData, isLoading } = useCreatorEarnings(selectedAppId);
+  const { data: earningsData, isLoading, error: earningsError } = useCreatorEarnings(selectedAppId);
 
   // Aggregate by week_start (API returns per-app-per-week rows in "All Apps" view)
   const weeklyData = (() => {
@@ -177,6 +183,12 @@ export default function Earnings() {
       </div>
 
       <PayoutCard />
+
+      {earningsError && (
+        <div className="bg-red-50 rounded-xl p-3 text-xs text-red-600">
+          Failed to load earnings data. Pull to refresh or try again later.
+        </div>
+      )}
 
       <AppSelector />
 

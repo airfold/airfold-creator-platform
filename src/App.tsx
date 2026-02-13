@@ -77,6 +77,8 @@ function AppRoutes() {
       </Route>
       {/* Catch old /login route */}
       <Route path="/login" element={<Navigate to="/" replace />} />
+      {/* 404 catch-all */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
