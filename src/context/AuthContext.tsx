@@ -1,21 +1,6 @@
-/** Check if dev skip mode is active */
-export function isDevMode(): boolean {
-  return localStorage.getItem('dev_skip') === '1';
-}
-
-/** Enable dev skip mode */
-export function enableDevMode() {
-  localStorage.setItem('dev_skip', '1');
-}
-
-/** Disable dev skip mode */
-export function clearDevMode() {
-  localStorage.removeItem('dev_skip');
-}
-
 /**
  * Native token mode — when opened from the iOS app with a JWT token.
- * The token is passed as ?__clerk_token=xxx and stored in sessionStorage.
+ * The token is injected into sessionStorage by the WKWebView at document start.
  * This lets the web dashboard authenticate without Clerk's web sign-in flow.
  */
 export function initNativeToken() {
@@ -39,26 +24,11 @@ export function isNativeMode(): boolean {
 }
 
 /**
- * Auth hook — dev mode returns mock user, native mode uses iOS JWT.
- * No web sign-in flow; dashboard is only accessible from the iOS app.
+ * Auth hook — native mode uses iOS JWT.
+ * Dashboard is only accessible from the iOS app.
  */
 export function useAuth() {
   const nativeToken = getNativeToken();
-
-  if (isDevMode()) {
-    return {
-      user: {
-        id: 'dev_9',
-        email: 'david@airfold.co',
-        name: 'Mock User',
-        avatar: undefined,
-      },
-      isAuthenticated: true,
-      isLoaded: true,
-      logout: () => { clearDevMode(); window.location.reload(); },
-      getToken: () => Promise.resolve('dev-token'),
-    };
-  }
 
   if (nativeToken) {
     const nativeName = sessionStorage.getItem('native_user_name') || 'Creator';

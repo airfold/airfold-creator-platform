@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { useAuth, isDevMode, enableDevMode, clearDevMode } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { setTokenGetter } from '../../services/api';
 import { haptic } from '../../utils/haptic';
 import DesktopBlocker from '../../components/DesktopBlocker';
@@ -42,26 +42,9 @@ export default function DashboardLayout() {
             <div className="cursor-pointer" onClick={() => navigate('/dashboard')}>
               <span className="font-brand text-lg text-af-tint tracking-tight">airfold</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="text-right">
-                <p className="text-xs font-semibold text-af-deep-charcoal leading-tight truncate max-w-[120px]">{user?.name}</p>
-                {selectedApp && <p className="text-[10px] text-af-medium-gray leading-tight truncate max-w-[120px]">{selectedApp.name}</p>}
-              </div>
-              {isDevMode() ? (
-                <button
-                  onClick={() => { clearDevMode(); window.location.reload(); }}
-                  className="text-[9px] font-mono font-bold text-af-tint border border-af-tint/30 rounded px-1.5 py-0.5 active:opacity-70"
-                >
-                  DEV
-                </button>
-              ) : (
-                <button
-                  onClick={() => { enableDevMode(); window.location.reload(); }}
-                  className="text-[9px] font-mono text-af-medium-gray/40 border border-dashed border-af-light-gray/50 rounded px-1.5 py-0.5 active:text-af-tint active:border-af-tint"
-                >
-                  DEV
-                </button>
-              )}
+            <div className="text-right">
+              <p className="text-xs font-semibold text-af-deep-charcoal leading-tight truncate max-w-[120px]">{user?.name}</p>
+              {selectedApp && <p className="text-[10px] text-af-medium-gray leading-tight truncate max-w-[120px]">{selectedApp.name}</p>}
             </div>
           </div>
         </header>

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchConnectStatus } from '../../../services/api';
-import { isDevMode } from '../../../context/AuthContext';
 
 export default function StripeCallback() {
   const navigate = useNavigate();
@@ -9,10 +8,6 @@ export default function StripeCallback() {
   const cancelledRef = useRef(false);
 
   useEffect(() => {
-    if (isDevMode()) {
-      navigate('/dashboard/earnings', { replace: true });
-      return;
-    }
 
     let attempts = 0;
     const maxAttempts = 10;

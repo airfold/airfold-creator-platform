@@ -15,7 +15,7 @@ import Analytics from './pages/Dashboard/Analytics';
 import Leaderboard from './pages/Dashboard/Leaderboard';
 import HealthScore from './pages/Dashboard/HealthScore';
 import StripeCallback from './pages/Dashboard/StripeCallback';
-import { isDevMode, isNativeMode, initNativeToken } from './context/AuthContext';
+import { isNativeMode, initNativeToken } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
@@ -45,7 +45,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
 initNativeToken();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  if (import.meta.env.DEV || isDevMode() || isNativeMode()) {
+  if (import.meta.env.DEV || isNativeMode()) {
     return <>{children}</>;
   }
   // Not authenticated — redirect to landing (no standalone login)
