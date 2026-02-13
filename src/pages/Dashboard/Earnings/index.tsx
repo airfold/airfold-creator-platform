@@ -148,7 +148,7 @@ function PayoutCard() {
 
 export default function Earnings() {
   const { selectedAppId } = useSelectedApp();
-  const { data: earningsData, isLoading, error: earningsError } = useCreatorEarnings(selectedAppId);
+  const { data: earningsData, isLoading } = useCreatorEarnings(selectedAppId);
 
   // Aggregate by week_start (API returns per-app-per-week rows in "All Apps" view)
   const weeklyData = (() => {
@@ -183,12 +183,6 @@ export default function Earnings() {
       </div>
 
       <PayoutCard />
-
-      {earningsError && !earningsData && (
-        <div className="bg-red-50 rounded-xl p-3 text-xs text-red-600">
-          Failed to load earnings data. Pull to refresh or try again later.
-        </div>
-      )}
 
       <AppSelector />
 

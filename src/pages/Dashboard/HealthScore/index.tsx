@@ -66,7 +66,7 @@ function QAURulesSheet({ onClose }: { onClose: () => void }) {
 
 export default function HealthScore() {
   const { selectedAppId } = useSelectedApp();
-  const { data: healthData, isLoading, error: healthError } = useCreatorHealth(selectedAppId);
+  const { data: healthData, isLoading } = useCreatorHealth(selectedAppId);
   const [showRules, setShowRules] = useState(false);
 
   const score = healthData?.score ?? null;
@@ -105,12 +105,6 @@ export default function HealthScore() {
       </div>
 
       <AppSelector />
-
-      {healthError && !healthData && (
-        <div className="bg-red-50 rounded-xl p-3 text-xs text-red-600">
-          Failed to load health data. Pull to refresh or try again later.
-        </div>
-      )}
 
       <div className="space-y-4">
         {/* Status card */}
