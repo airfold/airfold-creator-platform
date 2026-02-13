@@ -2,13 +2,11 @@ import { Component, useState, useEffect } from 'react';
 import type { ReactNode, ErrorInfo } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import PublicLayout from './layouts/PublicLayout';
 import DashboardLayout from './layouts/DashboardLayout';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
 });
-import Landing from './pages/Landing';
 import Overview from './pages/Dashboard/Overview';
 import Earnings from './pages/Dashboard/Earnings';
 import Analytics from './pages/Dashboard/Analytics';
@@ -74,15 +72,20 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (!checked) return <LoadingScreen />;
   if (allowed) return <>{children}</>;
-  return <Navigate to="/" replace />;
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center bg-white">
+      <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center mb-4">
+        <svg className="w-6 h-6 text-red-500" viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+      </div>
+      <h2 className="text-lg font-bold text-af-deep-charcoal mb-1">Session expired</h2>
+      <p className="text-sm text-af-medium-gray mb-4">Please open the dashboard from the Airfold app to sign in.</p>
+    </div>
+  );
 }
 
 function AppRoutes() {
   return (
     <Routes>
-      <Route element={<PublicLayout />}>
-        <Route path="/" element={<Landing />} />
-      </Route>
       <Route
         path="/dashboard"
         element={
@@ -100,10 +103,8 @@ function AppRoutes() {
         <Route path="health" element={<HealthScore />} />
         <Route path="stripe-callback" element={<StripeCallback />} />
       </Route>
-      {/* Catch old /login route */}
-      <Route path="/login" element={<Navigate to="/" replace />} />
-      {/* 404 catch-all */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      {/* All other routes redirect to dashboard (auth handled by ProtectedRoute) */}
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
 }
