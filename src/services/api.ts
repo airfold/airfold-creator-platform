@@ -52,7 +52,6 @@ export interface AppResponse {
   icon_url: string | null;
   cover_image_url: string | null;
   category: string | null;
-  user_count: number;
   prod_app_url: string | null;
   prod_deployment_status: string | null;
   prod_cf_worker_name: string | null;
@@ -124,7 +123,7 @@ export interface HealthMetrics {
 }
 
 export interface CreatorHealthResponse {
-  score: number;
+  score: number | null;
   status: string;
   metrics: HealthMetrics;
   flags: string[];
@@ -136,12 +135,13 @@ export interface LeaderboardEntry {
   name: string;
   avatar: string | null;
   qau: number;
+  earnings: number;
   app_count: number;
 }
 
 export interface LeaderboardResponse {
   entries: LeaderboardEntry[];
-  my_rank: { rank: number; qau: number } | null;
+  my_rank: { rank: number; qau: number; earnings: number } | null;
 }
 
 // ─── Stripe Connect Types ───

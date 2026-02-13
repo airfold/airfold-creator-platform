@@ -24,11 +24,7 @@ export default function Overview() {
   const { setSelectedAppId } = useSelectedApp();
   const [expanded, setExpanded] = useState(false);
 
-  // Current QAU from apps (always available once loaded)
-  const currentQAU = apps?.reduce((sum, app) => sum + (app.user_count ?? 0), 0) ?? 0;
-  const weeklyEarnings = calculateWeeklyEarnings(currentQAU);
-
-  // Weekly QAU trend from earnings API (8 weeks) — fallback to flat if unavailable
+  // Weekly QAU trend from earnings API (8 weeks)
   const qauTrend = useMemo(() => {
     if (!earnings?.weekly?.length) return null;
     // Group by week_start, sum QAU across apps
@@ -40,25 +36,49 @@ export default function Overview() {
     return values.length >= 2 ? values : null;
   }, [earnings]);
 
+  // Per-app QAU from the most recent week of earnings data
+  const { appQAUMap, currentQAU } = useMemo(() => {
+    const map = new Map<string, number>();
+    if (!earnings?.weekly?.length) return { appQAUMap: map, currentQAU: 0 };
+    // Find the latest week
+    const weeks = [...new Set(earnings.weekly.map(w => w.week_start))].sort();
+    const latestWeek = weeks[weeks.length - 1];
+    earnings.weekly
+      .filter(w => w.week_start === latestWeek)
+      .forEach(w => map.set(w.app_id, (map.get(w.app_id) ?? 0) + w.qau));
+    const total = [...map.values()].reduce((s, v) => s + v, 0);
+    return { appQAUMap: map, currentQAU: total };
+  }, [earnings]);
+
+  const weeklyEarnings = calculateWeeklyEarnings(currentQAU);
+
   const lastWeekQAU = qauTrend && qauTrend.length >= 2 ? qauTrend[qauTrend.length - 2] : 0;
   const trendCurrentQAU = qauTrend ? qauTrend[qauTrend.length - 1] : currentQAU;
   const qauChange = lastWeekQAU > 0 ? percentChange(trendCurrentQAU, lastWeekQAU) : 0;
 
-  // Monthly earnings from earnings API or estimate from current week
+  // Monthly earnings from last 4 weeks of earnings data, with $5K cap
   const monthly = useMemo(() => {
-    if (earnings?.totals) {
-      const t = earnings.totals;
-      return { capped: t.total_capped, total: t.total_gross, capApplied: t.total_gross > t.total_capped };
+    if (earnings?.weekly?.length) {
+      // Group capped earnings by week, take last 4 weeks
+      const weekMap = new Map<string, number>();
+      earnings.weekly.forEach(w => {
+        weekMap.set(w.week_start, (weekMap.get(w.week_start) ?? 0) + w.capped);
+      });
+      const weeklyCapped = [...weekMap.entries()]
+        .sort(([a], [b]) => a.localeCompare(b))
+        .slice(-4)
+        .map(([, v]) => v);
+      return calculateMonthlyEarnings(weeklyCapped);
     }
-    return calculateMonthlyEarnings([weeklyEarnings.capped, weeklyEarnings.capped, weeklyEarnings.capped, weeklyEarnings.capped]);
+    return calculateMonthlyEarnings([weeklyEarnings.capped]);
   }, [earnings, weeklyEarnings]);
 
   const healthScore = health?.score ?? null;
 
-  // Sort apps by user_count descending
+  // Sort apps by QAU descending (from earnings data)
   const sortedApps = useMemo(
-    () => (apps ? [...apps].sort((a, b) => (b.user_count ?? 0) - (a.user_count ?? 0)) : []),
-    [apps],
+    () => (apps ? [...apps].sort((a, b) => (appQAUMap.get(b.id) ?? 0) - (appQAUMap.get(a.id) ?? 0)) : []),
+    [apps, appQAUMap],
   );
 
   const hasMoreApps = sortedApps.length > COLLAPSED_COUNT;
@@ -199,7 +219,7 @@ export default function Overview() {
           style={expanded && sortedApps.length > 8 ? { WebkitOverflowScrolling: 'touch' } : undefined}
         >
           {visibleApps.map((app) => {
-            const appQAU = app.user_count ?? 0;
+            const appQAU = appQAUMap.get(app.id) ?? 0;
             const appEarnings = calculateWeeklyEarnings(appQAU);
             return (
               <div

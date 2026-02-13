@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLeaderboard } from '../../../hooks/useCreatorData';
 import { haptic } from '../../../utils/haptic';
+import { formatCurrency } from '../../../utils/earnings';
 
 type Period = 'week' | 'month' | 'all';
 
@@ -82,8 +83,8 @@ export default function Leaderboard() {
                       <span className="text-xs text-af-medium-gray">{entry.app_count} app{entry.app_count !== 1 ? 's' : ''}</span>
                     </div>
                     <div className="text-right shrink-0">
-                      <div className="text-sm font-bold text-af-tint">{entry.qau.toLocaleString()}</div>
-                      <div className="text-[10px] text-af-medium-gray">QAU</div>
+                      <div className="text-sm font-bold text-af-tint">{formatCurrency(entry.earnings)}</div>
+                      <div className="text-[10px] text-af-medium-gray">{entry.qau.toLocaleString()} QAU</div>
                     </div>
                   </div>
                 );

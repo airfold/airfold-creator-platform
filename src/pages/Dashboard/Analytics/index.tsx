@@ -47,9 +47,8 @@ export default function Analytics() {
           qau,
         }));
     }
-    // Fallback: single bar from current user_counts
-    const totalQAU = apps?.reduce((sum, a) => sum + (a.user_count ?? 0), 0) ?? 0;
-    return [{ week: 'Now', qau: totalQAU }];
+    // Fallback: no earnings data yet
+    return [{ week: 'Now', qau: 0 }];
   })();
 
   const subtitle = selectedApp
