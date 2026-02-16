@@ -17,9 +17,10 @@ const COLLAPSED_COUNT = 4;
 const MONTHLY_CAP = 5000;
 
 export default function Overview() {
-  const { data: apps, isLoading: appsLoading } = useMyApps();
-  const { data: earnings } = useCreatorEarnings();
-  const { data: health } = useCreatorHealth();
+  const { data: apps, isLoading: appsLoading, error: appsError } = useMyApps();
+  const { data: earnings, error: earningsError } = useCreatorEarnings();
+  const { data: health, error: healthError } = useCreatorHealth();
+  const hasError = !!(appsError || earningsError || healthError);
   const navigate = useNavigate();
   const { setSelectedAppId } = useSelectedApp();
   const [expanded, setExpanded] = useState(false);
@@ -132,6 +133,13 @@ export default function Overview() {
 
   return (
     <div className="space-y-4">
+      {/* Connection issue banner */}
+      {hasError && (
+        <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 flex items-center gap-3">
+          <svg className="w-5 h-5 text-amber-500 shrink-0" viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <p className="text-xs text-amber-800 flex-1">Some data may be out of date. Pull down to refresh.</p>
+        </div>
+      )}
       {/* Hero — the money */}
       <div className="rounded-2xl bg-gradient-to-br from-af-tint to-[#8B1D42] p-5 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />

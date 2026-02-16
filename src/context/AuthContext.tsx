@@ -3,18 +3,6 @@
  * The token is injected into sessionStorage by the WKWebView at document start.
  * This lets the web dashboard authenticate without Clerk's web sign-in flow.
  */
-export function initNativeToken() {
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('__clerk_token');
-  if (token) {
-    sessionStorage.setItem('native_token', token);
-    // Clean the URL
-    const url = new URL(window.location.href);
-    url.searchParams.delete('__clerk_token');
-    window.history.replaceState({}, '', url.pathname + url.hash);
-  }
-}
-
 export function getNativeToken(): string | null {
   return sessionStorage.getItem('native_token');
 }

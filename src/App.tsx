@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import DashboardLayout from './layouts/DashboardLayout';
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
+  defaultOptions: { queries: { retry: 3, retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000), refetchOnWindowFocus: false } },
 });
 import Overview from './pages/Dashboard/Overview';
 import Earnings from './pages/Dashboard/Earnings';
@@ -13,7 +13,7 @@ import Analytics from './pages/Dashboard/Analytics';
 import Leaderboard from './pages/Dashboard/Leaderboard';
 import HealthScore from './pages/Dashboard/HealthScore';
 import StripeCallback from './pages/Dashboard/StripeCallback';
-import { isNativeMode, initNativeToken } from './context/AuthContext';
+import { isNativeMode } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
@@ -39,9 +39,6 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   }
 }
 
-// Pick up native token from iOS WKWebView sessionStorage injection
-initNativeToken();
-
 function LoadingScreen() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white">
@@ -55,19 +52,32 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [checked, setChecked] = useState(false);
   const [allowed, setAllowed] = useState(false);
 
-  useEffect(() => {
+  const runCheck = () => {
     if (import.meta.env.DEV || isNativeMode()) {
       setAllowed(true);
       setChecked(true);
-      return;
+      return true;
     }
-    // Show loader for 1.5s to let WKWebView inject the token into sessionStorage.
+    return false;
+  };
+
+  useEffect(() => {
+    if (runCheck()) return;
+    // Poll every 100ms for up to 5s to let WKWebView inject the token.
     // The iOS userScript fires at document start but can race with React hydration.
-    const timer = setTimeout(() => {
-      setAllowed(isNativeMode());
-      setChecked(true);
-    }, 1500);
-    return () => clearTimeout(timer);
+    let elapsed = 0;
+    const interval = setInterval(() => {
+      elapsed += 100;
+      if (isNativeMode()) {
+        clearInterval(interval);
+        setAllowed(true);
+        setChecked(true);
+      } else if (elapsed >= 5000) {
+        clearInterval(interval);
+        setChecked(true);
+      }
+    }, 100);
+    return () => clearInterval(interval);
   }, []);
 
   if (!checked) return <LoadingScreen />;
@@ -79,14 +89,22 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       </div>
       <h2 className="text-lg font-bold text-af-deep-charcoal mb-1">Something went wrong</h2>
       <p className="text-sm text-af-medium-gray mb-4">We couldn't load your session. Please try again or contact support.</p>
-      <button
-        onClick={() => {
-          try { window.webkit?.messageHandlers?.support?.postMessage('open'); } catch {}
-        }}
-        className="px-5 py-2.5 rounded-xl bg-af-tint text-white text-sm font-semibold cursor-pointer active:opacity-80"
-      >
-        Contact Support
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={() => window.location.reload()}
+          className="px-5 py-2.5 rounded-xl bg-af-tint text-white text-sm font-semibold cursor-pointer active:opacity-80"
+        >
+          Try Again
+        </button>
+        <button
+          onClick={() => {
+            try { window.webkit?.messageHandlers?.support?.postMessage('open'); } catch {}
+          }}
+          className="px-5 py-2.5 rounded-xl border border-af-light-gray text-af-deep-charcoal text-sm font-semibold cursor-pointer active:opacity-80"
+        >
+          Contact Support
+        </button>
+      </div>
     </div>
   );
 }
