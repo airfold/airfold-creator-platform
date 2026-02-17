@@ -22,7 +22,7 @@ function PayoutCard() {
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  if (isLoading) {
+  if (isLoading && !status) {
     return (
       <div className="glass-card p-4">
         <div className="h-12 rounded-xl animate-pulse bg-af-surface" />
@@ -169,7 +169,7 @@ function PayoutHistoryTable() {
   const { data, isLoading } = usePayoutHistory();
   const payouts = data?.payouts ?? [];
 
-  if (isLoading) {
+  if (isLoading && !data) {
     return (
       <div className="glass-card p-4">
         <div className="h-6 w-28 rounded animate-pulse bg-af-surface mb-3" />

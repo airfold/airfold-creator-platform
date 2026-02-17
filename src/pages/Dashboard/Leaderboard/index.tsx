@@ -33,7 +33,7 @@ export default function Leaderboard() {
         </div>
       </div>
 
-      {isLoading ? (
+      {isLoading && !leaderboardData ? (
         <div className="glass-card overflow-hidden divide-y divide-af-light-gray">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="flex items-center gap-3 px-4 py-3">

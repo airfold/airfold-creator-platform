@@ -13,6 +13,8 @@ const queryClient = new QueryClient({
       },
       retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
       refetchOnWindowFocus: false,
+      gcTime: 30 * 60 * 1000, // Keep cache 30 min after unmount
+      staleTime: 5 * 60 * 1000, // Data fresh for 5 min (default for all queries)
     },
   },
 });

@@ -85,7 +85,7 @@ export default function Overview() {
   const hasMoreApps = sortedApps.length > COLLAPSED_COUNT;
   const visibleApps = expanded ? sortedApps : sortedApps.slice(0, COLLAPSED_COUNT);
 
-  if (appsLoading) {
+  if (appsLoading && !apps) {
     return (
       <div className="space-y-4">
         {/* Hero skeleton */}
