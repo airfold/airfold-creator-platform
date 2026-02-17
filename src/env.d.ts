@@ -13,6 +13,7 @@ interface Window {
   webkit?: {
     messageHandlers?: {
       support?: { postMessage: (msg: string) => void };
+      closeWebView?: { postMessage: (msg: string) => void };
     };
   };
 }

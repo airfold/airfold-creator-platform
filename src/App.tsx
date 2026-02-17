@@ -48,6 +48,11 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   }
 }
 
+/** Close the WKWebView so the iOS app can reopen with a fresh token. */
+function closeNativeWebView() {
+  try { window.webkit?.messageHandlers?.closeWebView?.postMessage('close'); } catch {}
+}
+
 function SessionExpiredOverlay() {
   const [visible, setVisible] = useState(false);
 
@@ -68,12 +73,12 @@ function SessionExpiredOverlay() {
           </svg>
         </div>
         <h2 className="text-lg font-bold text-af-deep-charcoal mb-1">Session expired</h2>
-        <p className="text-sm text-af-medium-gray mb-4">Please reload the dashboard to continue.</p>
+        <p className="text-sm text-af-medium-gray mb-4">Please reopen the dashboard to continue.</p>
         <button
-          onClick={() => window.location.reload()}
+          onClick={closeNativeWebView}
           className="px-5 py-2.5 rounded-xl bg-af-tint text-white text-sm font-semibold cursor-pointer active:opacity-80"
         >
-          Reload
+          Close
         </button>
       </div>
     </div>
@@ -129,13 +134,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
         <svg className="w-6 h-6 text-red-500" viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
       </div>
       <h2 className="text-lg font-bold text-af-deep-charcoal mb-1">Something went wrong</h2>
-      <p className="text-sm text-af-medium-gray mb-4">We couldn't load your session. Please try again or contact support.</p>
+      <p className="text-sm text-af-medium-gray mb-4">We couldn't load your session. Close and reopen the dashboard.</p>
       <div className="flex gap-3">
         <button
-          onClick={() => window.location.reload()}
+          onClick={closeNativeWebView}
           className="px-5 py-2.5 rounded-xl bg-af-tint text-white text-sm font-semibold cursor-pointer active:opacity-80"
         >
-          Try Again
+          Close
         </button>
         <button
           onClick={() => {
