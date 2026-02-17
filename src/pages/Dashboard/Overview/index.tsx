@@ -135,10 +135,13 @@ export default function Overview() {
     <div className="space-y-4">
       {/* Connection issue banner */}
       {hasError && (
-        <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 flex items-center gap-3">
+        <button
+          className="w-full rounded-xl bg-amber-50 border border-amber-200 p-3 flex items-center gap-3 text-left"
+          onClick={() => window.location.reload()}
+        >
           <svg className="w-5 h-5 text-amber-500 shrink-0" viewBox="0 0 24 24" fill="none"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          <p className="text-xs text-amber-800 flex-1">Some data may be out of date. Pull down to refresh.</p>
-        </div>
+          <p className="text-xs text-amber-800 flex-1">Some data may be out of date. Tap to refresh.</p>
+        </button>
       )}
       {/* Hero — the money */}
       <div className="rounded-2xl bg-gradient-to-br from-af-tint to-[#8B1D42] p-5 text-white relative overflow-hidden">
