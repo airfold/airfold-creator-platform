@@ -225,6 +225,12 @@ export default function Overview() {
           <span className="text-[11px] text-af-medium-gray">{sortedApps.length} app{sortedApps.length !== 1 ? 's' : ''}</span>
         </div>
 
+        {sortedApps.length === 0 ? (
+          <div className="glass-card p-5 text-center">
+            <p className="text-sm font-semibold text-af-deep-charcoal mb-1">No published apps yet</p>
+            <p className="text-xs text-af-medium-gray">Publish an app to start earning. Your apps will appear here once they're live.</p>
+          </div>
+        ) : (
         <div
           className={`space-y-1.5 ${expanded && sortedApps.length > 8 ? 'max-h-[50vh] overflow-y-auto overscroll-contain' : ''}`}
           style={expanded && sortedApps.length > 8 ? { WebkitOverflowScrolling: 'touch' } : undefined}
@@ -252,6 +258,7 @@ export default function Overview() {
             );
           })}
         </div>
+        )}
 
         {hasMoreApps && (
           <button

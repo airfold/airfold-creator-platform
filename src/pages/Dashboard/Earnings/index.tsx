@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import AppSelector from '../../../components/AppSelector';
-import { useCreatorEarnings, usePayoutStatus } from '../../../hooks/useCreatorData';
+import { useCreatorEarnings, usePayoutStatus, usePayoutHistory } from '../../../hooks/useCreatorData';
 import { startConnectOnboarding, refreshOnboardingLink } from '../../../services/api';
 import { useSelectedApp } from '../../../context/AppContext';
 import {
@@ -165,6 +165,56 @@ function PayoutCard() {
   );
 }
 
+function PayoutHistoryTable() {
+  const { data, isLoading } = usePayoutHistory();
+  const payouts = data?.payouts ?? [];
+
+  if (isLoading) {
+    return (
+      <div className="glass-card p-4">
+        <div className="h-6 w-28 rounded animate-pulse bg-af-surface mb-3" />
+        <div className="h-20 rounded-xl animate-pulse bg-af-surface" />
+      </div>
+    );
+  }
+
+  if (payouts.length === 0) return null;
+
+  const statusBadge = (status: string) => {
+    if (status === 'completed') return <span className="px-1.5 py-0.5 rounded-full bg-green-50 text-green-700 text-[10px] font-medium">Paid</span>;
+    if (status === 'pending') return <span className="px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[10px] font-medium">Pending</span>;
+    return <span className="px-1.5 py-0.5 rounded-full bg-red-50 text-red-700 text-[10px] font-medium">{status}</span>;
+  };
+
+  return (
+    <div className="glass-card overflow-hidden">
+      <div className="p-4 pb-0">
+        <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Payout History</h3>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b border-af-light-gray">
+              <th className="text-left px-3 py-2.5 text-af-medium-gray font-medium">Week</th>
+              <th className="text-right px-3 py-2.5 text-af-medium-gray font-medium">Amount</th>
+              <th className="text-right px-3 py-2.5 text-af-medium-gray font-medium">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {payouts.map((p) => (
+              <tr key={p.id} className="border-b border-af-light-gray">
+                <td className="px-3 py-2.5 font-medium text-af-deep-charcoal">{p.week_start}</td>
+                <td className="text-right px-3 py-2.5 text-af-charcoal">{formatCurrency(p.amount_cents / 100)}</td>
+                <td className="text-right px-3 py-2.5">{statusBadge(p.status)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 export default function Earnings() {
   const { selectedAppId } = useSelectedApp();
   const { data: earningsData, isLoading } = useCreatorEarnings(selectedAppId);
@@ -205,6 +255,12 @@ export default function Earnings() {
 
       <AppSelector />
 
+      {!isLoading && weeklyData.length === 0 ? (
+      <div className="glass-card p-5 text-center">
+        <p className="text-sm font-semibold text-af-deep-charcoal mb-1">No earnings yet</p>
+        <p className="text-xs text-af-medium-gray">Earnings appear once your published apps get qualified active users. Keep building and sharing!</p>
+      </div>
+      ) : (
       <div className="space-y-5">
       <div className="glass-card p-4">
         <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Weekly</h3>
@@ -267,7 +323,10 @@ export default function Earnings() {
           Cap reached — {formatCurrency(monthlyResult.total - monthlyResult.capped)} rolls to next month.
         </div>
       )}
+
+      <PayoutHistoryTable />
       </div>
+      )}
     </div>
   );
 }

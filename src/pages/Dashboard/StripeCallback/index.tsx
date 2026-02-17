@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchConnectStatus } from '../../../services/api';
@@ -6,20 +6,29 @@ import { fetchConnectStatus } from '../../../services/api';
 export default function StripeCallback() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [status, setStatus] = useState<'verifying' | 'success' | 'timeout'>('verifying');
-  const cancelledRef = useRef(false);
+  const [status, setStatus] = useState<'verifying' | 'success' | 'timeout' | 'cancelled'>('verifying');
 
   useEffect(() => {
+    // Check for cancellation/error params from Stripe
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('error') || params.get('cancelled') === 'true') {
+      setStatus('cancelled');
+      queryClient.invalidateQueries({ queryKey: ['payoutStatus'] });
+      const timeoutId = setTimeout(() => navigate('/dashboard/earnings', { replace: true }), 2500);
+      return () => clearTimeout(timeoutId);
+    }
+
+    let cancelled = false;
     let attempts = 0;
     const maxAttempts = 10;
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const poll = async () => {
-      if (cancelledRef.current) return;
+      if (cancelled) return;
 
       try {
         const result = await fetchConnectStatus();
-        if (cancelledRef.current) return;
+        if (cancelled) return;
         if (result.onboarding_complete || result.details_submitted) {
           setStatus('success');
           // Invalidate cache so Earnings page picks up new status immediately
@@ -28,7 +37,7 @@ export default function StripeCallback() {
           return;
         }
       } catch {
-        if (cancelledRef.current) return;
+        if (cancelled) return;
       }
 
       attempts++;
@@ -45,7 +54,7 @@ export default function StripeCallback() {
     poll();
 
     return () => {
-      cancelledRef.current = true;
+      cancelled = true;
       clearTimeout(timeoutId);
     };
   }, [navigate, queryClient]);
@@ -80,6 +89,17 @@ export default function StripeCallback() {
           </div>
           <p className="text-sm font-semibold text-af-deep-charcoal">Verification pending</p>
           <p className="text-xs text-af-medium-gray">Stripe is still processing. Redirecting to earnings...</p>
+        </>
+      )}
+      {status === 'cancelled' && (
+        <>
+          <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center">
+            <svg className="w-5 h-5 text-red-500" viewBox="0 0 24 24" fill="none">
+              <path d="M6 18L18 6M6 6l12 12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <p className="text-sm font-semibold text-af-deep-charcoal">Setup cancelled</p>
+          <p className="text-xs text-af-medium-gray">You can complete setup anytime from the Earnings page.</p>
         </>
       )}
     </div>

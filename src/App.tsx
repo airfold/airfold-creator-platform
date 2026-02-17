@@ -5,7 +5,16 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import DashboardLayout from './layouts/DashboardLayout';
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: 3, retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000), refetchOnWindowFocus: false } },
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        if (error instanceof Error && /^API 4\d\d:/.test(error.message)) return false;
+        return failureCount < 3;
+      },
+      retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
+      refetchOnWindowFocus: false,
+    },
+  },
 });
 import Overview from './pages/Dashboard/Overview';
 import Earnings from './pages/Dashboard/Earnings';
@@ -37,6 +46,38 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
     }
     return this.props.children;
   }
+}
+
+function SessionExpiredOverlay() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setVisible(true);
+    window.addEventListener('auth:session-expired', handler);
+    return () => window.removeEventListener('auth:session-expired', handler);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <div className="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-6">
+      <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-xl">
+        <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-4">
+          <svg className="w-6 h-6 text-amber-500" viewBox="0 0 24 24" fill="none">
+            <path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <h2 className="text-lg font-bold text-af-deep-charcoal mb-1">Session expired</h2>
+        <p className="text-sm text-af-medium-gray mb-4">Please reload the dashboard to continue.</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-5 py-2.5 rounded-xl bg-af-tint text-white text-sm font-semibold cursor-pointer active:opacity-80"
+        >
+          Reload
+        </button>
+      </div>
+    </div>
+  );
 }
 
 function LoadingScreen() {
@@ -139,6 +180,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
+        <SessionExpiredOverlay />
         <BrowserRouter>
           <AppRoutes />
         </BrowserRouter>

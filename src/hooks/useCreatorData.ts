@@ -9,6 +9,7 @@ import {
   fetchAppHealth,
   fetchLeaderboard,
   fetchConnectStatus,
+  fetchPayoutHistory,
 } from '../services/api';
 
 /** Fetch creator's apps */
@@ -70,6 +71,15 @@ export function usePayoutStatus() {
     queryFn: fetchConnectStatus,
     staleTime: 30 * 1000,
     refetchOnWindowFocus: true,
+  });
+}
+
+/** Fetch payout history */
+export function usePayoutHistory() {
+  return useQuery({
+    queryKey: ['payoutHistory'],
+    queryFn: fetchPayoutHistory,
+    staleTime: 5 * 60 * 1000,
   });
 }
 

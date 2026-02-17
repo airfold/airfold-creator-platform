@@ -37,6 +37,9 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
       const body = await res.json();
       if (body.detail) detail = body.detail;
     } catch { /* ignore parse errors */ }
+    if (res.status === 401) {
+      window.dispatchEvent(new CustomEvent('auth:session-expired'));
+    }
     throw new Error(`API ${res.status}: ${detail}`);
   }
   return res.json();
@@ -144,6 +147,23 @@ export interface LeaderboardResponse {
   my_rank: { rank: number; qau: number; earnings: number } | null;
 }
 
+// ─── Payout History Types ───
+
+export interface PayoutHistoryEntry {
+  id: string;
+  week_start: string;
+  amount_cents: number;
+  app_count: number;
+  total_qau: number;
+  status: string;
+  failure_reason: string | null;
+  created_at: string;
+}
+
+export interface PayoutHistoryResponse {
+  payouts: PayoutHistoryEntry[];
+}
+
 // ─── Stripe Connect Types ───
 
 export interface ConnectAccountStatus {
@@ -196,6 +216,12 @@ export async function fetchLeaderboard(period: string = 'week', limit?: number):
   const params = new URLSearchParams({ period });
   if (limit) params.set('limit', String(limit));
   return request<LeaderboardResponse>(`/v1/leaderboard?${params}`);
+}
+
+// ─── Payout History ───
+
+export async function fetchPayoutHistory(): Promise<PayoutHistoryResponse> {
+  return request<PayoutHistoryResponse>('/v1/creator/payouts');
 }
 
 // ─── Stripe Connect ───
