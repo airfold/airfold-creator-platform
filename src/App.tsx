@@ -48,9 +48,14 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   }
 }
 
-/** Close the WKWebView so the iOS app can reopen with a fresh token. */
+/** Close the WKWebView so the iOS app can reopen with a fresh token.
+ *  Falls back to reload if the native handler isn't available yet. */
 function closeNativeWebView() {
-  try { window.webkit?.messageHandlers?.closeWebView?.postMessage('close'); } catch {}
+  try {
+    const handler = window.webkit?.messageHandlers?.closeWebView;
+    if (handler) { handler.postMessage('close'); return; }
+  } catch { /* native bridge unavailable */ }
+  window.location.reload();
 }
 
 function SessionExpiredOverlay() {
