@@ -71,7 +71,7 @@ export default function Analytics() {
       <div className="grid grid-cols-2 gap-3">
         <div className="glass-card p-3 text-center">
           <div className="text-xs text-af-medium-gray mb-0.5">Views (30d)</div>
-          {isLoading ? (
+          {isLoading && !analytics ? (
             <div className="h-6 w-16 rounded animate-pulse bg-af-surface mx-auto" />
           ) : (
             <div className="text-xl font-bold text-af-tint">{totalViews.toLocaleString()}</div>
@@ -79,7 +79,7 @@ export default function Analytics() {
         </div>
         <div className="glass-card p-3 text-center">
           <div className="text-xs text-af-medium-gray mb-0.5">Unique (30d)</div>
-          {isLoading ? (
+          {isLoading && !analytics ? (
             <div className="h-6 w-16 rounded animate-pulse bg-af-surface mx-auto" />
           ) : (
             <div className="text-xl font-bold text-af-tint">{uniqueUsers.toLocaleString()}</div>
@@ -90,9 +90,9 @@ export default function Analytics() {
       {/* DAU from real API */}
       <div className="glass-card p-4">
         <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">DAU (30d)</h3>
-        {isLoading ? (
+        {isLoading && !analytics ? (
           <div className="h-[180px] rounded-xl animate-pulse bg-af-surface" />
-        ) : error ? (
+        ) : error && !analytics ? (
           <div className="h-[180px] flex items-center justify-center text-af-medium-gray text-sm">No data available</div>
         ) : (
           <ResponsiveContainer width="100%" height={180}>
@@ -116,7 +116,7 @@ export default function Analytics() {
       {/* Weekly QAU */}
       <div className="glass-card p-4">
         <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Weekly QAU</h3>
-        {isLoading ? (
+        {isLoading && !analytics ? (
           <div className="h-[180px] rounded-xl animate-pulse bg-af-surface" />
         ) : (
           <ResponsiveContainer width="100%" height={180}>

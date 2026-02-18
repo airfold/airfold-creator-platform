@@ -14,22 +14,33 @@ export function setTokenGetter(fn: GetToken) {
 /** Check if a JWT exp claim is within bufferMs of now (or already past) */
 function isTokenExpired(token: string, bufferMs = 5000): boolean {
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
+    const parts = token.split('.');
+    if (parts.length !== 3) return true; // malformed JWT → treat as expired
+    const payload = JSON.parse(atob(parts[1]));
+    if (typeof payload.exp !== 'number') return true;
     return payload.exp * 1000 < Date.now() + bufferMs;
   } catch {
-    return false; // can't decode → let the server decide
+    return true; // can't decode → assume expired, wait for fresh token
   }
 }
 
+// Mutex: only one awaitFreshToken runs at a time; others share its result
+let _refreshPromise: Promise<string | null> | null = null;
+
 /** Poll sessionStorage until iOS injects a non-expired token (max 5s) */
 async function awaitFreshToken(maxMs = 5000): Promise<string | null> {
-  const deadline = Date.now() + maxMs;
-  while (Date.now() < deadline) {
-    const t = sessionStorage.getItem('native_token');
-    if (t && !isTokenExpired(t)) return t;
-    await new Promise(r => setTimeout(r, 300));
-  }
-  return sessionStorage.getItem('native_token');
+  // Deduplicate: if another call is already waiting, share that promise
+  if (_refreshPromise) return _refreshPromise;
+  _refreshPromise = (async () => {
+    const deadline = Date.now() + maxMs;
+    while (Date.now() < deadline) {
+      const t = sessionStorage.getItem('native_token');
+      if (t && !isTokenExpired(t)) return t;
+      await new Promise(r => setTimeout(r, 300));
+    }
+    return null; // timed out — don't return an expired token
+  })();
+  try { return await _refreshPromise; } finally { _refreshPromise = null; }
 }
 
 async function authHeaders(): Promise<HeadersInit> {
@@ -42,7 +53,8 @@ async function authHeaders(): Promise<HeadersInit> {
     token = await awaitFreshToken();
   }
 
-  if (!token) return {};
+  // Final guard: never send an expired token
+  if (!token || isTokenExpired(token)) return {};
   return { Authorization: `Bearer ${token}` };
 }
 

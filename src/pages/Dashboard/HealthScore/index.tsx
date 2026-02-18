@@ -108,8 +108,8 @@ export default function HealthScore() {
 
       <div className="space-y-4">
         {/* Status card */}
-        <div className={`${isLoading ? 'bg-af-surface' : scoreBg} rounded-2xl p-5 flex items-center gap-4`}>
-          {isLoading ? (
+        <div className={`${isLoading && !healthData ? 'bg-af-surface' : scoreBg} rounded-2xl p-5 flex items-center gap-4`}>
+          {isLoading && !healthData ? (
             <>
               <div className="w-12 h-12 rounded-full animate-pulse bg-af-light-gray shrink-0" />
               <div className="flex-1 space-y-1.5">
@@ -161,12 +161,12 @@ export default function HealthScore() {
 
           {/* Session time */}
           <div className="px-4 py-3 border-t border-af-light-gray flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLoading ? 'bg-af-surface' : statusColors[sessionStatus].bg}`}>
-              <svg className={`w-5 h-5 ${isLoading ? 'text-af-medium-gray' : statusColors[sessionStatus].text}`} viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="1.5"/><path d="M10 6v4.5l3 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLoading && !healthData ? 'bg-af-surface' : statusColors[sessionStatus].bg}`}>
+              <svg className={`w-5 h-5 ${isLoading && !healthData ? 'text-af-medium-gray' : statusColors[sessionStatus].text}`} viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="1.5"/><path d="M10 6v4.5l3 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-semibold text-af-deep-charcoal">Time in app</div>
-              {isLoading ? <div className="h-3 w-36 rounded animate-pulse bg-af-surface mt-1" /> : (
+              {isLoading && !healthData ? <div className="h-3 w-36 rounded animate-pulse bg-af-surface mt-1" /> : (
                 <div className="text-xs text-af-medium-gray">
                   {sessionStatus === 'green' && `${formatSessionTime(session)} avg — users stick around`}
                   {sessionStatus === 'orange' && `${formatSessionTime(session)} avg — sessions are a bit short`}
@@ -175,7 +175,7 @@ export default function HealthScore() {
               )}
             </div>
             <div className="shrink-0">
-              {isLoading ? <div className="h-7 w-7 rounded-full animate-pulse bg-af-surface" /> : (
+              {isLoading && !healthData ? <div className="h-7 w-7 rounded-full animate-pulse bg-af-surface" /> : (
                 <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-bold ${statusColors[sessionStatus].bg} ${statusColors[sessionStatus].text}`}>
                   {sessionStatus === 'green' ? '✓' : '✗'}
                 </span>
@@ -185,12 +185,12 @@ export default function HealthScore() {
 
           {/* Returning users */}
           <div className="px-4 py-3 border-t border-af-light-gray flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLoading ? 'bg-af-surface' : statusColors[bounceStatus].bg}`}>
-              <svg className={`w-5 h-5 ${isLoading ? 'text-af-medium-gray' : statusColors[bounceStatus].text}`} viewBox="0 0 20 20" fill="none"><path d="M10 3v4m0 0l-2-2m2 2l2-2M10 17v-4m0 0l-2 2m2-2l2 2M3 10h4m0 0L5 8m2 2L5 12M17 10h-4m0 0l2-2m-2 2l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLoading && !healthData ? 'bg-af-surface' : statusColors[bounceStatus].bg}`}>
+              <svg className={`w-5 h-5 ${isLoading && !healthData ? 'text-af-medium-gray' : statusColors[bounceStatus].text}`} viewBox="0 0 20 20" fill="none"><path d="M10 3v4m0 0l-2-2m2 2l2-2M10 17v-4m0 0l-2 2m2-2l2 2M3 10h4m0 0L5 8m2 2L5 12M17 10h-4m0 0l2-2m-2 2l2 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-semibold text-af-deep-charcoal">Returning users</div>
-              {isLoading ? <div className="h-3 w-40 rounded animate-pulse bg-af-surface mt-1" /> : (
+              {isLoading && !healthData ? <div className="h-3 w-40 rounded animate-pulse bg-af-surface mt-1" /> : (
                 <div className="text-xs text-af-medium-gray">
                   {bounceStatus === 'green' && `${100 - bounce}% come back — great retention`}
                   {bounceStatus === 'orange' && `${100 - bounce}% come back — could be better`}
@@ -199,7 +199,7 @@ export default function HealthScore() {
               )}
             </div>
             <div className="shrink-0">
-              {isLoading ? <div className="h-7 w-7 rounded-full animate-pulse bg-af-surface" /> : (
+              {isLoading && !healthData ? <div className="h-7 w-7 rounded-full animate-pulse bg-af-surface" /> : (
                 <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-bold ${statusColors[bounceStatus].bg} ${statusColors[bounceStatus].text}`}>
                   {bounceStatus === 'green' ? '✓' : '✗'}
                 </span>
@@ -209,12 +209,12 @@ export default function HealthScore() {
 
           {/* Real traffic */}
           <div className="px-4 py-3 border-t border-af-light-gray flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLoading ? 'bg-af-surface' : statusColors[trafficStatus].bg}`}>
-              <svg className={`w-5 h-5 ${isLoading ? 'text-af-medium-gray' : statusColors[trafficStatus].text}`} viewBox="0 0 20 20" fill="none"><path d="M13.5 6.5a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0zM4 16c0-2.5 2.5-4.5 6-4.5s6 2 6 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isLoading && !healthData ? 'bg-af-surface' : statusColors[trafficStatus].bg}`}>
+              <svg className={`w-5 h-5 ${isLoading && !healthData ? 'text-af-medium-gray' : statusColors[trafficStatus].text}`} viewBox="0 0 20 20" fill="none"><path d="M13.5 6.5a3.5 3.5 0 11-7 0 3.5 3.5 0 017 0zM4 16c0-2.5 2.5-4.5 6-4.5s6 2 6 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-semibold text-af-deep-charcoal">Real traffic</div>
-              {isLoading ? <div className="h-3 w-32 rounded animate-pulse bg-af-surface mt-1" /> : (
+              {isLoading && !healthData ? <div className="h-3 w-32 rounded animate-pulse bg-af-surface mt-1" /> : (
                 <div className="text-xs text-af-medium-gray">
                   {trafficStatus === 'green' && `${100 - sameIp}% organic — traffic looks legit`}
                   {trafficStatus === 'orange' && `${100 - sameIp}% organic — some traffic looks suspicious`}
@@ -223,7 +223,7 @@ export default function HealthScore() {
               )}
             </div>
             <div className="shrink-0">
-              {isLoading ? <div className="h-7 w-7 rounded-full animate-pulse bg-af-surface" /> : (
+              {isLoading && !healthData ? <div className="h-7 w-7 rounded-full animate-pulse bg-af-surface" /> : (
                 <span className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-sm font-bold ${statusColors[trafficStatus].bg} ${statusColors[trafficStatus].text}`}>
                   {trafficStatus === 'green' ? '✓' : '✗'}
                 </span>

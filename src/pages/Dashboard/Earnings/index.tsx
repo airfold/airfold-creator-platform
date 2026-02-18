@@ -255,7 +255,11 @@ export default function Earnings() {
 
       <AppSelector />
 
-      {!isLoading && weeklyData.length === 0 ? (
+      {!isLoading && !earningsData ? (
+      <div className="glass-card p-4">
+        <div className="h-[240px] rounded-xl animate-pulse bg-af-surface" />
+      </div>
+      ) : weeklyData.length === 0 ? (
       <div className="glass-card p-5 text-center">
         <p className="text-sm font-semibold text-af-deep-charcoal mb-1">No earnings yet</p>
         <p className="text-xs text-af-medium-gray">Earnings appear once your published apps get qualified active users. Keep building and sharing!</p>
@@ -264,7 +268,7 @@ export default function Earnings() {
       <div className="space-y-5">
       <div className="glass-card p-4">
         <h3 className="text-sm font-semibold text-af-deep-charcoal mb-3">Weekly</h3>
-        {isLoading ? (
+        {isLoading && !earningsData ? (
           <div className="h-[240px] rounded-xl animate-pulse bg-af-surface" />
         ) : (
           <ResponsiveContainer width="100%" height={240}>
@@ -294,7 +298,7 @@ export default function Earnings() {
               </tr>
             </thead>
             <tbody>
-              {isLoading ? (
+              {isLoading && !earningsData ? (
                 [...Array(4)].map((_, i) => (
                   <tr key={i} className="border-b border-af-light-gray">
                     <td className="px-3 py-2.5"><div className="h-3 w-8 rounded animate-pulse bg-af-surface" /></td>
