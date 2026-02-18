@@ -226,8 +226,8 @@ export default function Landing() {
 
             <div className="flex items-center gap-6 sm:gap-8 text-sm">
               <a href="https://airfold.co" target="_blank" rel="noopener noreferrer" className="text-af-medium-gray hover:text-af-tint transition-colors">About</a>
-              <a href="https://airfold.co/pp" target="_blank" rel="noopener noreferrer" className="text-af-medium-gray hover:text-af-tint transition-colors">Privacy</a>
-              <a href="https://airfold.co/tos" target="_blank" rel="noopener noreferrer" className="text-af-medium-gray hover:text-af-tint transition-colors">Terms</a>
+              <a href="https://airfold.co/#/pp" target="_blank" rel="noopener noreferrer" className="text-af-medium-gray hover:text-af-tint transition-colors">Privacy</a>
+              <a href="https://airfold.co/#/tos" target="_blank" rel="noopener noreferrer" className="text-af-medium-gray hover:text-af-tint transition-colors">Terms</a>
               <a href="mailto:apple@airfold.co" className="text-af-medium-gray hover:text-af-tint transition-colors">Contact</a>
             </div>
 
