@@ -11,15 +11,37 @@ export function setTokenGetter(fn: GetToken) {
   _getToken = fn;
 }
 
+/** Check if a JWT exp claim is within bufferMs of now (or already past) */
+function isTokenExpired(token: string, bufferMs = 5000): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000 < Date.now() + bufferMs;
+  } catch {
+    return false; // can't decode → let the server decide
+  }
+}
+
+/** Poll sessionStorage until iOS injects a non-expired token (max 5s) */
+async function awaitFreshToken(maxMs = 5000): Promise<string | null> {
+  const deadline = Date.now() + maxMs;
+  while (Date.now() < deadline) {
+    const t = sessionStorage.getItem('native_token');
+    if (t && !isTokenExpired(t)) return t;
+    await new Promise(r => setTimeout(r, 300));
+  }
+  return sessionStorage.getItem('native_token');
+}
+
 async function authHeaders(): Promise<HeadersInit> {
-  // 4C: Try custom getter first, fall back to sessionStorage (native WKWebView token)
   let token: string | null = null;
-  if (_getToken) {
-    token = await _getToken();
+  if (_getToken) token = await _getToken();
+  if (!token) token = sessionStorage.getItem('native_token');
+
+  // If token is expired or about to expire, wait for iOS refresh timer
+  if (token && isTokenExpired(token)) {
+    token = await awaitFreshToken();
   }
-  if (!token) {
-    token = sessionStorage.getItem('native_token');
-  }
+
   if (!token) return {};
   return { Authorization: `Bearer ${token}` };
 }
@@ -38,11 +60,12 @@ async function request<T>(path: string, options?: RequestInit, _isRetry = false)
       if (body.detail) detail = body.detail;
     } catch { /* ignore parse errors */ }
     if (res.status === 401) {
-      // On first 401, wait for iOS token refresh timer to inject a fresh JWT
-      // (timers pause when app is backgrounded, so token may be stale on resume)
+      // Retry once after waiting for a fresh token from iOS
       if (!_isRetry) {
-        await new Promise(r => setTimeout(r, 2000));
-        return request<T>(path, options, true);
+        const fresh = await awaitFreshToken();
+        if (fresh && !isTokenExpired(fresh)) {
+          return request<T>(path, options, true);
+        }
       }
       window.dispatchEvent(new CustomEvent('auth:session-expired'));
     }
