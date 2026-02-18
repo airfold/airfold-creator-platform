@@ -45,13 +45,13 @@ export default function DashboardLayout() {
 
   // Prefetch ALL dashboard tab data in parallel on mount — instant tab switching
   useEffect(() => {
-    queryClient.prefetchQuery({ queryKey: ['myApps'], queryFn: fetchMyApps });
-    queryClient.prefetchQuery({ queryKey: ['creatorEarnings', null], queryFn: fetchCreatorEarnings });
-    queryClient.prefetchQuery({ queryKey: ['creatorHealth', null], queryFn: fetchCreatorHealth });
+    queryClient.prefetchQuery({ queryKey: ['myApps'], queryFn: () => fetchMyApps() });
+    queryClient.prefetchQuery({ queryKey: ['creatorEarnings', null], queryFn: () => fetchCreatorEarnings() });
+    queryClient.prefetchQuery({ queryKey: ['creatorHealth', null], queryFn: () => fetchCreatorHealth() });
     queryClient.prefetchQuery({ queryKey: ['creatorAnalytics', '30d'], queryFn: () => fetchCreatorAnalytics('30d') });
     queryClient.prefetchQuery({ queryKey: ['leaderboard', 'week'], queryFn: () => fetchLeaderboard('week') });
-    queryClient.prefetchQuery({ queryKey: ['payoutStatus'], queryFn: fetchConnectStatus });
-    queryClient.prefetchQuery({ queryKey: ['payoutHistory'], queryFn: fetchPayoutHistory });
+    queryClient.prefetchQuery({ queryKey: ['payoutStatus'], queryFn: () => fetchConnectStatus() });
+    queryClient.prefetchQuery({ queryKey: ['payoutHistory'], queryFn: () => fetchPayoutHistory() });
   }, [queryClient]);
 
   return (
