@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import {
   AreaChart, Area,
   BarChart, Bar,
@@ -16,6 +17,7 @@ const tooltipStyle = {
 };
 
 export default function Analytics() {
+  const dauGradId = useId();
   const { data: apps } = useMyApps();
   const { selectedAppId } = useSelectedApp();
   const { data: earnings } = useCreatorEarnings(selectedAppId);
@@ -102,12 +104,12 @@ export default function Analytics() {
               <YAxis stroke="#8E8E93" fontSize={10} width={35} />
               <Tooltip contentStyle={tooltipStyle} />
               <defs>
-                <linearGradient id="dauGrad" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id={dauGradId} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#BD295A" stopOpacity={0.15} />
                   <stop offset="100%" stopColor="#BD295A" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <Area type="monotone" dataKey="users" stroke="#BD295A" strokeWidth={2} fill="url(#dauGrad)" />
+              <Area type="monotone" dataKey="users" stroke="#BD295A" strokeWidth={2} fill={`url(#${dauGradId})`} />
             </AreaChart>
           </ResponsiveContainer>
         )}
