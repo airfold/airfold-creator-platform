@@ -24,7 +24,7 @@ async function authHeaders(): Promise<HeadersInit> {
   return { Authorization: `Bearer ${token}` };
 }
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
+async function request<T>(path: string, options?: RequestInit, _isRetry = false): Promise<T> {
   const headers = await authHeaders();
   const res = await fetch(`${API_URL}${path}`, {
     ...options,
@@ -38,6 +38,12 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
       if (body.detail) detail = body.detail;
     } catch { /* ignore parse errors */ }
     if (res.status === 401) {
+      // On first 401, wait for iOS token refresh timer to inject a fresh JWT
+      // (timers pause when app is backgrounded, so token may be stale on resume)
+      if (!_isRetry) {
+        await new Promise(r => setTimeout(r, 2000));
+        return request<T>(path, options, true);
+      }
       window.dispatchEvent(new CustomEvent('auth:session-expired'));
     }
     throw new Error(`API ${res.status}: ${detail}`);
