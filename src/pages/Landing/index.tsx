@@ -216,7 +216,7 @@ export default function Landing() {
       <footer className="border-t border-af-light-gray bg-white py-8 sm:py-12 px-5 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8">
-            <a href="https://airfold.co" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
+            <a href="https://airfold.co" className="flex items-center gap-3">
               <img src="/icon.png" alt="airfold" className="w-10 h-10 rounded-xl shadow-sm" />
               <div className="flex flex-col justify-center">
                 <span className="text-xl text-af-tint leading-tight font-brand">airfold</span>
@@ -225,9 +225,9 @@ export default function Landing() {
             </a>
 
             <div className="flex items-center gap-6 sm:gap-8 text-sm">
-              <a href="https://airfold.co" target="_blank" rel="noopener noreferrer" className="text-af-medium-gray hover:text-af-tint transition-colors">About</a>
-              <a href="https://airfold.co/#/pp" target="_blank" rel="noopener noreferrer" className="text-af-medium-gray hover:text-af-tint transition-colors">Privacy</a>
-              <a href="https://airfold.co/#/tos" target="_blank" rel="noopener noreferrer" className="text-af-medium-gray hover:text-af-tint transition-colors">Terms</a>
+              <a href="https://airfold.co" className="text-af-medium-gray hover:text-af-tint transition-colors">About</a>
+              <a href="https://airfold.co/#/pp" className="text-af-medium-gray hover:text-af-tint transition-colors">Privacy</a>
+              <a href="https://airfold.co/#/tos" className="text-af-medium-gray hover:text-af-tint transition-colors">Terms</a>
               <a href="mailto:apple@airfold.co" className="text-af-medium-gray hover:text-af-tint transition-colors">Contact</a>
             </div>
 
