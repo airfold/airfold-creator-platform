@@ -24,6 +24,7 @@ import Analytics from './pages/Dashboard/Analytics';
 import Leaderboard from './pages/Dashboard/Leaderboard';
 import HealthScore from './pages/Dashboard/HealthScore';
 import StripeCallback from './pages/Dashboard/StripeCallback';
+import Landing from './pages/Landing';
 import { isNativeMode } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 
@@ -182,8 +183,9 @@ function AppRoutes() {
         <Route path="health" element={<HealthScore />} />
         <Route path="stripe-callback" element={<StripeCallback />} />
       </Route>
-      {/* All other routes redirect to dashboard (auth handled by ProtectedRoute) */}
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<Landing />} />
+      {/* Unknown routes go to landing */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
