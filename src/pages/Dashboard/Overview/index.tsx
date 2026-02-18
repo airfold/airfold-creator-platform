@@ -20,7 +20,8 @@ export default function Overview() {
   const { data: apps, isLoading: appsLoading, error: appsError } = useMyApps();
   const { data: earnings, error: earningsError } = useCreatorEarnings();
   const { data: health, error: healthError } = useCreatorHealth();
-  const hasError = !!(appsError || earningsError || healthError);
+  // Only show error banner when a query failed AND has no cached data to show
+  const hasError = !!((appsError && !apps) || (earningsError && !earnings) || (healthError && !health));
   const navigate = useNavigate();
   const { setSelectedAppId } = useSelectedApp();
   const [expanded, setExpanded] = useState(false);

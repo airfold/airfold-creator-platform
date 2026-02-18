@@ -71,6 +71,7 @@ export function usePayoutStatus() {
     queryFn: fetchConnectStatus,
     staleTime: 30 * 1000,
     refetchOnWindowFocus: true,
+    placeholderData: keepPreviousData,
   });
 }
 

@@ -1,7 +1,17 @@
 import { useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../context/AuthContext';
-import { setTokenGetter } from '../../services/api';
+import {
+  setTokenGetter,
+  fetchMyApps,
+  fetchCreatorEarnings,
+  fetchCreatorHealth,
+  fetchCreatorAnalytics,
+  fetchLeaderboard,
+  fetchConnectStatus,
+  fetchPayoutHistory,
+} from '../../services/api';
 import { haptic } from '../../utils/haptic';
 import DesktopBlocker from '../../components/DesktopBlocker';
 import { useSelectedApp } from '../../context/AppContext';
@@ -24,6 +34,7 @@ const navItems = [
 export default function DashboardLayout() {
   const { user, getToken } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { selectedAppId } = useSelectedApp();
   const { data: apps } = useMyApps();
   const selectedApp = selectedAppId && apps ? apps.find(a => a.id === selectedAppId) : null;
@@ -31,6 +42,17 @@ export default function DashboardLayout() {
   useEffect(() => {
     setTokenGetter(getToken);
   }, [getToken]);
+
+  // Prefetch ALL dashboard tab data in parallel on mount — instant tab switching
+  useEffect(() => {
+    queryClient.prefetchQuery({ queryKey: ['myApps'], queryFn: fetchMyApps });
+    queryClient.prefetchQuery({ queryKey: ['creatorEarnings', null], queryFn: fetchCreatorEarnings });
+    queryClient.prefetchQuery({ queryKey: ['creatorHealth', null], queryFn: fetchCreatorHealth });
+    queryClient.prefetchQuery({ queryKey: ['creatorAnalytics', '30d'], queryFn: () => fetchCreatorAnalytics('30d') });
+    queryClient.prefetchQuery({ queryKey: ['leaderboard', 'week'], queryFn: () => fetchLeaderboard('week') });
+    queryClient.prefetchQuery({ queryKey: ['payoutStatus'], queryFn: fetchConnectStatus });
+    queryClient.prefetchQuery({ queryKey: ['payoutHistory'], queryFn: fetchPayoutHistory });
+  }, [queryClient]);
 
   return (
     <>
