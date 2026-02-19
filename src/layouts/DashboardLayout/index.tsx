@@ -50,6 +50,8 @@ export default function DashboardLayout() {
     queryClient.prefetchQuery({ queryKey: ['creatorHealth', null], queryFn: () => fetchCreatorHealth() });
     queryClient.prefetchQuery({ queryKey: ['creatorAnalytics', '30d'], queryFn: () => fetchCreatorAnalytics('30d') });
     queryClient.prefetchQuery({ queryKey: ['leaderboard', 'week'], queryFn: () => fetchLeaderboard('week') });
+    queryClient.prefetchQuery({ queryKey: ['leaderboard', 'month'], queryFn: () => fetchLeaderboard('month') });
+    queryClient.prefetchQuery({ queryKey: ['leaderboard', 'all'], queryFn: () => fetchLeaderboard('all') });
     queryClient.prefetchQuery({ queryKey: ['payoutStatus'], queryFn: () => fetchConnectStatus() });
     queryClient.prefetchQuery({ queryKey: ['payoutHistory'], queryFn: () => fetchPayoutHistory() });
   }, [queryClient]);
