@@ -14,6 +14,7 @@ interface Window {
     messageHandlers?: {
       support?: { postMessage: (msg: string) => void };
       closeWebView?: { postMessage: (msg: string) => void };
+      requestFreshToken?: { postMessage: (msg: string) => void };
     };
   };
 }

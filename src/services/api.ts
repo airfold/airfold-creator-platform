@@ -27,16 +27,18 @@ function isTokenExpired(token: string, bufferMs = 5000): boolean {
 // Mutex: only one awaitFreshToken runs at a time; others share its result
 let _refreshPromise: Promise<string | null> | null = null;
 
-/** Poll sessionStorage until iOS injects a non-expired token (max 5s) */
-async function awaitFreshToken(maxMs = 5000): Promise<string | null> {
+/** Ask iOS to inject a fresh token, then poll sessionStorage until it arrives (max 15s) */
+async function awaitFreshToken(maxMs = 15000): Promise<string | null> {
   // Deduplicate: if another call is already waiting, share that promise
   if (_refreshPromise) return _refreshPromise;
   _refreshPromise = (async () => {
+    // Actively request iOS to refresh the token now (don't wait for timer)
+    try { window.webkit?.messageHandlers?.requestFreshToken?.postMessage('refresh'); } catch { /* not in WKWebView */ }
     const deadline = Date.now() + maxMs;
     while (Date.now() < deadline) {
       const t = sessionStorage.getItem('native_token');
       if (t && !isTokenExpired(t)) return t;
-      await new Promise(r => setTimeout(r, 300));
+      await new Promise(r => setTimeout(r, 200));
     }
     return null; // timed out — don't return an expired token
   })();

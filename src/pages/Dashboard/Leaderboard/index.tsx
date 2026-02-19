@@ -50,7 +50,7 @@ export default function Leaderboard() {
       ) : entries.length === 0 ? (
         <div className="glass-card p-8 text-center text-af-medium-gray text-sm">No creators yet</div>
       ) : (
-        <div className={`transition-opacity duration-200 ${isFetching ? 'opacity-50' : 'opacity-100'}`}>
+        <div>
           <div className="glass-card overflow-hidden">
             <div className="divide-y divide-af-light-gray">
               {entries.map((entry) => {
